@@ -1,0 +1,1178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>My Future Job – Online Task</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #111827;
+      --accent: #38bdf8;
+      --accent-soft: rgba(56,189,248,0.15);
+      --accent-strong: #0ea5e9;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --danger: #f97373;
+      --success: #4ade80;
+      --border: #1f2937;
+      --radius-lg: 18px;
+      --radius-md: 12px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #1f2937 0, #020617 55%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .page {
+      width: 100%;
+      max-width: 900px;
+      margin: 0 auto 40px;
+    }
+
+    .card {
+      background: linear-gradient(145deg, #020617 0, #020617 35%, #020617 60%, #020617 100%);
+      border-radius: 24px;
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      box-shadow:
+        0 30px 80px rgba(0,0,0,0.6),
+        0 0 0 1px rgba(15,23,42,0.8);
+      overflow: hidden;
+    }
+
+    .card-header {
+      padding: 18px 18px 12px;
+      background: radial-gradient(circle at top left, rgba(56,189,248,0.18), transparent 60%);
+      border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+    }
+
+    .title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .title-main {
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .title-main span.emoji {
+      font-size: 1.6rem;
+    }
+
+    .title-sub {
+      font-size: 0.9rem;
+      color: var(--muted);
+      margin-top: 6px;
+      max-width: 420px;
+    }
+
+    .badge {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      border-radius: 999px;
+      padding: 4px 10px;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      color: var(--muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+
+    .badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: var(--accent);
+      box-shadow: 0 0 12px rgba(56,189,248,0.9);
+    }
+
+    .card-body {
+      padding: 16px 16px 20px;
+    }
+
+    @media (min-width: 640px) {
+      .card-header {
+        padding: 22px 24px 16px;
+      }
+      .card-body {
+        padding: 20px 24px 24px;
+      }
+      .title-main {
+        font-size: 1.7rem;
+      }
+    }
+
+    .section {
+      margin-bottom: 20px;
+      padding: 14px 14px 16px;
+      border-radius: var(--radius-lg);
+      background: rgba(15, 23, 42, 0.96);
+      border: 1px solid var(--border);
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      gap: 8px;
+    }
+
+    .section-title {
+      font-size: 1rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-title span.icon {
+      font-size: 1.2rem;
+    }
+
+    .section-tag {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .section-body {
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .pill {
+      font-size: 0.74rem;
+      padding: 3px 9px;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.5);
+      color: var(--muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+    }
+
+    .pill strong {
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    .field-group {
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .field-row {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .field-label {
+      font-size: 0.85rem;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .field-label span.req {
+      color: var(--accent);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .field-helper {
+      font-size: 0.7rem;
+      color: #6b7280;
+    }
+
+    input[type="text"],
+    select,
+    textarea {
+      width: 100%;
+      background: #020617;
+      border-radius: var(--radius-md);
+      border: 1px solid #1e293b;
+      padding: 8px 10px;
+      color: var(--text);
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+    }
+
+    input[type="text"]:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(56,189,248,0.4);
+      background: #020617;
+    }
+
+    textarea {
+      min-height: 70px;
+      resize: vertical;
+    }
+
+    .two-col {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    @media (min-width: 640px) {
+      .two-col {
+        flex-direction: row;
+      }
+      .two-col > .field-row {
+        flex: 1;
+      }
+    }
+
+    .theory-grid {
+      display: grid;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    @media (min-width: 640px) {
+      .theory-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    .theory-card {
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(148,163,184,0.4);
+      background: radial-gradient(circle at top, rgba(56,189,248,0.12), rgba(15,23,42,0.9));
+      padding: 8px 10px;
+      font-size: 0.85rem;
+    }
+
+    .theory-card-title {
+      font-weight: 600;
+      color: var(--accent-strong);
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .theory-card-title span {
+      font-size: 1rem;
+    }
+
+    .theory-example {
+      margin-top: 4px;
+      font-size: 0.8rem;
+      color: #9ca3af;
+    }
+
+    .quote-box {
+      margin-top: 10px;
+      padding: 8px 10px;
+      border-radius: var(--radius-md);
+      background: rgba(15,23,42,0.9);
+      border: 1px dashed rgba(148,163,184,0.6);
+      font-size: 0.82rem;
+      color: #9ca3af;
+    }
+
+    .levels-toggle {
+      display: inline-flex;
+      padding: 3px;
+      border-radius: 999px;
+      background: rgba(15,23,42,1);
+      border: 1px solid rgba(148,163,184,0.5);
+      gap: 3px;
+    }
+
+    .level-btn {
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-size: 0.75rem;
+      padding: 4px 10px;
+      border-radius: 999px;
+      cursor: pointer;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .level-btn span.dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: transparent;
+    }
+
+    .level-btn.active {
+      background: var(--accent-soft);
+      color: var(--accent-strong);
+      font-weight: 500;
+    }
+
+    .level-btn.active span.dot {
+      background: var(--accent-strong);
+      box-shadow: 0 0 10px rgba(56,189,248,0.9);
+    }
+
+    .reading-box {
+      margin-top: 8px;
+      padding: 10px;
+      border-radius: var(--radius-md);
+      background: rgba(15,23,42,0.95);
+      border: 1px solid #1e293b;
+      font-size: 0.86rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .reading-title {
+      font-weight: 600;
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+
+    .reading-title span {
+      font-size: 1rem;
+    }
+
+    .reading-text {
+      line-height: 1.4;
+      color: #e5e7eb;
+    }
+
+    .reading-note {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 6px;
+      font-style: italic;
+    }
+
+    .reading-panel {
+      display: none;
+    }
+
+    .reading-panel.active {
+      display: block;
+      animation: fadeIn 0.2s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(3px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .questions-list {
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .question-item {
+      padding: 7px 8px;
+      border-radius: var(--radius-md);
+      background: #020617;
+      border: 1px solid #1e293b;
+      font-size: 0.85rem;
+    }
+
+    .question-label {
+      margin-bottom: 4px;
+      color: #e5e7eb;
+      display: flex;
+      justify-content: space-between;
+      gap: 6px;
+    }
+
+    .question-label small {
+      color: var(--muted);
+      font-size: 0.72rem;
+    }
+
+    .match-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .match-word {
+      flex: 0 0 120px;
+      font-weight: 500;
+      color: #e5e7eb;
+      font-size: 0.86rem;
+    }
+
+    .match-arrow {
+      flex: 0 0 auto;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .match-select {
+      flex: 1;
+    }
+
+    .match-options {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .tabs-row {
+      display: inline-flex;
+      gap: 6px;
+      border-radius: 999px;
+      padding: 3px;
+      border: 1px solid rgba(148,163,184,0.5);
+      background: rgba(15,23,42,1);
+      margin-top: 6px;
+      margin-bottom: 8px;
+    }
+
+    .tab-btn {
+      border-radius: 999px;
+      border: none;
+      font-size: 0.78rem;
+      padding: 4px 10px;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .tab-btn.active {
+      background: var(--accent-soft);
+      color: var(--accent-strong);
+      font-weight: 500;
+    }
+
+    .tab-panel {
+      display: none;
+    }
+
+    .tab-panel.active {
+      display: block;
+      animation: fadeIn 0.2s ease-out;
+    }
+
+    .submit-row {
+      margin-top: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: stretch;
+    }
+
+    .btn-primary {
+      border: none;
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      background: linear-gradient(135deg, var(--accent-strong), #22c55e);
+      color: #0f172a;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 12px 30px rgba(34,197,94,0.45);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.6;
+      cursor: default;
+      box-shadow: none;
+    }
+
+    .btn-primary span.icon {
+      font-size: 1.1rem;
+    }
+
+    .submit-note {
+      font-size: 0.78rem;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .status-bar {
+      font-size: 0.8rem;
+      text-align: center;
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(15,23,42,0.96);
+      border: 1px solid rgba(148,163,184,0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      min-height: 34px;
+    }
+
+    .status-bar span.dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+    }
+
+    .status-idle span.dot {
+      background: rgba(148,163,184,0.7);
+    }
+
+    .status-sending span.dot {
+      background: var(--accent-strong);
+      box-shadow: 0 0 12px rgba(56,189,248,0.9);
+    }
+
+    .status-success span.dot {
+      background: var(--success);
+      box-shadow: 0 0 14px rgba(74,222,128,0.9);
+    }
+
+    .status-error span.dot {
+      background: var(--danger);
+      box-shadow: 0 0 14px rgba(248,113,113,0.9);
+    }
+
+    .status-sending::after {
+      content: "";
+      width: 12px;
+      height: 12px;
+      border-radius: 999px;
+      border: 2px solid rgba(148,163,184,0.6);
+      border-top-color: var(--accent-strong);
+      animation: spin 0.7s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .status-text {
+      color: var(--muted);
+    }
+
+    .status-success .status-text {
+      color: var(--success);
+    }
+
+    .status-error .status-text {
+      color: var(--danger);
+    }
+
+    .small-hint {
+      font-size: 0.7rem;
+      color: #6b7280;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="card">
+      <div class="card-header">
+        <div class="title-row">
+          <div>
+            <div class="title-main">
+              <span class="emoji">🧳</span>
+              <span>My Future Job in Tourism &amp; Hospitality</span>
+            </div>
+            <div class="title-sub">
+              Read the short theory, choose your level, answer the questions and write about your future job.
+            </div>
+          </div>
+          <div class="badge">
+            <span class="badge-dot"></span>
+            Live task · Phone friendly
+          </div>
+        </div>
+      </div>
+
+      <div class="card-body">
+        <!-- STUDENT INFO -->
+        <section class="section">
+          <div class="section-header">
+            <div class="section-title">
+              <span class="icon">👤</span>
+              <span>Student information</span>
+            </div>
+            <div class="section-tag">Please fill before you start</div>
+          </div>
+          <div class="section-body">
+            <div class="two-col field-group">
+              <div class="field-row">
+                <label class="field-label" for="studentName">
+                  <span>Full name</span>
+                  <span class="req">required</span>
+                </label>
+                <input type="text" id="studentName" placeholder="Example: Ivan Petrov" autocomplete="name" />
+              </div>
+              <div class="field-row">
+                <label class="field-label" for="studentGroup">
+                  <span>Group</span>
+                  <span class="req">required</span>
+                </label>
+                <select id="studentGroup">
+                  <option value="">Select your group</option>
+                  <option>ГД.22.1А</option>
+                  <option>ТГ.25А</option>
+                  <option>ТГ.23.2А</option>
+                  <option>Other</option>
+                </select>
+              </div>
+            </div>
+            <p class="small-hint" style="margin-top:6px;">
+              Your teacher will receive your answers automatically. You stay on this page – no extra windows.
+            </p>
+          </div>
+        </section>
+
+        <!-- THEORY -->
+        <section class="section">
+          <div class="section-header">
+            <div class="section-title">
+              <span class="icon">📚</span>
+              <span>Mini theory – talking about your future job</span>
+            </div>
+            <div class="section-tag">Read quickly before you answer</div>
+          </div>
+          <div class="section-body">
+            <div class="theory-grid">
+              <div class="theory-card">
+                <div class="theory-card-title">
+                  <span>1️⃣</span>
+                  <span>I want to be…</span>
+                </div>
+                <div>Use for your <strong>wish</strong>.</div>
+                <div class="theory-example">
+                  ➜ I want to be a <strong>receptionist</strong>.<br />
+                  ➜ I want to be a <strong>tour guide</strong>.
+                </div>
+              </div>
+              <div class="theory-card">
+                <div class="theory-card-title">
+                  <span>2️⃣</span>
+                  <span>I'm going to…</span>
+                </div>
+                <div>Use for your <strong>plans</strong>.</div>
+                <div class="theory-example">
+                  ➜ I'm going to work in a <strong>hotel</strong>.<br />
+                  ➜ I'm going to work in a <strong>restaurant</strong>.
+                </div>
+              </div>
+              <div class="theory-card">
+                <div class="theory-card-title">
+                  <span>3️⃣</span>
+                  <span>I will…</span>
+                </div>
+                <div>Use for promises and quick decisions.</div>
+                <div class="theory-example">
+                  ➜ I will <strong>help guests</strong> with problems.<br />
+                  ➜ I will <strong>answer questions</strong>.
+                </div>
+              </div>
+            </div>
+
+            <div class="pill-row">
+              <div class="pill"><strong>I want to work as a…</strong> receptionist / chef / manager / tour guide</div>
+              <div class="pill"><strong>I'm going to work in…</strong> a hotel / restaurant / travel agency</div>
+              <div class="pill"><strong>My future job is…</strong> interesting / difficult / exciting</div>
+            </div>
+
+            <div class="quote-box">
+              💡 <strong>Tip:</strong> You can mix these forms:
+              <br />
+              <em>I want to be a chef. I'm going to work in a hotel restaurant. I will cook food for guests.</em>
+            </div>
+          </div>
+        </section>
+
+        <!-- PART A -->
+        <section class="section">
+          <div class="section-header">
+            <div class="section-title">
+              <span class="icon">🧩</span>
+              <span>Part A – Vocabulary (for everyone)</span>
+            </div>
+            <div class="section-tag">Match the job with the meaning</div>
+          </div>
+          <div class="section-body">
+            <div class="field-group">
+              <div class="question-item">
+                <div class="question-label">
+                  <span>Task A1. Match the words and meanings.</span>
+                  <small>Write A–E</small>
+                </div>
+                <div class="match-options">
+                  <strong>Options:</strong><br />
+                  A – cooks food in a restaurant or hotel<br />
+                  B – stays in a hotel<br />
+                  C – answers the phone at the front desk<br />
+                  D – shows tourists interesting places<br />
+                  E – is responsible for the hotel and the staff
+                </div>
+
+                <div class="field-group" style="margin-top:8px;">
+                  <div class="match-row">
+                    <div class="match-word">1. receptionist</div>
+                    <div class="match-arrow">→</div>
+                    <div class="match-select">
+                      <input type="text" id="a1" placeholder="A–E" maxlength="1" />
+                    </div>
+                  </div>
+                  <div class="match-row">
+                    <div class="match-word">2. guest</div>
+                    <div class="match-arrow">→</div>
+                    <div class="match-select">
+                      <input type="text" id="a2" placeholder="A–E" maxlength="1" />
+                    </div>
+                  </div>
+                  <div class="match-row">
+                    <div class="match-word">3. chef</div>
+                    <div class="match-arrow">→</div>
+                    <div class="match-select">
+                      <input type="text" id="a3" placeholder="A–E" maxlength="1" />
+                    </div>
+                  </div>
+                  <div class="match-row">
+                    <div class="match-word">4. tour guide</div>
+                    <div class="match-arrow">→</div>
+                    <div class="match-select">
+                      <input type="text" id="a4" placeholder="A–E" maxlength="1" />
+                    </div>
+                  </div>
+                  <div class="match-row">
+                    <div class="match-word">5. hotel manager</div>
+                    <div class="match-arrow">→</div>
+                    <div class="match-select">
+                      <input type="text" id="a5" placeholder="A–E" maxlength="1" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="question-item">
+                <div class="question-label">
+                  <span>Task A2. Extra (for strong students)</span>
+                  <small>Optional</small>
+                </div>
+                <textarea id="a_extra" placeholder="Write one sentence with any two words from the list."></textarea>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- PART B -->
+        <section class="section">
+          <div class="section-header">
+            <div class="section-title">
+              <span class="icon">📖</span>
+              <span>Part B – Reading (choose your level)</span>
+            </div>
+            <div class="section-tag">Easier / harder text</div>
+          </div>
+          <div class="section-body">
+            <div class="field-group">
+              <div class="levels-toggle">
+                <button type="button" class="level-btn active" data-level="easy">
+                  <span class="dot"></span>
+                  Easier text (A1–A2)
+                </button>
+                <button type="button" class="level-btn" data-level="hard">
+                  <span class="dot"></span>
+                  Harder text (A2–B1)
+                </button>
+              </div>
+
+              <!-- Reading panels -->
+              <div class="reading-panel active" id="panel-easy">
+                <div class="reading-box">
+                  <div class="reading-title">
+                    <span>📘</span>
+                    <span>Text 1 – Anna’s future job</span>
+                  </div>
+                  <div class="reading-text">
+                    My name is Anna. I am 18. I study tourism.
+                    In the future, I want to be a receptionist.
+                    I am going to work in a big hotel.
+                    I will answer the phone and help guests at the front desk.
+                    I think this job is interesting and I like talking to people.
+                  </div>
+                  <div class="reading-note">
+                    Beginners: you can read slowly and use a dictionary if you need.
+                  </div>
+                </div>
+
+                <div class="questions-list">
+                  <div class="question-item">
+                    <div class="question-label">
+                      <span>B1. Is Anna 18 or 28 years old?</span>
+                    </div>
+                    <input type="text" id="t1_q1" placeholder="Your answer" />
+                  </div>
+                  <div class="question-item">
+                    <div class="question-label">
+                      <span>B2. What job does Anna want to have?</span>
+                    </div>
+                    <input type="text" id="t1_q2" placeholder="Your answer" />
+                  </div>
+                  <div class="question-item">
+                    <div class="question-label">
+                      <span>B3. Where is she going to work?</span>
+                    </div>
+                    <input type="text" id="t1_q3" placeholder="Your answer" />
+                  </div>
+                  <div class="question-item">
+                    <div class="question-label">
+                      <span>B4. What will she do at her job? (1–2 things)</span>
+                    </div>
+                    <textarea id="t1_q4" placeholder="Your answer"></textarea>
+                  </div>
+                  <div class="question-item">
+                    <div class="question-label">
+                      <span>B5. Does she think her job is boring or interesting?</span>
+                    </div>
+                    <input type="text" id="t1_q5" placeholder="Your answer" />
+                  </div>
+                </div>
+              </div>
+
+              <div class="reading-panel" id="panel-hard">
+                <div class="reading-box">
+                  <div class="reading-title">
+                    <span>📙</span>
+                    <span>Text 2 – Dmitry’s future job</span>
+                  </div>
+                  <div class="reading-text">
+                    My name is Dmitry, and I study hospitality at college.
+                    In the future, I am going to work as a hotel manager.
+                    I want to work in a modern business hotel in a big city.
+                    I will organise the work of the staff, solve guests’ problems and control the quality of service.
+                    This job is difficult and sometimes stressful, but it is also very exciting.
+                    I like working with people and making the hotel a comfortable place for every guest.
+                  </div>
+                  <div class="reading-note">
+                    Strong students: try to answer in full sentences in English.
+                  </div>
+                </div>
+
+                <div class="questions-list">
+                  <div class="question-item">
+                    <div class="question-label">
+                      <span>B1. What does Dmitry study?</span>
+                    </div>
+                    <input type="text" id="t2_q1" placeholder="Your answer" />
+                  </div>
+                  <div class="question-item">
+                    <div class="question-label">
+                      <span>B2. What job is he going to have?</span>
+                    </div>
+                    <input type="text" id="t2_q2" placeholder="Your answer" />
+                  </div>
+                  <div class="question-item">
+                    <div class="question-label">
+                      <span>B3. Where does he want to work?</span>
+                    </div>
+                    <textarea id="t2_q3" placeholder="Your answer"></textarea>
+                  </div>
+                  <div class="question-item">
+                    <div class="question-label">
+                      <span>B4. Name two things he will do in his job.</span>
+                    </div>
+                    <textarea id="t2_q4" placeholder="Your answer"></textarea>
+                  </div>
+                  <div class="question-item">
+                    <div class="question-label">
+                      <span>B5. Why is this job difficult and exciting?</span>
+                    </div>
+                    <textarea id="t2_q5" placeholder="Your answer"></textarea>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- PART C -->
+        <section class="section">
+          <div class="section-header">
+            <div class="section-title">
+              <span class="icon">✍️</span>
+              <span>Part C – Writing about your future job</span>
+            </div>
+            <div class="section-tag">Choose one option or do both</div>
+          </div>
+          <div class="section-body">
+            <div class="field-group">
+              <div class="tabs-row">
+                <button type="button" class="tab-btn active" data-tab="template">Beginner template</button>
+                <button type="button" class="tab-btn" data-tab="free">Free writing</button>
+              </div>
+
+              <div class="tab-panel active" id="tab-template">
+                <div class="field-row">
+                  <label class="field-label" for="w_template">
+                    <span>Task C1. Complete the text about YOU.</span>
+                    <span class="section-tag">You can mix Russian and English if needed</span>
+                  </label>
+                  <textarea id="w_template" placeholder="My name is ______. I am ______ years old.
+I study ______.
+In the future, I want to be a ______.
+I am going to work in a ______ (hotel / restaurant / travel agency / other).
+I will ______ and ______.
+I think this job is ______ because ______."></textarea>
+                </div>
+              </div>
+
+              <div class="tab-panel" id="tab-free">
+                <div class="field-row">
+                  <label class="field-label" for="w_free">
+                    <span>Task C2. Short paragraph (6–10 sentences)</span>
+                    <span class="section-tag">For strong students</span>
+                  </label>
+                  <textarea id="w_free" placeholder="Write about:
+1) Your name and what you study.
+2) What job you want in tourism/hospitality.
+3) Where you want to work (country/city/type of hotel).
+4) What you are going to do every day.
+5) Why this job is good for you.
+Extra: What problems can you have and how will you solve them?"></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- SUBMIT -->
+        <section class="section">
+          <div class="section-header">
+            <div class="section-title">
+              <span class="icon">📤</span>
+              <span>Submit your work</span>
+            </div>
+            <div class="section-tag">Sent silently to your teacher’s form</div>
+          </div>
+          <div class="section-body">
+            <div class="submit-row">
+              <button type="button" class="btn-primary" id="submitBtn">
+                <span class="icon">🚀</span>
+                <span>Send answers</span>
+              </button>
+              <div class="submit-note">
+                Your answers are sent in the background as one JSON message. You stay on this page –
+                no Google Forms will open.
+              </div>
+              <div class="status-bar status-idle" id="statusBar">
+                <span class="dot"></span>
+                <span class="status-text">Ready to send. Please check your name and group.</span>
+              </div>
+              <div class="small-hint">
+                ⚙️ Technical note (for teacher): answers go to the hidden Google Form as JSON into one field.
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // === CONFIG: Google Form endpoint & field IDs ===
+    // Original viewform URL:
+    // https://docs.google.com/forms/d/e/1FAIpQLScNOJgyC8DP1x6Zb-QlEtAevEIgwaC8B7V58eXI3pENtmLHRQ/viewform?usp=pp_url&entry.1921741824=...&entry.1988412302=...
+    const GOOGLE_FORM_ACTION =
+      "https://docs.google.com/forms/d/e/1FAIpQLScNOJgyC8DP1x6Zb-QlEtAevEIgwaC8B7V58eXI3pENtmLHRQ/formResponse";
+
+    // IDs from the prefilled link:
+    const ENTRY_NAME_GROUP = "entry.1921741824"; // Name + group
+    const ENTRY_JSON = "entry.1988412302";       // JSON with all answers
+
+    // === Level toggle logic ===
+    let currentLevel = "easy"; // "easy" or "hard"
+
+    const levelButtons = document.querySelectorAll(".level-btn");
+    const panelEasy = document.getElementById("panel-easy");
+    const panelHard = document.getElementById("panel-hard");
+
+    levelButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const level = btn.getAttribute("data-level");
+        currentLevel = level;
+
+        levelButtons.forEach(b => b.classList.toggle("active", b === btn));
+        panelEasy.classList.toggle("active", level === "easy");
+        panelHard.classList.toggle("active", level === "hard");
+      });
+    });
+
+    // === Tabs for writing ===
+    const tabButtons = document.querySelectorAll(".tab-btn");
+    const tabTemplate = document.getElementById("tab-template");
+    const tabFree = document.getElementById("tab-free");
+
+    tabButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const tab = btn.getAttribute("data-tab");
+
+        tabButtons.forEach(b => b.classList.toggle("active", b === btn));
+        tabTemplate.classList.toggle("active", tab === "template");
+        tabFree.classList.toggle("active", tab === "free");
+      });
+    });
+
+    // === Status bar helpers ===
+    const statusBar = document.getElementById("statusBar");
+    const submitBtn = document.getElementById("submitBtn");
+
+    function setStatus(mode, text) {
+      statusBar.classList.remove("status-idle", "status-sending", "status-success", "status-error");
+      statusBar.classList.add(mode);
+      statusBar.querySelector(".status-text").textContent = text;
+    }
+
+    // === Collect all answers into JSON ===
+    function collectAnswers() {
+      const name = document.getElementById("studentName").value.trim();
+      const group = document.getElementById("studentGroup").value.trim();
+
+      // Part A
+      const partA = {
+        a1: document.getElementById("a1").value.trim(),
+        a2: document.getElementById("a2").value.trim(),
+        a3: document.getElementById("a3").value.trim(),
+        a4: document.getElementById("a4").value.trim(),
+        a5: document.getElementById("a5").value.trim(),
+        extra: document.getElementById("a_extra").value.trim()
+      };
+
+      // Part B – Text 1 & 2 (we store both, but indicate selected level)
+      const text1 = {
+        q1: document.getElementById("t1_q1").value.trim(),
+        q2: document.getElementById("t1_q2").value.trim(),
+        q3: document.getElementById("t1_q3").value.trim(),
+        q4: document.getElementById("t1_q4").value.trim(),
+        q5: document.getElementById("t1_q5").value.trim()
+      };
+
+      const text2 = {
+        q1: document.getElementById("t2_q1").value.trim(),
+        q2: document.getElementById("t2_q2").value.trim(),
+        q3: document.getElementById("t2_q3").value.trim(),
+        q4: document.getElementById("t2_q4").value.trim(),
+        q5: document.getElementById("t2_q5").value.trim()
+      };
+
+      // Part C – Writing
+      const writing = {
+        template: document.getElementById("w_template").value.trim(),
+        free: document.getElementById("w_free").value.trim()
+      };
+
+      const payload = {
+        meta: {
+          timestamp: new Date().toISOString(),
+          selectedReadingLevel: currentLevel  // "easy" or "hard"
+        },
+        student: {
+          name,
+          group
+        },
+        partA,
+        partB: {
+          text1,
+          text2
+        },
+        partC: writing
+      };
+
+      return { name, group, payload };
+    }
+
+    // === Send to Google Form in the background ===
+    async function sendToGoogleForm() {
+      const { name, group, payload } = collectAnswers();
+
+      if (!name || !group) {
+        setStatus("status-error", "Please fill in your name and group before sending.");
+        return;
+      }
+
+      // Combine name + group into one string (as in your original link)
+      const nameGroup = `${name} ${group}`;
+
+      // Convert to JSON string (pretty printed)
+      const jsonText = JSON.stringify(payload, null, 2);
+
+      // Prepare FormData
+      const formData = new FormData();
+      formData.append(ENTRY_NAME_GROUP, nameGroup);
+      formData.append(ENTRY_JSON, jsonText);
+
+      try {
+        setStatus("status-sending", "Sending your answers… please wait 1–2 seconds.");
+        submitBtn.disabled = true;
+
+        // Use no-cors so that the browser doesn't block the request visually
+        await fetch(GOOGLE_FORM_ACTION, {
+          method: "POST",
+          mode: "no-cors",
+          body: formData
+        });
+
+        setStatus("status-success", "Done! Your answers were sent. You can close this page.");
+        // Optionally disable the button completely after success:
+        submitBtn.disabled = true;
+      } catch (err) {
+        console.error("Error sending to Google Form:", err);
+        setStatus("status-error", "Something went wrong. Try again or make a screenshot for your teacher.");
+        submitBtn.disabled = false;
+      }
+    }
+
+    submitBtn.addEventListener("click", () => {
+      sendToGoogleForm();
+    });
+  </script>
+</body>
+</html>
