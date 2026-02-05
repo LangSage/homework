@@ -1,1 +1,1764 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover">
+  <title>Description Trainer</title>
 
+  <!-- Bootstrap 5.0.2 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+        crossorigin="anonymous">
+
+  <style>
+    :root{ --card-radius: 18px; }
+    body{ background:#f6f7fb; }
+    .app-shell{ max-width:980px; margin:0 auto; padding:14px; }
+    .brand{ font-weight:800; letter-spacing:.2px; }
+    .card{ border:0; border-radius:var(--card-radius); box-shadow:0 10px 30px rgba(0,0,0,.06); }
+    .task-img-wrap{
+      width:100%; border-radius:16px; background:#0b1220; overflow:hidden; position:relative; min-height:210px;
+    }
+    .task-img-wrap img{ width:100%; height:100%; object-fit:cover; display:block; max-height:360px; }
+    .img-fallback{
+      color:rgba(255,255,255,.85); padding:18px;
+      font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,"Liberation Mono","Courier New", monospace;
+      font-size:14px; line-height:1.25;
+    }
+    .pill{
+      display:inline-flex; align-items:center; gap:8px; background:#eef2ff; border:1px solid rgba(0,0,0,.06);
+      border-radius:999px; padding:8px 12px; font-weight:600; font-size:13px; color:#273045;
+    }
+    .muted{ color:#6b7280; }
+    .big-btn{ border-radius:14px; padding:12px 14px; font-weight:700; }
+    .option-btn{ border-radius:14px; padding:12px 14px; font-weight:700; text-align:left; width:100%; }
+    .word-bank{ background:#fff; border-radius:14px; border:1px solid rgba(0,0,0,.06); padding:12px; }
+    .word-chip{
+      display:inline-block; padding:8px 10px; border-radius:999px; background:#f3f4f6;
+      border:1px solid rgba(0,0,0,.06); font-weight:700; margin:4px; font-size:13px;
+    }
+    .token{
+      display:inline-block; padding:10px 12px; border-radius:14px; border:1px solid rgba(0,0,0,.08);
+      background:#fff; font-weight:800; margin:6px 6px 0 0; cursor:pointer; user-select:none;
+    }
+    .token.selected{ opacity:.55; text-decoration:line-through; }
+    .token.pick.selected{ opacity:1; text-decoration:none; background:#111827; color:#fff; border-color:#111827; }
+    .answer-box{
+      border-radius:14px; border:1px dashed rgba(0,0,0,.18); background:#fff; min-height:54px;
+      padding:10px; font-weight:800; display:flex; align-items:center; flex-wrap:wrap; gap:8px;
+    }
+    .answer-pill{ background:#111827; color:#fff; border-radius:999px; padding:8px 12px; font-weight:800; }
+    .toastish{ border-radius:14px; background:#111827; color:#fff; padding:12px 14px; font-weight:700; }
+    .dangerish{ background:#7f1d1d; }
+    .successish{ background:#064e3b; }
+    .warnish{ background:#92400e; }
+    .small-note{ font-size:13px; color:#6b7280; }
+    .mini-card{ background:#fff; border:1px solid rgba(0,0,0,.08); border-radius:14px; padding:12px; }
+    .rowline{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+    .rowline .left{ font-weight:800; min-width:140px; }
+    @media (max-width:576px){
+      .task-img-wrap{ min-height:180px; }
+      .app-shell{ padding:10px; }
+      .rowline .left{ min-width:110px; }
+    }
+  </style>
+</head>
+
+<body>
+<div class="app-shell">
+
+  <!-- Top bar -->
+  <div class="d-flex align-items-center justify-content-between mb-3 gap-2 flex-wrap">
+    <div class="d-flex align-items-center gap-2">
+      <div class="brand fs-4">Description Trainer</div>
+    </div>
+    <div class="d-flex align-items-center gap-2 flex-wrap">
+      <button class="btn btn-outline-secondary big-btn" id="btnReset">Restart</button>
+    </div>
+  </div>
+
+  <!-- Resume banner -->
+  <div class="card mb-3 d-none" id="resumeCard">
+    <div class="card-body">
+      <div class="d-flex align-items-start justify-content-between gap-2 flex-wrap">
+        <div>
+          <div class="fw-bold mb-1">Saved progress found</div>
+          <div class="small-note">Continue or start new.</div>
+        </div>
+        <div class="d-flex gap-2">
+          <button class="btn btn-dark big-btn" id="btnResume">Continue</button>
+          <button class="btn btn-outline-secondary big-btn" id="btnStartNew">Start new</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main card -->
+  <div class="card">
+    <div class="card-body">
+
+      <!-- Intro -->
+      <div id="screenIntro">
+        <div class="row g-3">
+          <div class="col-12 col-lg-6">
+            <div class="p-3 rounded-4 bg-white border">
+              <div class="fw-bold fs-5 mb-2">Student info</div>
+              <div class="small-note mb-3">Progress + time are saved automatically.</div>
+
+              <div class="mb-3">
+                <label class="form-label fw-bold">Name</label>
+                <input class="form-control form-control-lg" id="inpName" placeholder="Type your name..." />
+              </div>
+
+              <div class="d-grid">
+                <button class="btn btn-dark big-btn" id="btnStart">Start</button>
+              </div>
+
+              <div class="small-note mt-3">
+                Tip: You can refresh the page — progress stays.
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12 col-lg-6">
+            <div class="p-3 rounded-4 bg-white border">
+              <div class="fw-bold fs-5 mb-2">Vocabulary</div>
+              <div class="small-note mb-3">Words used in tasks.</div>
+              <div id="vocabPreview"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Task screen -->
+      <div id="screenTask" class="d-none">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
+          <div class="d-flex align-items-center gap-2 flex-wrap">
+            <span class="pill"><span id="taskCounter">Task 1/50</span></span>
+            <span class="pill">Attempts: <span id="attemptCounter">1</span>/<span id="attemptMax">2</span></span>
+            <span class="pill">Time: <span id="timeNow">0.0</span>s</span>
+          </div>
+          <div class="text-end">
+            <div class="small-note">Student: <span class="fw-bold" id="studentLabel"></span></div>
+            <div class="small-note muted">Autosave: ON</div>
+          </div>
+        </div>
+
+        <div class="progress mb-3" style="height:12px; border-radius:999px;">
+          <div class="progress-bar" id="progressBar" role="progressbar" style="width:0%"></div>
+        </div>
+
+        <div class="row g-3">
+          <div class="col-12 col-lg-6">
+            <div class="task-img-wrap">
+              <img id="taskImg" alt="task image" />
+              <div class="img-fallback d-none" id="imgFallback"></div>
+            </div>
+
+            <div class="mt-3 d-flex gap-2 flex-wrap">
+              <span class="pill">Type: <span id="taskTypeLabel" class="fw-bold"></span></span>
+              <span class="pill">Topic: <span id="taskTopicLabel" class="fw-bold"></span></span>
+            </div>
+
+            <div class="mt-3">
+              <button class="btn btn-outline-secondary big-btn w-100" id="btnToggleWordBank">
+                Show / Hide Word Bank
+              </button>
+              <div class="word-bank mt-2 d-none" id="wordBank"></div>
+            </div>
+          </div>
+
+          <div class="col-12 col-lg-6">
+            <div class="fw-bold fs-5 mb-2" id="taskTitle">Task title</div>
+            <div class="mb-3" id="taskPrompt">Task prompt</div>
+
+            <div id="taskArea"></div>
+
+            <div class="mt-3 d-flex align-items-center justify-content-between gap-2 flex-wrap">
+              <div id="feedback" class="toastish d-none"></div>
+              <div class="d-flex gap-2 ms-auto">
+                <button class="btn btn-outline-secondary big-btn" id="btnSkipHint">Hint</button>
+                <button class="btn btn-dark big-btn" id="btnSubmit">Submit</button>
+              </div>
+            </div>
+
+            <div class="small-note mt-3" id="noteArea"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Finish screen -->
+      <div id="screenFinish" class="d-none">
+        <div class="text-center">
+          <div class="fw-bold display-6 mb-2">Done ✅</div>
+          <div class="fs-5 mb-2">
+            Score: <span class="fw-bold" id="scoreLabel"></span>
+          </div>
+          <div class="fs-6 mb-3 muted">
+            Total time: <span class="fw-bold" id="totalTimeLabel"></span> • Skipped: <span class="fw-bold" id="skippedLabel"></span>
+          </div>
+
+          <div class="d-flex gap-2 justify-content-center flex-wrap mb-3">
+            <button class="btn btn-dark big-btn" id="btnRetryWrong">Retry wrong tasks</button>
+          </div>
+
+          <div class="small-note mb-3" id="finishNote"></div>
+
+          <div class="text-start">
+            <div class="fw-bold mb-2">Summary</div>
+            <div class="p-3 bg-white rounded-4 border" id="summaryBox"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="small-note mt-3 text-center">
+    Images should be placed in <code>images/</code> folder.
+  </div>
+
+</div>
+
+<script>
+/* =========================================================
+   1) CONFIG — YOUR GOOGLE FORM IS ALREADY SET
+   ========================================================= */
+const CONFIG = {
+  prefilledFormUrl: "https://docs.google.com/forms/d/e/1FAIpQLScNOJgyC8DP1x6Zb-QlEtAevEIgwaC8B7V58eXI3pENtmLHRQ/viewform?usp=pp_url&entry.1921741824=Andrew&entry.1988412302=json_here",
+  fields: {
+    studentName: "entry.1921741824",
+    resultsJson: "entry.1988412302"
+  },
+  autoSendOnFinish: true,
+  maxAttemptsPerTask: 2,
+  imagesFolder: "images/",
+  imageLoadTimeoutMs: 2500,
+  skipDelayMs: 550
+};
+
+/* =========================================================
+   2) VOCAB
+   ========================================================= */
+const VOCAB = {
+  "Shapes": ["circle", "square", "rectangle", "triangle"],
+  "3D": ["cube", "sphere", "cylinder", "cone"],
+  "Adjectives": ["round", "flat", "sharp", "smooth", "long", "short"],
+  "Size": ["big", "small", "wide", "narrow"],
+  "Materials": ["wood", "metal", "plastic", "glass", "fabric"],
+  "Surface": ["rough", "smooth", "soft", "hard", "slippery"],
+  "Condition": ["clean", "dirty", "broken", "scratched"]
+};
+const ALL_VOCAB_WORDS = Object.values(VOCAB).flat();
+
+/* =========================================================
+   3) TASKS (50) — same images reused, plus text-only tasks
+   Supported types:
+   mcq, guess_desc, dropdown, multi, order, short, truefalse, writing,
+   fill_blank, multi_blank, matching_dropdown, select_tokens
+   imageKey can be: null (no image), string, or array of strings (fallbacks)
+   ========================================================= */
+const TASKS = [
+  // ---- 1–10 (image-based, warm up) ----
+  { id:"t01", type:"mcq", topic:"Shapes", title:"Identify the shape (from picture)",
+    prompt:"Look carefully at the picture. Choose the correct 2D shape.",
+    imageKey:"t09_circle_2.png",
+    options:["circle","square","rectangle","triangle"], correct:"circle", hint:"No corners. Round." },
+
+  { id:"t02", type:"mcq", topic:"Shapes", title:"Identify the shape",
+    prompt:"Choose the correct shape.",
+    imageKey:"t02_square.png",
+    options:["triangle","square","circle","rectangle"], correct:"square", hint:"4 equal sides." },
+
+  { id:"t03", type:"mcq", topic:"Shapes", title:"Identify the shape",
+    prompt:"Choose the correct shape.",
+    imageKey:"t03_rectangle.png",
+    options:["rectangle","square","circle","triangle"], correct:"rectangle", hint:"4 sides. Not all equal." },
+
+  { id:"t04", type:"mcq", topic:"Shapes", title:"Identify the shape",
+    prompt:"Choose the correct shape.",
+    imageKey:"t04_triangle.png",
+    options:["triangle","circle","square","rectangle"], correct:"triangle", hint:"3 corners." },
+
+  { id:"t05", type:"mcq", topic:"3D", title:"Identify the 3D shape",
+    prompt:"What 3D shape is shown in the picture?",
+    imageKey:"t05_cube.png",
+    options:["cube","sphere","cylinder","cone"], correct:"cube", hint:"Like a dice." },
+
+  { id:"t06", type:"mcq", topic:"3D", title:"Identify the 3D shape",
+    prompt:"What 3D shape is shown in the picture?",
+    imageKey:"t06_sphere.png",
+    options:["cone","sphere","cube","cylinder"], correct:"sphere", hint:"Like a ball." },
+
+  { id:"t07", type:"mcq", topic:"3D", title:"Identify the 3D shape",
+    prompt:"What 3D shape is shown in the picture?",
+    imageKey:"t07_cylinder.jpg",
+    options:["cylinder","sphere","cube","cone"], correct:"cylinder", hint:"Like a can." },
+
+  { id:"t08", type:"mcq", topic:"3D", title:"Identify the 3D shape",
+    prompt:"What 3D shape is shown in the picture?",
+    imageKey:"t08_cone.jpg",
+    options:["cone","cube","cylinder","sphere"], correct:"cone", hint:"Point + round base." },
+
+  { id:"t09", type:"guess_desc", topic:"Adjectives", title:"Choose the correct adjective",
+    prompt:"Read: 'It has no corners. It is like a wheel.' Choose the best adjective.",
+    imageKey:"t09_circle_2.png",
+    options:["round","sharp","flat","long"], correct:"round", hint:"Circle → ____." },
+
+  { id:"t10", type:"guess_desc", topic:"Surface", title:"Choose the correct surface word",
+    prompt:"Read: 'You can slide on it easily and it is dangerous.' Choose the best word.",
+    imageKey:"t10_slippery.jpg",
+    options:["rough","slippery","soft","dirty"], correct:"slippery", hint:"Ice is ____." },
+
+  // ---- 11–20 (more text + structure) ----
+  { id:"t11", type:"fill_blank", topic:"Shapes", title:"Fill the blank",
+    prompt:"Complete the sentence using ONE word.",
+    imageKey:"t11_triangle_2.png",
+    sentence:"A ____ has three corners.",
+    options:["circle","triangle","square","rectangle"], correct:"triangle", hint:"Count corners." },
+
+  { id:"t12", type:"fill_blank", topic:"3D", title:"Fill the blank",
+    prompt:"Complete the sentence using ONE word.",
+    imageKey:"t12_cylinder_2.png",
+    sentence:"A ____ can roll and has two flat ends.",
+    options:["cube","sphere","cylinder","cone"], correct:"cylinder", hint:"Think of a can." },
+
+  { id:"t13", type:"multi", topic:"Adjectives", title:"Choose ALL correct words",
+    prompt:"Choose all words that can describe a knife edge (focus on the edge).",
+    imageKey:"t13_sharp.png",
+    options:["sharp","soft","round","long","smooth"], correct:["sharp"], hint:"Edge = ____." },
+
+  { id:"t14", type:"multi", topic:"Condition", title:"Choose ALL correct words",
+    prompt:"This screen is damaged. Choose ALL condition words that fit.",
+    imageKey:"t14_scratched_broken.jpg",
+    options:["clean","scratched","broken","slippery","dirty"], correct:["scratched","broken"], hint:"Damaged = ____ / ____." },
+
+  { id:"t15", type:"order", topic:"Mixed", title:"Build a correct description",
+    prompt:"Tap words to build a correct noun phrase (correct order).",
+    imageKey:"t15_cube_plastic.jpg",
+    tokens:["cube","small","plastic"], correctPhrase:"small plastic cube", hint:"Size → material → object." },
+
+  { id:"t16", type:"order", topic:"Mixed", title:"Build a correct description",
+    prompt:"Tap words to build a correct noun phrase (correct order).",
+    imageKey:"t16_cylinder_metal.png",
+    tokens:["metal","big","cylinder"], correctPhrase:"big metal cylinder", hint:"Size first." },
+
+  { id:"t17", type:"short", topic:"Materials", title:"Definition → word",
+    prompt:"Type ONE material word: 'a transparent hard material used for windows'.",
+    imageKey:"t24_glass.jpg",
+    correctAny:["glass"], hint:"Starts with g..." },
+
+  { id:"t18", type:"short", topic:"Surface", title:"Definition → word",
+    prompt:"Type ONE surface word: 'not smooth; with small bumps'.",
+    imageKey:"t18_rough.jpg",
+    correctAny:["rough"], hint:"Opposite of smooth." },
+
+  { id:"t19", type:"truefalse", topic:"3D", title:"True or False",
+    prompt:"Statement: 'This is a sphere.'",
+    imageKey:"t19_cube_tf.jpg",
+    correctBoolean:false, hint:"Look for corners." },
+
+  { id:"t20", type:"truefalse", topic:"Condition", title:"True or False",
+    prompt:"Statement: 'The object is clean.'",
+    imageKey:"t20_dirty_tf.jpg",
+    correctBoolean:false, hint:"Check dirt/marks." },
+
+  // ---- 21–30 (materials + size + writing) ----
+  { id:"t21", type:"mcq", topic:"Materials", title:"Identify material",
+    prompt:"Look at the picture. What material is it?",
+    imageKey:"t21_wood.jpg",
+    options:["wood","metal","plastic","glass","fabric"], correct:"wood", hint:"Like a table / tree." },
+
+  { id:"t22", type:"mcq", topic:"Materials", title:"Identify material",
+    prompt:"Look at the picture. What material is it?",
+    imageKey:"t22_metal.jpg",
+    options:["fabric","metal","wood","glass","plastic"], correct:"metal", hint:"Often shiny and hard." },
+
+  { id:"t23", type:"mcq", topic:"Materials", title:"Identify material",
+    prompt:"Look at the picture. What material is it?",
+    imageKey:"t23_fabric.jpg",
+    options:["fabric","glass","metal","wood","plastic"], correct:"fabric", hint:"Soft cloth." },
+
+  { id:"t24", type:"mcq", topic:"Materials", title:"Identify material",
+    prompt:"Look at the picture. What material is it?",
+    imageKey:"t24_glass.jpg",
+    options:["plastic","glass","wood","fabric","metal"], correct:"glass", hint:"Transparent and hard." },
+
+  { id:"t25", type:"guess_desc", topic:"Size", title:"Choose the correct size word",
+    prompt:"Read: 'It takes a lot of space. Not small.'",
+    imageKey:"t25_big.jpg",
+    options:["big","narrow","wide","small"], correct:"big", hint:"Opposite of small." },
+
+  { id:"t26", type:"guess_desc", topic:"Size", title:"Choose the correct size word",
+    prompt:"Read: 'It is not wide. It is ____.'",
+    imageKey:"t26_narrow.jpg",
+    options:["wide","narrow","big","smooth"], correct:"narrow", hint:"Opposite of wide." },
+
+  { id:"t27", type:"guess_desc", topic:"Adjectives", title:"Choose the correct adjective",
+    prompt:"Read: 'It is not long. It is ____.'",
+    imageKey:"t27_short.png",
+    options:["short","long","flat","sharp"], correct:"short", hint:"Opposite of long." },
+
+  { id:"t28", type:"fill_blank", topic:"Surface", title:"Fill the blank (real warning sentence)",
+    prompt:"Complete the sentence using ONE word.",
+    imageKey:"t28_slippery_2.webp",
+    sentence:"Be careful! The floor is very ____ , so you can fall.",
+    options:["soft","slippery","rough","dirty","flat"], correct:"slippery", hint:"You might fall." },
+
+  { id:"t29", type:"writing", topic:"Writing", title:"Write a description (checked)",
+    prompt:"Write 1–2 sentences describing the picture. Use at least 4 different vocabulary words from the word bank.",
+    imageKey:["t29_mystery_obj1.jpg","t29_mystery_obj1.webp"],
+    minUniqueVocab: 4, minChars: 45, hint:"Try: size + material + shape + surface/condition." },
+
+  { id:"t30", type:"writing", topic:"Writing", title:"Write a structured description (checked)",
+    prompt:"Write 2 short sentences. Include: 1 size word, 1 material, 1 shape/3D word, and 1 condition word.",
+    imageKey:["t29_mystery_obj1.jpg","t29_mystery_obj1.webp"],
+    requireCategories: ["Size","Materials","Shapes|3D","Condition"], minChars: 60, hint:"Example: 'It is a ___. It is ___.'" },
+
+  // ---- 31–50 (MORE challenging, many task styles, mostly text) ----
+  { id:"t31", type:"mcq", topic:"Objects", title:"Guess the object (no picture)",
+    prompt:"Description: Small. Usually metal. You use it to open a door. What is it?",
+    imageKey:null,
+    options:["key","phone","computer","bottle"], correct:"key", hint:"You put it into a lock." },
+
+  { id:"t32", type:"mcq", topic:"Objects", title:"Guess the object (no picture)",
+    prompt:"Description: Flat screen, you can call and text, usually glass + metal/plastic. What is it?",
+    imageKey:null,
+    options:["phone","key","cube","fabric"], correct:"phone", hint:"You hold it in your hand." },
+
+  { id:"t33", type:"mcq", topic:"Objects", title:"Guess the object (no picture)",
+    prompt:"Description: You type on it, it has a screen, and you can work or study. What is it?",
+    imageKey:null,
+    options:["computer","cone","key","glass"], correct:"computer", hint:"Laptop / PC." },
+
+  { id:"t34", type:"fill_blank", topic:"3D", title:"Definition → shape",
+    prompt:"Complete the sentence using ONE word.",
+    imageKey:null,
+    sentence:"A ____ is round and can roll in any direction (like a ball).",
+    options:["sphere","cube","cone","cylinder"], correct:"sphere", hint:"Ball shape." },
+
+  { id:"t35", type:"fill_blank", topic:"3D", title:"Definition → shape (more text)",
+    prompt:"Complete the sentence using ONE word.",
+    imageKey:null,
+    sentence:"A ____ has one point (tip) and a round base.",
+    options:["cone","cube","sphere","rectangle"], correct:"cone", hint:"Ice-cream shape." },
+
+  { id:"t36", type:"multi_blank", topic:"Mixed", title:"Two blanks (think + choose)",
+    prompt:"A new spoon: choose the best words to complete the sentence.",
+    imageKey:null,
+    sentence:"The ____ object is made of ____.",
+    options1:["clean","dirty","broken","scratched"],
+    options2:["wood","metal","plastic","glass","fabric"],
+    correct1:"clean", correct2:"metal",
+    hint:"Spoon: usually metal. New: clean." },
+
+  { id:"t37", type:"matching_dropdown", topic:"Opposites", title:"Match opposites",
+    prompt:"Match each word with its opposite.",
+    imageKey:null,
+    left:["long","wide","clean","smooth"],
+    right:["dirty","rough","short","narrow"],
+    correctMap:{ long:"short", wide:"narrow", clean:"dirty", smooth:"rough" },
+    hint:"Think: opposite meaning." },
+
+  { id:"t38", type:"matching_dropdown", topic:"Objects → Materials", title:"Match object to material",
+    prompt:"Choose the most common material for each object.",
+    imageKey:null,
+    left:["window","key","shirt","toy","table"],
+    right:["wood","metal","plastic","glass","fabric"],
+    correctMap:{ window:"glass", key:"metal", shirt:"fabric", toy:"plastic", table:"wood" },
+    hint:"Window=glass, key=metal, shirt=fabric..." },
+
+  { id:"t39", type:"select_tokens", topic:"Grammar", title:"Select the adjectives",
+    prompt:"Tap ALL adjectives in the sentence (only adjectives).",
+    imageKey:null,
+    text:"A small round smooth sphere is on the table.",
+    tokens:["A","small","round","smooth","sphere","is","on","the","table"],
+    correctSelected:["small","round","smooth"],
+    hint:"Adjectives describe a noun." },
+
+  { id:"t40", type:"select_tokens", topic:"Vocabulary", title:"Select the MATERIAL word",
+    prompt:"Tap the ONE material word in the sentence.",
+    imageKey:"t24_glass.jpg",
+    text:"The big glass sphere is smooth and clean.",
+    tokens:["The","big","glass","sphere","is","smooth","and","clean"],
+    correctSelected:["glass"],
+    hint:"Material = what it is made of." },
+
+  { id:"t41", type:"mcq", topic:"Logic", title:"Odd one out",
+    prompt:"Three words are 3D shapes. One word is a 2D shape. Choose the odd one out.",
+    imageKey:null,
+    options:["sphere","cube","circle","cone"], correct:"circle", hint:"2D vs 3D." },
+
+  { id:"t42", type:"mcq", topic:"Logic", title:"Odd one out (materials)",
+    prompt:"Three words are materials. One word is NOT a material. Choose the odd one out.",
+    imageKey:null,
+    options:["wood","metal","fabric","triangle"], correct:"triangle", hint:"Triangle is a shape." },
+
+  { id:"t43", type:"mcq", topic:"Comprehension", title:"Choose the best description",
+    prompt:"Which sentence is a better description of a phone?",
+    imageKey:null,
+    options:[
+      "It is a big wooden cube.",
+      "It is a small flat object with a glass screen (often glass + metal/plastic)."
+    ],
+    correct:"It is a small flat object with a glass screen (often glass + metal/plastic).",
+    hint:"Phone: flat + screen." },
+
+  { id:"t44", type:"mcq", topic:"Comprehension", title:"Choose the best description (image)",
+    prompt:"Look at the picture. Which sentence fits better?",
+    imageKey:"t18_rough.jpg",
+    options:[
+      "The surface is rough.",
+      "The surface is slippery."
+    ],
+    correct:"The surface is rough.",
+    hint:"Rough ≠ slippery." },
+
+  { id:"t45", type:"order", topic:"Mixed", title:"Build a longer description",
+    prompt:"Tap words to build a correct phrase (correct order).",
+    imageKey:"t22_metal.jpg",
+    tokens:["metal","small","clean","object"],
+    correctPhrase:"small clean metal object",
+    hint:"Size → condition → material → noun." },
+
+  { id:"t46", type:"multi", topic:"Objects", title:"Choose ALL that can describe a towel",
+    prompt:"Imagine a towel. Choose ALL words that can describe it.",
+    imageKey:null,
+    options:["fabric","metal","soft","sharp","clean","rough"],
+    correct:["fabric","soft","clean"],
+    hint:"Towel: fabric + soft. Usually clean." },
+
+  { id:"t47", type:"fill_blank", topic:"Condition", title:"Fill the blank (condition)",
+    prompt:"Complete the sentence using ONE word.",
+    imageKey:"t14_scratched_broken.jpg",
+    sentence:"The screen is ____ (it has many lines and marks).",
+    options:["clean","scratched","slippery","soft"], correct:"scratched",
+    hint:"Marks/lines on the surface." },
+
+  { id:"t48", type:"multi", topic:"Condition", title:"Choose ALL correct condition words (harder)",
+    prompt:"Look again at the picture. Choose ALL condition words that fit (more than one).",
+    imageKey:"t14_scratched_broken.jpg",
+    options:["scratched","broken","clean","dirty","smooth"],
+    correct:["scratched","broken"],
+    hint:"Two problems are visible." },
+
+  { id:"t49", type:"multi_blank", topic:"Shapes", title:"Two blanks (facts)",
+    prompt:"Complete the facts about a rectangle (numbers).",
+    imageKey:"t03_rectangle.png",
+    sentence:"A rectangle has ____ sides and ____ corners.",
+    options1:["3","4","5"], options2:["3","4","5"],
+    correct1:"4", correct2:"4",
+    hint:"Think of a book shape." },
+
+  { id:"t50", type:"writing", topic:"Writing", title:"Hard writing (checked)",
+    prompt:"Write 2–3 sentences describing the picture. Requirements: use at least 5 different vocabulary words, and include one sentence about material + one about surface/condition.",
+    imageKey:"t21_wood.jpg",
+    minUniqueVocab: 5, minChars: 85,
+    hint:"Try: size + material + shape + surface + condition." }
+];
+
+/* =========================================================
+   4) STATE + STORAGE
+   ========================================================= */
+const LS_KEY = "desc_trainer_v4_state";
+let state = {
+  version: 4,
+  student: { name:"" },
+  startedAtISO: "",
+  finishedAtISO: "",
+  currentIndex: 0,
+  phase: "intro",      // intro | tasks | finish | retryWrong
+  retryQueue: [],
+  results: []
+};
+
+let taskStartMs = 0;
+let timerInterval = null;
+let currentAttempt = 1;
+
+// guards
+let skipLock = false;
+let currentImageLoadToken = 0;
+
+/* =========================================================
+   5) HELPERS
+   ========================================================= */
+const el = (id)=>document.getElementById(id);
+function show(id){ el(id).classList.remove("d-none"); }
+function hide(id){ el(id).classList.add("d-none"); }
+function setText(id, txt){ el(id).textContent = txt; }
+function normalize(s){ return (s||"").toString().trim().toLowerCase().replace(/\s+/g," "); }
+function nowISO(){ return new Date().toISOString(); }
+function clamp(n,a,b){ return Math.max(a, Math.min(b,n)); }
+
+function safeSaveState(){
+  try{ localStorage.setItem(LS_KEY, JSON.stringify(state)); }catch(e){}
+}
+function loadState(){
+  try{
+    const raw = localStorage.getItem(LS_KEY);
+    if(!raw) return null;
+    const parsed = JSON.parse(raw);
+    if(!parsed || typeof parsed !== "object") return null;
+    return parsed;
+  }catch(e){ return null; }
+}
+function clearState(){
+  try{ localStorage.removeItem(LS_KEY); }catch(e){}
+}
+
+function setFeedback(kind, msg){
+  const box = el("feedback");
+  box.classList.remove("d-none","successish","dangerish","warnish");
+  if(kind==="success") box.classList.add("successish");
+  if(kind==="danger") box.classList.add("dangerish");
+  if(kind==="warn") box.classList.add("warnish");
+  box.textContent = msg;
+}
+function hideFeedback(){
+  const box = el("feedback");
+  box.classList.add("d-none");
+  box.textContent = "";
+  box.classList.remove("successish","dangerish","warnish");
+}
+
+/* =========================================================
+   6) VOCAB UI
+   ========================================================= */
+function renderVocabPreview(){
+  const wrap = el("vocabPreview");
+  wrap.innerHTML = "";
+  Object.entries(VOCAB).forEach(([cat, words])=>{
+    const box = document.createElement("div");
+    box.className = "mb-2";
+    box.innerHTML = `<div class="fw-bold mb-1">${cat}</div>`;
+    const chips = document.createElement("div");
+    words.forEach(w=>{
+      const span = document.createElement("span");
+      span.className = "word-chip";
+      span.textContent = w;
+      chips.appendChild(span);
+    });
+    box.appendChild(chips);
+    wrap.appendChild(box);
+  });
+}
+function renderWordBank(){
+  const wrap = el("wordBank");
+  wrap.innerHTML = "";
+  Object.entries(VOCAB).forEach(([cat, words])=>{
+    const header = document.createElement("div");
+    header.className = "fw-bold mt-2";
+    header.textContent = cat + ":";
+    wrap.appendChild(header);
+
+    const line = document.createElement("div");
+    words.forEach(w=>{
+      const chip = document.createElement("span");
+      chip.className = "word-chip";
+      chip.textContent = w;
+      line.appendChild(chip);
+    });
+    wrap.appendChild(line);
+  });
+}
+
+/* =========================================================
+   7) TIMER
+   ========================================================= */
+function startTaskTimer(){
+  taskStartMs = Date.now();
+  if(timerInterval) clearInterval(timerInterval);
+  timerInterval = setInterval(()=>{
+    const sec = (Date.now()-taskStartMs)/1000;
+    setText("timeNow", sec.toFixed(1));
+  }, 100);
+}
+function stopTaskTimer(){
+  if(timerInterval) clearInterval(timerInterval);
+  timerInterval = null;
+  return Date.now()-taskStartMs;
+}
+
+/* =========================================================
+   8) ACTIVE TASK LIST
+   ========================================================= */
+function getActiveTaskList(){
+  if(state.phase==="retryWrong"){
+    return state.retryQueue.map(id=>TASKS.find(t=>t.id===id)).filter(Boolean);
+  }
+  return TASKS;
+}
+function getCurrentTask(){
+  const list = getActiveTaskList();
+  return list[state.currentIndex];
+}
+
+/* =========================================================
+   9) RESULTS + SCORE
+   ========================================================= */
+function upsertResult(taskId, data){
+  const idx = state.results.findIndex(r=>r.taskId===taskId && r.run===state.phase);
+  if(idx>=0) state.results[idx] = {...state.results[idx], ...data};
+  else state.results.push({...data});
+}
+function markWrongForRetry(taskId){
+  if(!state.retryQueue.includes(taskId)) state.retryQueue.push(taskId);
+}
+function removeFromRetry(taskId){
+  state.retryQueue = state.retryQueue.filter(x=>x!==taskId);
+}
+
+function computeSummary(){
+  let correct = 0;
+  let wrong = 0;
+  let skipped = 0;
+
+  TASKS.forEach(t=>{
+    const base = state.results.find(r=>r.taskId===t.id && r.run==="tasks");
+    const retry = state.results.find(r=>r.taskId===t.id && r.run==="retryWrong");
+    const final = retry || base;
+
+    if(!final){ wrong++; return; }
+    if(final.skipped){ skipped++; return; }
+    if(final.isCorrect===true) correct++;
+    else wrong++;
+  });
+
+  const attempted = TASKS.length - skipped;
+  const pct = attempted>0 ? Math.round(correct/attempted*100) : 0;
+  return { correct, wrong, skipped, attempted, total: TASKS.length, pct };
+}
+function computeTotalTimeMs(){
+  return state.results.reduce((sum, r)=> sum + (r.msSpent||0), 0);
+}
+function buildResultsExport(){
+  return {
+    version: state.version,
+    student: state.student,
+    startedAtISO: state.startedAtISO,
+    finishedAtISO: state.finishedAtISO,
+    summary: computeSummary(),
+    totalMs: computeTotalTimeMs(),
+    results: state.results
+  };
+}
+
+/* =========================================================
+   10) GOOGLE FORM SEND (hidden)
+   ========================================================= */
+function parseFormAction(prefilledUrl){
+  if(!prefilledUrl) return "";
+  try{
+    const u = new URL(prefilledUrl);
+    const path = u.pathname;
+    if(path.includes("/formResponse")) return u.origin + path;
+    if(path.includes("/viewform")) return u.origin + path.replace("/viewform","/formResponse");
+    return u.origin + path.replace(/\/viewform.*/,"/formResponse");
+  }catch(e){ return ""; }
+}
+function canSendToForm(){
+  if(!CONFIG.prefilledFormUrl) return false;
+  const action = parseFormAction(CONFIG.prefilledFormUrl);
+  if(!action) return false;
+  return Boolean(CONFIG.fields.resultsJson && CONFIG.fields.resultsJson.startsWith("entry."));
+}
+async function sendToGoogleForm(){
+  if(!canSendToForm()) return false;
+
+  const action = parseFormAction(CONFIG.prefilledFormUrl);
+  const payload = {};
+  payload[CONFIG.fields.studentName] = state.student.name || "";
+  payload[CONFIG.fields.resultsJson] = JSON.stringify(buildResultsExport());
+
+  const body = new URLSearchParams(payload);
+  try{
+    await fetch(action, { method:"POST", mode:"no-cors", body });
+    return true;
+  }catch(e){
+    return false;
+  }
+}
+
+/* =========================================================
+   11) SKIP / ERROR HANDLING
+   ========================================================= */
+function skipCurrentTaskWithError(errorType, details){
+  if(skipLock) return;
+  skipLock = true;
+
+  const task = getCurrentTask();
+  let ms = 0;
+  try{ ms = stopTaskTimer(); }catch(e){ ms = 0; }
+
+  if(task){
+    setFeedback("warn", `Skipping task (error: ${errorType}).`);
+
+    if(state.phase==="retryWrong") removeFromRetry(task.id);
+
+    upsertResult(task.id, {
+      run: state.phase,
+      taskId: task.id,
+      type: task.type,
+      topic: task.topic,
+      attempts: 0,
+      msSpent: ms,
+      startedAtISO: taskStartMs ? new Date(taskStartMs).toISOString() : nowISO(),
+      endedAtISO: nowISO(),
+      isCorrect: null,
+      skipped: true,
+      answer: null,
+      error: { type: errorType, details: String(details || "") }
+    });
+    safeSaveState();
+  }
+
+  setTimeout(()=>{
+    skipLock = false;
+    goNextSafe();
+  }, CONFIG.skipDelayMs);
+}
+
+function goNextSafe(){
+  try{ goNext(); }
+  catch(e){
+    try{
+      state.finishedAtISO = nowISO();
+      state.phase = "finish";
+      safeSaveState();
+      showFinishScreen(false, "Forced finish (navigation error).");
+    }catch(_){}
+  }
+}
+
+/* =========================================================
+   12) IMAGE LOADING
+   ========================================================= */
+function showNoImage(){
+  const img = el("taskImg");
+  const fb = el("imgFallback");
+  img.style.display = "none";
+  fb.classList.remove("d-none");
+  fb.innerHTML = `No image for this task.<br><br><b>Focus on the text.</b>`;
+}
+function setTaskImageOrSkip(task){
+  // no image required
+  if(task.imageKey === null || task.imageKey === undefined){
+    showNoImage();
+    return;
+  }
+
+  const img = el("taskImg");
+  const fb = el("imgFallback");
+
+  const keys = Array.isArray(task.imageKey) ? task.imageKey : [task.imageKey];
+  const token = ++currentImageLoadToken;
+
+  img.style.display = "none";
+  fb.classList.remove("d-none");
+  fb.innerHTML = `Loading image...`;
+
+  let timeoutId = null;
+  let idx = 0;
+
+  const tryLoad = () => {
+    if(token !== currentImageLoadToken) return;
+
+    const key = keys[idx];
+    const src = CONFIG.imagesFolder + key;
+
+    img.onload = () => {
+      if(token !== currentImageLoadToken) return;
+      if(timeoutId) clearTimeout(timeoutId);
+      img.style.display = "block";
+      fb.classList.add("d-none");
+    };
+
+    img.onerror = () => {
+      if(token !== currentImageLoadToken) return;
+      idx++;
+      if(idx < keys.length){
+        tryLoad();
+        return;
+      }
+      if(timeoutId) clearTimeout(timeoutId);
+      fb.classList.remove("d-none");
+      img.style.display = "none";
+      fb.innerHTML = `Image not found.<br><br><b>Expected:</b><br>${keys.map(k=>CONFIG.imagesFolder+k).join("<br>")}`;
+      skipCurrentTaskWithError("image_missing", keys.join(" | "));
+    };
+
+    if(timeoutId) clearTimeout(timeoutId);
+    timeoutId = setTimeout(()=>{
+      if(token !== currentImageLoadToken) return;
+      skipCurrentTaskWithError("image_timeout", keys.join(" | "));
+    }, CONFIG.imageLoadTimeoutMs);
+
+    img.src = src;
+  };
+
+  tryLoad();
+}
+
+/* =========================================================
+   13) GRADING HELPERS
+   ========================================================= */
+function extractVocabWords(text){
+  const t = normalize(text);
+  const found = new Set();
+  ALL_VOCAB_WORDS.forEach(w=>{
+    const re = new RegExp(`\\b${w}\\b`, "i");
+    if(re.test(t)) found.add(w);
+  });
+  return [...found];
+}
+function categoryHasWord(catName, word){
+  return (VOCAB[catName]||[]).includes(word);
+}
+function matchesCategoryPattern(pattern, foundWords){
+  const cats = pattern.split("|").map(s=>s.trim());
+  return foundWords.some(w=>cats.some(c=>categoryHasWord(c, w)));
+}
+function sameSet(a, b){
+  const A = [...new Set((a||[]).map(x=>normalize(x)))].sort();
+  const B = [...new Set((b||[]).map(x=>normalize(x)))].sort();
+  return JSON.stringify(A) === JSON.stringify(B);
+}
+
+/* =========================================================
+   14) TASK RENDER
+   ========================================================= */
+function renderTask(task){
+  try{
+    hideFeedback();
+    currentAttempt = 1;
+    setText("attemptCounter", String(currentAttempt));
+    setText("attemptMax", String(CONFIG.maxAttemptsPerTask));
+    setText("taskTypeLabel", task.type);
+    setText("taskTopicLabel", task.topic);
+    setText("taskTitle", task.title);
+    el("taskPrompt").textContent = task.prompt;
+    el("noteArea").textContent = "";
+
+    const total = getActiveTaskList().length;
+    const idx = state.currentIndex + 1;
+    setText("taskCounter", `Task ${idx}/${total}`);
+    el("progressBar").style.width = `${((idx-1)/total*100).toFixed(1)}%`;
+
+    // start timer BEFORE image load, so skipping still logs correct time
+    startTaskTimer();
+
+    // image (can auto-skip if missing, OR show "no image")
+    setTaskImageOrSkip(task);
+
+    const area = el("taskArea");
+    area.innerHTML = "";
+
+    // --- MCQ / GUESS ---
+    if(task.type==="mcq" || task.type==="guess_desc"){
+      const row = document.createElement("div");
+      row.className = "d-grid gap-2";
+      task.options.forEach(opt=>{
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "btn btn-outline-dark option-btn";
+        btn.textContent = opt;
+        btn.dataset.value = opt;
+        btn.onclick = ()=>{
+          [...row.querySelectorAll("button")].forEach(b=>b.classList.remove("active"));
+          btn.classList.add("active");
+        };
+        row.appendChild(btn);
+      });
+      area.appendChild(row);
+      el("noteArea").textContent = "Choose one option.";
+    }
+
+    // --- DROPDOWN (single) ---
+    if(task.type==="dropdown"){
+      const box = document.createElement("div");
+      box.innerHTML = `
+        <label class="form-label fw-bold">Choose one:</label>
+        <select class="form-select form-select-lg" id="selAnswer"></select>
+      `;
+      area.appendChild(box);
+      const sel = box.querySelector("#selAnswer");
+      sel.appendChild(new Option("— select —",""));
+      task.options.forEach(opt=> sel.appendChild(new Option(opt,opt)));
+      el("noteArea").textContent = "Pick the best word.";
+    }
+
+    // --- FILL BLANK (single) ---
+    if(task.type==="fill_blank"){
+      const box = document.createElement("div");
+      box.innerHTML = `
+        <div class="mini-card mb-2"><span class="fw-bold">Sentence:</span><br>${task.sentence}</div>
+        <label class="form-label fw-bold">Choose the missing word:</label>
+        <select class="form-select form-select-lg" id="selFill"></select>
+      `;
+      area.appendChild(box);
+      const sel = box.querySelector("#selFill");
+      sel.appendChild(new Option("— select —",""));
+      task.options.forEach(opt=> sel.appendChild(new Option(opt,opt)));
+      el("noteArea").textContent = "Choose the best word to complete the sentence.";
+    }
+
+    // --- MULTI BLANK (two) ---
+    if(task.type==="multi_blank"){
+      const box = document.createElement("div");
+      box.innerHTML = `
+        <div class="mini-card mb-2"><span class="fw-bold">Sentence:</span><br>${task.sentence}</div>
+        <div class="row g-2">
+          <div class="col-12 col-md-6">
+            <label class="form-label fw-bold">Blank #1</label>
+            <select class="form-select form-select-lg" id="selBlank1"></select>
+          </div>
+          <div class="col-12 col-md-6">
+            <label class="form-label fw-bold">Blank #2</label>
+            <select class="form-select form-select-lg" id="selBlank2"></select>
+          </div>
+        </div>
+      `;
+      area.appendChild(box);
+      const s1 = box.querySelector("#selBlank1");
+      const s2 = box.querySelector("#selBlank2");
+      s1.appendChild(new Option("— select —",""));
+      s2.appendChild(new Option("— select —",""));
+      task.options1.forEach(opt=> s1.appendChild(new Option(opt,opt)));
+      task.options2.forEach(opt=> s2.appendChild(new Option(opt,opt)));
+      el("noteArea").textContent = "Complete BOTH blanks.";
+    }
+
+    // --- MULTI SELECT ---
+    if(task.type==="multi"){
+      const box = document.createElement("div");
+      box.className = "d-grid gap-2";
+      task.options.forEach(opt=>{
+        const id = `chk_${task.id}_${opt}`.replace(/\s+/g,"_");
+        const div = document.createElement("div");
+        div.className = "form-check border rounded-4 p-3 bg-white";
+        div.innerHTML = `
+          <input class="form-check-input" type="checkbox" value="${opt}" id="${id}">
+          <label class="form-check-label fw-bold" for="${id}">${opt}</label>
+        `;
+        box.appendChild(div);
+      });
+      area.appendChild(box);
+      el("noteArea").textContent = "Select all correct options.";
+    }
+
+    // --- ORDER WORDS ---
+    if(task.type==="order"){
+      const wrap = document.createElement("div");
+      const ans = document.createElement("div");
+      ans.className = "answer-box mb-2";
+      ans.innerHTML = `<span class="muted">Tap words below...</span>`;
+      const tokensWrap = document.createElement("div");
+      const picked = [];
+
+      function refreshAnswer(){
+        ans.innerHTML = "";
+        if(picked.length===0){
+          ans.innerHTML = `<span class="muted">Tap words below...</span>`;
+          return;
+        }
+        picked.forEach((w, idx)=>{
+          const p = document.createElement("span");
+          p.className = "answer-pill";
+          p.textContent = w;
+          p.title = "Tap to remove";
+          p.onclick = ()=>{
+            const removeWord = picked.splice(idx,1)[0];
+            const t = [...tokensWrap.querySelectorAll(".token")]
+              .find(x=>x.dataset.word===removeWord && x.classList.contains("selected"));
+            if(t) t.classList.remove("selected");
+            refreshAnswer();
+          };
+          ans.appendChild(p);
+        });
+      }
+
+      task.tokens.forEach(w=>{
+        const t = document.createElement("span");
+        t.className = "token";
+        t.textContent = w;
+        t.dataset.word = w;
+        t.onclick = ()=>{
+          if(t.classList.contains("selected")) return;
+          t.classList.add("selected");
+          picked.push(w);
+          refreshAnswer();
+        };
+        tokensWrap.appendChild(t);
+      });
+
+      wrap.dataset.getOrderAnswer = ()=> picked.join(" ");
+      wrap.appendChild(ans);
+      wrap.appendChild(tokensWrap);
+
+      const tiny = document.createElement("div");
+      tiny.className = "small-note mt-2";
+      tiny.textContent = "Tap a word in the answer to remove it.";
+      wrap.appendChild(tiny);
+
+      area.appendChild(wrap);
+      el("noteArea").textContent = "Build the phrase in the correct order.";
+    }
+
+    // --- SHORT ANSWER ---
+    if(task.type==="short"){
+      const box = document.createElement("div");
+      box.innerHTML = `
+        <label class="form-label fw-bold">Your answer (one word):</label>
+        <input class="form-control form-control-lg" id="inpShort" placeholder="type here..." />
+      `;
+      area.appendChild(box);
+      el("noteArea").textContent = "Type one vocabulary word.";
+    }
+
+    // --- TRUE/FALSE ---
+    if(task.type==="truefalse"){
+      const box = document.createElement("div");
+      box.className = "d-grid gap-2";
+      ["True","False"].forEach(v=>{
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "btn btn-outline-dark option-btn";
+        btn.textContent = v;
+        btn.dataset.value = v.toLowerCase();
+        btn.onclick = ()=>{
+          [...box.querySelectorAll("button")].forEach(b=>b.classList.remove("active"));
+          btn.classList.add("active");
+        };
+        box.appendChild(btn);
+      });
+      area.appendChild(box);
+      el("noteArea").textContent = "Choose True or False.";
+    }
+
+    // --- MATCHING (dropdown each row) ---
+    if(task.type==="matching_dropdown"){
+      const box = document.createElement("div");
+      box.innerHTML = `<div class="mini-card mb-2">Select the best match for each item.</div>`;
+      task.left.forEach((leftItem, i)=>{
+        const row = document.createElement("div");
+        row.className = "rowline mini-card mb-2";
+        row.innerHTML = `
+          <div class="left">${leftItem}</div>
+          <div class="flex-grow-1">
+            <select class="form-select form-select-lg" data-left="${leftItem}" id="match_${task.id}_${i}"></select>
+          </div>
+        `;
+        const sel = row.querySelector("select");
+        sel.appendChild(new Option("— choose —",""));
+        task.right.forEach(opt=> sel.appendChild(new Option(opt,opt)));
+        box.appendChild(row);
+      });
+      area.appendChild(box);
+      el("noteArea").textContent = "Match all items.";
+    }
+
+    // --- SELECT TOKENS ---
+    if(task.type==="select_tokens"){
+      const box = document.createElement("div");
+      box.innerHTML = `<div class="mini-card mb-2"><span class="fw-bold">Sentence:</span><br>${task.text}</div>`;
+      const tokWrap = document.createElement("div");
+      tokWrap.className = "mini-card";
+      const selected = new Set();
+
+      task.tokens.forEach((tok, idx)=>{
+        const t = document.createElement("span");
+        t.className = "token pick";
+        t.textContent = tok;
+        t.dataset.tok = tok;
+        t.dataset.idx = String(idx);
+        t.onclick = ()=>{
+          const key = `${tok}__${idx}`; // keep duplicates safe
+          if(selected.has(key)){
+            selected.delete(key);
+            t.classList.remove("selected");
+          }else{
+            selected.add(key);
+            t.classList.add("selected");
+          }
+        };
+        tokWrap.appendChild(t);
+      });
+
+      box.dataset.getPickedTokens = ()=>{
+        // return tokens values (unique by value only) for grading simplicity
+        const values = [];
+        selected.forEach(k=>{
+          const [tok] = k.split("__");
+          values.push(tok);
+        });
+        return values;
+      };
+
+      box.appendChild(tokWrap);
+      area.appendChild(box);
+      el("noteArea").textContent = "Tap tokens to select. Tap again to unselect.";
+    }
+
+    // --- WRITING ---
+    if(task.type==="writing"){
+      const box = document.createElement("div");
+      box.innerHTML = `
+        <label class="form-label fw-bold">Write here:</label>
+        <textarea class="form-control" id="txtWriting" rows="5" placeholder="Write 1–3 sentences..."></textarea>
+        <div class="small-note mt-2" id="writingCheckNote"></div>
+      `;
+      area.appendChild(box);
+
+      const txt = box.querySelector("#txtWriting");
+      const note = box.querySelector("#writingCheckNote");
+
+      const updateCheck = ()=>{
+        const text = txt.value || "";
+        const found = extractVocabWords(text);
+        note.innerHTML = `Detected vocab words: <b>${found.join(", ") || "—"}</b>`;
+      };
+      txt.addEventListener("input", updateCheck);
+      updateCheck();
+
+      el("noteArea").textContent = "Writing is checked by simple rules.";
+    }
+  }catch(e){
+    skipCurrentTaskWithError("render_error", e && e.message ? e.message : String(e));
+  }
+}
+
+/* =========================================================
+   15) ANSWER COLLECT
+   ========================================================= */
+function collectAnswer(task){
+  const area = el("taskArea");
+
+  if(task.type==="mcq" || task.type==="guess_desc"){
+    const active = area.querySelector("button.active");
+    return active ? active.dataset.value : "";
+  }
+  if(task.type==="dropdown"){
+    const sel = area.querySelector("#selAnswer");
+    return sel ? sel.value : "";
+  }
+  if(task.type==="fill_blank"){
+    const sel = area.querySelector("#selFill");
+    return sel ? sel.value : "";
+  }
+  if(task.type==="multi_blank"){
+    const a = area.querySelector("#selBlank1")?.value || "";
+    const b = area.querySelector("#selBlank2")?.value || "";
+    return { a, b };
+  }
+  if(task.type==="multi"){
+    return [...area.querySelectorAll('input[type="checkbox"]:checked')].map(x=>x.value);
+  }
+  if(task.type==="order"){
+    const wrap = area.querySelector("[data-get-order-answer], div") || area.firstElementChild;
+    // robust: find element that has dataset.getOrderAnswer
+    const candidate = [...area.querySelectorAll("*")].find(x=>x.dataset && x.dataset.getOrderAnswer);
+    if(candidate && candidate.dataset.getOrderAnswer) return candidate.dataset.getOrderAnswer();
+    // fallback (should not happen)
+    const pills = [...area.querySelectorAll(".answer-pill")].map(x=>x.textContent);
+    return pills.join(" ");
+  }
+  if(task.type==="short"){
+    const inp = area.querySelector("#inpShort");
+    return inp ? inp.value : "";
+  }
+  if(task.type==="truefalse"){
+    const active = area.querySelector("button.active");
+    return active ? active.dataset.value : "";
+  }
+  if(task.type==="matching_dropdown"){
+    const rows = [...area.querySelectorAll('select[data-left]')];
+    const map = {};
+    rows.forEach(sel=>{
+      const left = sel.dataset.left;
+      map[left] = sel.value || "";
+    });
+    return map;
+  }
+  if(task.type==="select_tokens"){
+    const box = area.firstElementChild;
+    if(box && box.dataset && box.dataset.getPickedTokens){
+      // not reachable (dataset stores strings only)
+    }
+    const getterBox = [...area.querySelectorAll("*")].find(x=>x.dataset && x.dataset.getPickedTokens !== undefined);
+    // we used box.dataset.getPickedTokens as function, but dataset can't hold functions.
+    // so we store it on element property instead:
+    const holder = area.querySelector(".mini-card")?.parentElement; // not safe
+    // better: we attached function to box itself as property:
+    const container = area.firstElementChild;
+    if(container && typeof container.getPickedTokens === "function"){
+      return container.getPickedTokens();
+    }
+    // fallback: read selected tokens:
+    return [...area.querySelectorAll(".token.pick.selected")].map(x=>x.dataset.tok);
+  }
+  if(task.type==="writing"){
+    const txt = area.querySelector("#txtWriting");
+    return txt ? txt.value : "";
+  }
+  return "";
+}
+
+/* Fix for select_tokens getter: attach function on element */
+(function patchSelectTokensGetter(){
+  const originalRenderTask = renderTask;
+  renderTask = function(task){
+    originalRenderTask(task);
+    if(task.type==="select_tokens"){
+      const area = el("taskArea");
+      const box = area.firstElementChild;
+      if(!box) return;
+      const selectedKeys = new Set();
+      // Re-bind clicks to ensure we can read selected keys
+      const picks = [...area.querySelectorAll(".token.pick")];
+      picks.forEach(t=>{
+        const idx = t.dataset.idx;
+        const tok = t.dataset.tok;
+        const key = `${tok}__${idx}`;
+        t.onclick = ()=>{
+          if(selectedKeys.has(key)){
+            selectedKeys.delete(key);
+            t.classList.remove("selected");
+          }else{
+            selectedKeys.add(key);
+            t.classList.add("selected");
+          }
+        };
+      });
+      box.getPickedTokens = ()=>{
+        const vals = [];
+        selectedKeys.forEach(k=>{
+          const tok = k.split("__")[0];
+          vals.push(tok);
+        });
+        return vals;
+      };
+    }
+  };
+})();
+
+/* =========================================================
+   16) GRADING
+   ========================================================= */
+function grade(task, answerRaw){
+  try{
+    if(task.type==="mcq" || task.type==="guess_desc"){
+      const ans = normalize(answerRaw);
+      if(!ans) return {ok:false, message:"Choose an option."};
+      return ans===normalize(task.correct) ? {ok:true, message:"Correct ✅"} : {ok:false, message:"Not correct."};
+    }
+
+    if(task.type==="dropdown"){
+      const ans = normalize(answerRaw);
+      if(!ans) return {ok:false, message:"Select an option."};
+      return ans===normalize(task.correct) ? {ok:true, message:"Correct ✅"} : {ok:false, message:"Not correct."};
+    }
+
+    if(task.type==="fill_blank"){
+      const ans = normalize(answerRaw);
+      if(!ans) return {ok:false, message:"Select the missing word."};
+      return ans===normalize(task.correct) ? {ok:true, message:"Correct ✅"} : {ok:false, message:"Not correct."};
+    }
+
+    if(task.type==="multi_blank"){
+      const a = normalize(answerRaw?.a || "");
+      const b = normalize(answerRaw?.b || "");
+      if(!a || !b) return {ok:false, message:"Fill both blanks."};
+      const ok = (a===normalize(task.correct1) && b===normalize(task.correct2));
+      return ok ? {ok:true, message:"Correct ✅"} : {ok:false, message:"Not correct."};
+    }
+
+    if(task.type==="multi"){
+      const ans = Array.isArray(answerRaw) ? answerRaw.map(normalize) : [];
+      if(ans.length===0) return {ok:false, message:"Select at least one option."};
+      const correct = task.correct.map(normalize).sort();
+      const got = [...new Set(ans)].sort();
+      return JSON.stringify(correct)===JSON.stringify(got)
+        ? {ok:true, message:"Correct ✅"}
+        : {ok:false, message:"Not correct."};
+    }
+
+    if(task.type==="order"){
+      const ans = normalize(answerRaw);
+      if(!ans) return {ok:false, message:"Build the phrase by tapping words."};
+      return ans===normalize(task.correctPhrase)
+        ? {ok:true, message:"Correct ✅"}
+        : {ok:false, message:"Wrong order."};
+    }
+
+    if(task.type==="short"){
+      const ans = normalize(answerRaw);
+      if(!ans) return {ok:false, message:"Type one word."};
+      return (task.correctAny||[]).map(normalize).includes(ans)
+        ? {ok:true, message:"Correct ✅"}
+        : {ok:false, message:"Not correct."};
+    }
+
+    if(task.type==="truefalse"){
+      const ans = normalize(answerRaw);
+      if(!ans) return {ok:false, message:"Choose True or False."};
+      const bool = (ans==="true");
+      return bool===Boolean(task.correctBoolean)
+        ? {ok:true, message:"Correct ✅"}
+        : {ok:false, message:"Not correct."};
+    }
+
+    if(task.type==="matching_dropdown"){
+      const map = answerRaw || {};
+      // require all filled
+      for(const left of task.left){
+        if(!normalize(map[left])) return {ok:false, message:"Match all items (no blanks)."};
+      }
+      // check each
+      for(const left of task.left){
+        if(normalize(map[left]) !== normalize(task.correctMap[left])){
+          return {ok:false, message:"Not correct."};
+        }
+      }
+      return {ok:true, message:"Correct ✅"};
+    }
+
+    if(task.type==="select_tokens"){
+      const picked = Array.isArray(answerRaw) ? answerRaw : [];
+      const ok = sameSet(picked, task.correctSelected);
+      if(picked.length===0) return {ok:false, message:"Select at least one token."};
+      return ok ? {ok:true, message:"Correct ✅"} : {ok:false, message:"Not correct."};
+    }
+
+    if(task.type==="writing"){
+      const text = (answerRaw||"").toString();
+      const nText = normalize(text);
+      if(nText.length < (task.minChars||20)) return {ok:false, message:`Write a bit more (min ${task.minChars||20} characters).`};
+
+      const found = extractVocabWords(text);
+
+      if(task.minUniqueVocab && found.length < task.minUniqueVocab){
+        return {ok:false, message:`Use at least ${task.minUniqueVocab} different vocabulary words. Now: ${found.length}.`};
+      }
+
+      if(task.requireCategories){
+        for(const pat of task.requireCategories){
+          if(!matchesCategoryPattern(pat, found)){
+            return {ok:false, message:`Missing: ${pat}. Add at least one word from that category.`};
+          }
+        }
+      }
+      return {ok:true, message:"Accepted ✅"};
+    }
+
+    return {ok:false, message:"Unknown task type."};
+  }catch(e){
+    skipCurrentTaskWithError("grade_error", e && e.message ? e.message : String(e));
+    return {ok:false, message:"Error."};
+  }
+}
+
+/* =========================================================
+   17) FLOW
+   ========================================================= */
+function goNext(){
+  const list = getActiveTaskList();
+  state.currentIndex++;
+  safeSaveState();
+
+  if(state.currentIndex >= list.length){
+    finishRun();
+    return;
+  }
+  renderTask(getCurrentTask());
+}
+
+function submitCurrent(){
+  try{
+    const task = getCurrentTask();
+    if(!task) return skipCurrentTaskWithError("task_missing", "No current task object");
+
+    const answer = collectAnswer(task);
+    const g = grade(task, answer);
+
+    if(skipLock) return;
+
+    if(g.ok){
+      const ms = stopTaskTimer();
+      setFeedback("success", g.message);
+
+      upsertResult(task.id, {
+        run: state.phase,
+        taskId: task.id,
+        type: task.type,
+        topic: task.topic,
+        attempts: currentAttempt,
+        msSpent: ms,
+        startedAtISO: taskStartMs ? new Date(taskStartMs).toISOString() : nowISO(),
+        endedAtISO: nowISO(),
+        isCorrect: true,
+        skipped: false,
+        answer
+      });
+
+      if(state.phase==="retryWrong") removeFromRetry(task.id);
+      safeSaveState();
+
+      setTimeout(()=>goNextSafe(), 520);
+      return;
+    }
+
+    currentAttempt++;
+    setText("attemptCounter", String(clamp(currentAttempt,1,CONFIG.maxAttemptsPerTask)));
+
+    if(currentAttempt <= CONFIG.maxAttemptsPerTask){
+      setFeedback("danger", `${g.message} Try again.`);
+      safeSaveState();
+      return;
+    }
+
+    const ms = stopTaskTimer();
+    setFeedback("danger", `Max attempts reached. Marked as wrong.`);
+
+    upsertResult(task.id, {
+      run: state.phase,
+      taskId: task.id,
+      type: task.type,
+      topic: task.topic,
+      attempts: CONFIG.maxAttemptsPerTask,
+      msSpent: ms,
+      startedAtISO: taskStartMs ? new Date(taskStartMs).toISOString() : nowISO(),
+      endedAtISO: nowISO(),
+      isCorrect: false,
+      skipped: false,
+      answer
+    });
+
+    if(state.phase==="tasks") markWrongForRetry(task.id);
+    safeSaveState();
+
+    setTimeout(()=>goNextSafe(), 620);
+  }catch(e){
+    skipCurrentTaskWithError("submit_error", e && e.message ? e.message : String(e));
+  }
+}
+
+function showHint(){
+  try{
+    const task = getCurrentTask();
+    const msg = task?.hint ? `Hint: ${task.hint}` : "Hint: Use the word bank.";
+    setFeedback("warn", msg);
+  }catch(e){
+    skipCurrentTaskWithError("hint_error", e && e.message ? e.message : String(e));
+  }
+}
+
+function startNewRun(){
+  state = {
+    version: 4,
+    student: { name: (el("inpName").value||"").trim() },
+    startedAtISO: nowISO(),
+    finishedAtISO: "",
+    currentIndex: 0,
+    phase: "tasks",
+    retryQueue: [],
+    results: []
+  };
+  safeSaveState();
+  goToTasks();
+}
+
+function goToTasks(){
+  hide("screenIntro");
+  hide("screenFinish");
+  show("screenTask");
+  setText("studentLabel", state.student.name || "—");
+  renderTask(getCurrentTask());
+}
+
+function startRetryWrong(){
+  if(state.retryQueue.length===0){
+    alert("No wrong tasks ✅");
+    return;
+  }
+  state.phase = "retryWrong";
+  state.currentIndex = 0;
+  safeSaveState();
+
+  hide("screenFinish");
+  show("screenTask");
+  goToTasks();
+}
+
+function showFinishScreen(sentStatus, extraNote){
+  hide("screenIntro");
+  hide("screenTask");
+  show("screenFinish");
+
+  el("progressBar").style.width = "100%";
+
+  const sum = computeSummary();
+  setText("scoreLabel", `${sum.correct}/${sum.attempted} (${sum.pct}%)`);
+  setText("skippedLabel", String(sum.skipped));
+  setText("totalTimeLabel", `${(computeTotalTimeMs()/1000).toFixed(1)}s`);
+
+  el("btnRetryWrong").disabled = (sum.wrong===0);
+
+  const note = [];
+  note.push(sentStatus ? "Results sent to Google Form ✅" : "Results NOT sent (no internet or error).");
+  if(extraNote) note.push(extraNote);
+  el("finishNote").textContent = note.join(" ");
+
+  const box = el("summaryBox");
+  box.innerHTML = "";
+
+  TASKS.forEach(t=>{
+    const base = state.results.find(r=>r.taskId===t.id && r.run==="tasks");
+    const retry = state.results.find(r=>r.taskId===t.id && r.run==="retryWrong");
+    const final = retry || base;
+
+    let statusText = "Wrong";
+    let statusClass = "text-danger";
+    let attempts = 0;
+    let sec = "0.0";
+
+    if(final){
+      attempts = final.attempts ?? 0;
+      sec = ((final.msSpent||0)/1000).toFixed(1);
+
+      if(final.skipped){
+        statusText = "Skipped";
+        statusClass = "text-secondary";
+      }else if(final.isCorrect===true){
+        statusText = "Correct";
+        statusClass = "text-success";
+      }
+    }
+
+    const errLine = (final && final.error && final.error.type)
+      ? `<div class="small-note text-secondary">Error: ${final.error.type}</div>`
+      : "";
+
+    const line = document.createElement("div");
+    line.className = "d-flex justify-content-between align-items-start gap-2 py-2 border-bottom";
+    line.innerHTML = `
+      <div>
+        <div class="fw-bold">${t.id.toUpperCase()} • ${t.title}</div>
+        <div class="small-note">${t.topic} • ${t.type}</div>
+        ${errLine}
+      </div>
+      <div class="text-end">
+        <div class="fw-bold ${statusClass}">${statusText}</div>
+        <div class="small-note">Attempts: ${attempts} • ${sec}s</div>
+      </div>
+    `;
+    box.appendChild(line);
+  });
+}
+
+function finishRun(){
+  try{
+    if(timerInterval) clearInterval(timerInterval);
+    timerInterval = null;
+
+    state.finishedAtISO = nowISO();
+    state.phase = "finish";
+    safeSaveState();
+
+    (async ()=>{
+      let sent = false;
+      if(CONFIG.autoSendOnFinish && canSendToForm()){
+        sent = await sendToGoogleForm();
+      }
+      showFinishScreen(sent);
+    })();
+  }catch(e){
+    showFinishScreen(false, "Finish error (forced).");
+  }
+}
+
+/* =========================================================
+   18) GLOBAL ERROR HANDLERS (prevents whole app crash)
+   ========================================================= */
+window.addEventListener("error", (ev)=>{
+  if(state && (state.phase==="tasks" || state.phase==="retryWrong")){
+    const msg = ev && ev.message ? ev.message : "window_error";
+    skipCurrentTaskWithError("runtime_error", msg);
+    ev.preventDefault?.();
+  }
+});
+window.addEventListener("unhandledrejection", (ev)=>{
+  if(state && (state.phase==="tasks" || state.phase==="retryWrong")){
+    const msg = ev && ev.reason ? (ev.reason.message || String(ev.reason)) : "promise_rejection";
+    skipCurrentTaskWithError("unhandled_rejection", msg);
+    ev.preventDefault?.();
+  }
+});
+
+/* =========================================================
+   19) INIT
+   ========================================================= */
+function init(){
+  renderVocabPreview();
+  renderWordBank();
+
+  const saved = loadState();
+  if(saved && saved.phase && saved.phase !== "intro" && saved.results){
+    show("resumeCard");
+    el("inpName").value = (saved.student && saved.student.name) ? saved.student.name : "";
+  }
+
+  el("btnStart").onclick = ()=>{
+    const name = (el("inpName").value||"").trim();
+    if(!name){ alert("Please type your name."); return; }
+    startNewRun();
+  };
+
+  el("btnReset").onclick = ()=>{
+    if(!confirm("Restart and clear saved progress?")) return;
+    clearState();
+    location.reload();
+  };
+
+  el("btnResume").onclick = ()=>{
+    const s = loadState();
+    if(!s) return;
+    state = s;
+
+    if(state.phase==="finish"){
+      showFinishScreen(true, "Opened saved summary.");
+    }else{
+      goToTasks();
+    }
+  };
+
+  el("btnStartNew").onclick = ()=>{
+    clearState();
+    hide("resumeCard");
+    hide("screenTask");
+    hide("screenFinish");
+    show("screenIntro");
+  };
+
+  el("btnSubmit").onclick = submitCurrent;
+  el("btnSkipHint").onclick = showHint;
+
+  el("btnToggleWordBank").onclick = ()=>{
+    el("wordBank").classList.toggle("d-none");
+  };
+
+  el("btnRetryWrong").onclick = startRetryWrong;
+
+  show("screenIntro");
+}
+
+init();
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+</body>
+</html>
