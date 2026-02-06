@@ -1,0 +1,1421 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover">
+  <title>Garage Trainer — Image Tasks</title>
+
+  <!-- Bootstrap 5.0.2 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+  <style>
+    :root{ --card-radius: 18px; }
+    body { background: #f7f9fb; }
+    .app-card{
+      border: 0;
+      border-radius: var(--card-radius);
+      box-shadow: 0 10px 30px rgba(0,0,0,.06);
+    }
+    .muted { color:#6c757d; }
+    .kbd-pill{
+      display:inline-block;
+      padding:.15rem .5rem;
+      border-radius: 999px;
+      background:#fff;
+      border:1px solid rgba(0,0,0,.08);
+      font-size:.85rem;
+      margin:.15rem .15rem 0 0;
+      white-space:nowrap;
+    }
+    .img-frame{
+      width:100%;
+      aspect-ratio: 16/10;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #eef4ff, #f6fffb);
+      border:1px solid rgba(0,0,0,.07);
+      overflow:hidden;
+      position:relative;
+    }
+    .img-frame img{
+      width:100%;
+      height:100%;
+      object-fit: cover;
+      display:block;
+    }
+    .img-overlay{
+      position:absolute;
+      inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:1rem;
+      text-align:center;
+      color:#5c6b7a;
+      font-weight:600;
+    }
+    .green-block{
+      border-radius: 16px;
+      border: 1px solid rgba(25,135,84,.22);
+      background: rgba(25,135,84,.10);
+    }
+    .green-block .small-note{
+      color: rgba(25,135,84,.95);
+      font-weight:600;
+    }
+    .choice-card{
+      border-radius: 14px;
+      border: 1px solid rgba(0,0,0,.10);
+      background:#fff;
+      padding:.9rem .95rem;
+      cursor:pointer;
+      transition: border-color .15s ease, transform .05s ease, background .15s ease;
+    }
+    .choice-card:hover{ border-color: rgba(13,110,253,.35); }
+    .choice-card:active{ transform: scale(.99); }
+    .choice-card.selected{
+      border-color: rgba(13,110,253,.70);
+      background: rgba(13,110,253,.05);
+    }
+    .choice-card.correct{
+      border-color: rgba(25,135,84,.75);
+      background: rgba(25,135,84,.07);
+    }
+    .choice-card.wrong{
+      border-color: rgba(220,53,69,.70);
+      background: rgba(220,53,69,.05);
+    }
+    .btn-round{ border-radius: 999px; }
+    .sticky-actions{
+      position: sticky;
+      bottom: 0;
+      background: linear-gradient(to top, rgba(247,249,251,1), rgba(247,249,251,.92));
+      padding-top:.75rem;
+      padding-bottom:.25rem;
+      border-top:1px solid rgba(0,0,0,.06);
+      z-index: 5;
+    }
+    .mini{ font-size:.92rem; }
+    .summary-row{
+      border-radius: 14px;
+      border:1px solid rgba(0,0,0,.08);
+      background:#fff;
+    }
+    .badge-soft{
+      background: rgba(13,110,253,.12);
+      color:#0d6efd;
+      border:1px solid rgba(13,110,253,.20);
+    }
+    .badge-soft-success{
+      background: rgba(25,135,84,.12);
+      color:#198754;
+      border:1px solid rgba(25,135,84,.20);
+    }
+    .badge-soft-danger{
+      background: rgba(220,53,69,.12);
+      color:#dc3545;
+      border:1px solid rgba(220,53,69,.20);
+    }
+    .badge-soft-warning{
+      background: rgba(255,193,7,.16);
+      color:#9a6a00;
+      border:1px solid rgba(255,193,7,.24);
+    }
+    .small-hr{ margin:.8rem 0; opacity:.12; }
+    pre.codebox{
+      white-space: pre-wrap;
+      word-break: break-word;
+      background: rgba(0,0,0,.03);
+      border: 1px solid rgba(0,0,0,.08);
+      border-radius: 12px;
+      padding: .75rem;
+      margin: 0;
+      font-size: .85rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container py-3 py-md-4" style="max-width: 980px;">
+    <div class="card app-card">
+      <div class="card-body p-3 p-md-4">
+
+        <!-- INTRO -->
+        <section id="screenIntro">
+          <div class="d-flex align-items-start justify-content-between flex-wrap gap-2">
+            <div>
+              <h1 class="h3 mb-1">Garage Image Trainer</h1>
+              <div class="muted">Topic: <span id="topicText"></span> · Level: <span id="levelText"></span> · Tasks: <span id="taskCountText"></span></div>
+            </div>
+            <div class="text-end">
+              <span class="badge badge-soft">Online · Choose + Speak</span>
+            </div>
+          </div>
+
+          <div id="resumeBanner" class="alert alert-warning mt-3 d-none" role="alert">
+            <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-2">
+              <div>
+                <strong>Resume available.</strong>
+                <div class="mini">Saved progress found for <span id="resumeName" class="fw-semibold"></span> — task <span id="resumeTaskNum" class="fw-semibold"></span> of <span id="resumeTotal" class="fw-semibold"></span>.</div>
+              </div>
+              <div class="d-flex gap-2">
+                <button class="btn btn-sm btn-primary btn-round" id="btnResume">Resume</button>
+                <button class="btn btn-sm btn-outline-secondary btn-round" id="btnStartFresh">Start new</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="green-block p-3 mt-3">
+            <div class="small-note mb-2">Story hook (teacher reads once):</div>
+            <div class="mb-0">
+              A city inspector stands inside the garage. One wrong step and Alex can be fired — or worse:
+              a car can crash in the city. Your job: choose safe procedures and read them out loud.
+            </div>
+          </div>
+
+          <div class="row g-3 mt-2 align-items-stretch">
+            <div class="col-12 col-md-5">
+              <label for="nameInput" class="form-label fw-semibold">Your name</label>
+              <input id="nameInput" class="form-control form-control-lg" placeholder="Type your name" maxlength="40" autocomplete="name">
+
+              <label for="groupInput" class="form-label fw-semibold mt-3">Group (optional)</label>
+              <input id="groupInput" class="form-control" placeholder="po23" maxlength="20" autocomplete="off">
+              <div class="form-text">Used for the Google Form link (default: po23).</div>
+
+              <div class="d-grid gap-2 mt-3">
+                <button id="btnStart" class="btn btn-success btn-lg btn-round">Start lesson</button>
+                <button id="btnClearStorage" class="btn btn-outline-danger btn-round">Clear saved progress</button>
+              </div>
+            </div>
+
+            <div class="col-12 col-md-7">
+              <div class="green-block p-3 h-100">
+                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                  <div class="small-note">Vocab preview</div>
+                  <button class="btn btn-sm btn-outline-success btn-round" data-bs-toggle="collapse" data-bs-target="#vocabCollapse" aria-expanded="true">
+                    Toggle word bank
+                  </button>
+                </div>
+                <div id="vocabCollapse" class="collapse show mt-2">
+                  <div class="mb-2"><span class="fw-semibold">Nouns:</span> <span id="vocabNouns"></span></div>
+                  <div><span class="fw-semibold">Verbs:</span> <span id="vocabVerbs"></span></div>
+                  <hr class="small-hr">
+                  <div class="mini muted">
+                    Rule: choose the safest procedure, then read it aloud.
+                    Images load from <b>/images/</b>. If an image is missing, the task auto-skips.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- TASK -->
+        <section id="screenTask" class="d-none">
+          <div class="d-flex align-items-start justify-content-between flex-wrap gap-2">
+            <div>
+              <div class="muted mini">Player: <span id="playerName" class="fw-semibold"></span> · Group: <span id="playerGroup" class="fw-semibold"></span></div>
+              <h2 class="h4 mb-0" id="taskTitle">Task</h2>
+              <div class="muted mini mt-1">
+                Task <span id="taskIndex"></span>/<span id="taskTotal"></span>
+                · Score: <span id="scoreText"></span>
+                · Attempts: <span id="attemptsText"></span>
+                · Skipped: <span id="skippedText"></span>
+              </div>
+            </div>
+            <div class="text-end">
+              <div class="mini muted">Total time</div>
+              <div class="h5 mb-0" id="totalTimeText">00:00</div>
+              <div class="mini muted mt-1">Task time</div>
+              <div class="h6 mb-0" id="taskTimeText">01:00</div>
+            </div>
+          </div>
+
+          <div class="progress mt-3" style="height: 12px; border-radius: 999px;">
+            <div id="progressBar" class="progress-bar" role="progressbar" style="width: 0%"></div>
+          </div>
+
+          <div class="row g-3 mt-2">
+            <div class="col-12 col-lg-5">
+              <div class="img-frame">
+                <img id="taskImg" alt="" class="d-none">
+                <div id="imgOverlay" class="img-overlay">
+                  <div>
+                    <div class="fw-semibold">Loading image…</div>
+                    <div class="mini muted">If it fails, the task will auto-skip.</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="d-grid gap-2 mt-3">
+                <button class="btn btn-outline-success btn-round" data-bs-toggle="collapse" data-bs-target="#wordBankCollapse" aria-expanded="false">
+                  Word bank (toggle)
+                </button>
+                <div id="wordBankCollapse" class="collapse">
+                  <div class="green-block p-3">
+                    <div class="small-note mb-2">Word bank</div>
+                    <div class="mb-2"><span class="fw-semibold">Nouns:</span> <span id="bankNouns"></span></div>
+                    <div><span class="fw-semibold">Verbs:</span> <span id="bankVerbs"></span></div>
+                  </div>
+                </div>
+
+                <button id="btnSkip" class="btn btn-outline-secondary btn-round">Skip task</button>
+              </div>
+            </div>
+
+            <div class="col-12 col-lg-7">
+              <div class="green-block p-3">
+                <div class="small-note mb-2">Situation (choose + speak)</div>
+                <div id="taskPrompt"></div>
+              </div>
+
+              <div class="mt-3">
+                <div id="answerArea"></div>
+
+                <div id="hintArea" class="alert alert-info mt-3 d-none mb-0" role="alert"></div>
+                <div id="feedbackArea" class="alert mt-3 d-none mb-0" role="alert"></div>
+
+                <div class="sticky-actions mt-3">
+                  <div class="d-flex flex-column flex-md-row gap-2 justify-content-between">
+                    <div class="d-flex gap-2">
+                      <button id="btnHint" class="btn btn-outline-info btn-round">Hint</button>
+                      <button id="btnResetAnswer" class="btn btn-outline-secondary btn-round">Reset</button>
+                    </div>
+                    <div class="d-flex gap-2">
+                      <button id="btnSubmit" class="btn btn-primary btn-round">Submit</button>
+                      <button id="btnNext" class="btn btn-success btn-round d-none">Next</button>
+                    </div>
+                  </div>
+                  <div class="mini muted mt-2">After you choose, read the procedure out loud.</div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- FINISH -->
+        <section id="screenFinish" class="d-none">
+          <div class="d-flex align-items-start justify-content-between flex-wrap gap-2">
+            <div>
+              <h2 class="h3 mb-1">Finish</h2>
+              <div class="muted">Review + retry wrong tasks. Then send result to the form.</div>
+            </div>
+            <div class="text-end">
+              <div class="mini muted">Total time</div>
+              <div class="h4 mb-0" id="finishTime"></div>
+            </div>
+          </div>
+
+          <div class="row g-3 mt-2">
+            <div class="col-12 col-md-4">
+              <div class="green-block p-3 h-100">
+                <div class="small-note mb-2">Result</div>
+                <div class="d-flex align-items-center justify-content-between">
+                  <div class="muted">Score</div>
+                  <div class="h4 mb-0" id="finishScore"></div>
+                </div>
+                <div class="d-flex align-items-center justify-content-between mt-2">
+                  <div class="muted">Correct</div>
+                  <div class="fw-semibold" id="finishCorrect"></div>
+                </div>
+                <div class="d-flex align-items-center justify-content-between mt-2">
+                  <div class="muted">Wrong</div>
+                  <div class="fw-semibold" id="finishWrong"></div>
+                </div>
+                <div class="d-flex align-items-center justify-content-between mt-2">
+                  <div class="muted">Skipped</div>
+                  <div class="fw-semibold" id="finishSkipped"></div>
+                </div>
+                <hr class="small-hr">
+                <div class="d-grid gap-2">
+                  <button id="btnRetryWrong" class="btn btn-primary btn-round">Retry wrong</button>
+                  <button id="btnRestartAll" class="btn btn-outline-secondary btn-round">Restart full lesson</button>
+                  <button id="btnBackToIntro" class="btn btn-outline-danger btn-round">Back to intro</button>
+                </div>
+                <hr class="small-hr">
+                <div class="d-grid gap-2">
+                  <button id="btnSendForm" class="btn btn-success btn-round">Send to Google Form</button>
+                  <button id="btnCopyJson" class="btn btn-outline-success btn-round">Copy JSON</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-12 col-md-8">
+              <div class="card summary-row">
+                <div class="card-body p-3">
+                  <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                    <div class="fw-semibold">Per-task summary</div>
+                    <div class="mini muted">Tap a row to see details.</div>
+                  </div>
+                  <div id="summaryList" class="mt-3"></div>
+
+                  <div class="green-block p-3 mt-3">
+                    <div class="small-note mb-2">JSON preview (short)</div>
+                    <pre id="jsonPreview" class="codebox"></pre>
+                    <div class="mini muted mt-2">This JSON goes into: <b>entry.1988412302</b></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </div>
+
+    <div class="text-center mini muted mt-3">
+      Autosave: localStorage · Images: <span class="fw-semibold">/images/</span>
+    </div>
+  </div>
+
+  <!-- Bootstrap 5.0.2 JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+          crossorigin="anonymous"></script>
+
+  <script>
+    /***********************
+     * Google Form (your link)
+     ***********************/
+    const GOOGLE_FORM_PREFILL_LINK =
+      "https://docs.google.com/forms/d/e/1FAIpQLSfhgAxbZiFv1vwfYGZR-kwwVplw7oPaavMKb_B_K4w4yJBiVA/viewform?usp=pp_url&entry.1921741824=andrew&entry.1886481554=po23&entry.1988412302=json_here";
+
+    /***********************
+     * Lesson (10 image tasks, easy)
+     ***********************/
+    const LESSON = {
+      topic: "Garage Safety — Image Procedures (Choose + Speak)",
+      level: "A2",
+      vocab: {
+        nouns: ["car","part","brake pads","battery","tire","rim","terminals","cover","tool"],
+        verbs: ["check","replace","clean","dry","cover","tighten","stop","test","install"]
+      },
+      tasks: [
+        {
+          id: 1, type: "mcq", title: "Battery: terminals visible (image)", timeLimitSec: 80, maxAttempts: 2,
+          imageKey: "battery_terminals_open_01.jpg",
+          promptHtml: `
+            You open the hood. The <b>battery</b> is right in front of you and the <b>terminals</b> are clearly visible.
+            A coworker is holding a metal <b>tool</b>. The inspector says: “One spark in a busy garage is enough.”
+            <br><br><b>Choose the safest procedure.</b>`,
+          hint: "Safe idea: stop → cover terminals → tighten cover → test battery.",
+          options: [
+            "A) I <b>test</b> the <b>battery</b> first to save time. If I see sparks, I will <b>stop</b> after that.",
+            "B) I <b>stop</b>, <b>cover</b> the <b>terminals</b>, <b>tighten</b> the <b>cover</b> with a <b>tool</b>, then I <b>test</b> the <b>battery</b>.",
+            "C) I <b>install</b> <b>brake pads</b> first because brakes are more important than electricity."
+          ],
+          correctIndex: 1,
+          speak: "Read the whole procedure out loud."
+        },
+        {
+          id: 2, type: "order", title: "Brake pads job: correct order (image)", timeLimitSec: 80, maxAttempts: 2,
+          imageKey: "brake_pads_new_01.jpg",
+          promptHtml: `
+            You see new <b>brake pads</b> on the workbench. The customer is already waiting at the desk.
+            Alex whispers: “Fast is good — but only if it’s safe.”
+            <br><br><b>Put the steps in the safest order.</b>`,
+          hint: "Check first. End with test.",
+          items: ["test the car","install brake pads","check the part"],
+          correctOrder: ["check the part","install brake pads","test the car"],
+          speak: "Read the full order out loud."
+        },
+        {
+          id: 3, type: "mcq", title: "Dirty rim: see the real condition (image)", timeLimitSec: 80, maxAttempts: 2,
+          imageKey: "rim_dirty_01.jpg",
+          promptHtml: `
+            The inspector points at the wheel and says:
+            “If the <b>rim</b> is dirty, you can miss a problem and the wheel can fail in the city.”
+            <br><br><b>Choose the best plan.</b>`,
+          hint: "Clean → dry → check → test.",
+          options: [
+            "A) I <b>test</b> the <b>car</b> now. If it feels okay, I do not touch the <b>rim</b>.",
+            "B) I <b>clean</b> the <b>rim</b>, <b>dry</b> it, <b>check</b> the <b>part</b>, then <b>test</b> the <b>car</b>.",
+            "C) I <b>replace</b> the <b>battery</b> because that is the fastest fix."
+          ],
+          correctIndex: 1,
+          speak: "Read your chosen plan out loud."
+        },
+        {
+          id: 4, type: "dropdown", title: "Loose cover: what do we do first? (image)", timeLimitSec: 70, maxAttempts: 2,
+          imageKey: "engine_cover_loose_01.jpg",
+          promptHtml: `
+            The inspector touches the <b>cover</b>. It moves a little.
+            Alex says: “If the cover is loose, parts can move, and the car can crash.”
+            <br><br>Complete the rule:
+            <br><b>First we ____ the cover with a tool.</b>`,
+          hint: "Loose cover → make it tight.",
+          textParts: ["First we "," the cover with a tool."],
+          choices: ["test","tighten","install","dry"],
+          correctChoice: "tighten",
+          speak: "Read the full sentence out loud."
+        },
+        {
+          id: 5, type: "matching_dropdown", title: "Match item → best action (image)", timeLimitSec: 90, maxAttempts: 2,
+          imageKey: "tool_set_01.jpg",
+          promptHtml: `
+            The inspector says: “Professional language. Simple and clear.”
+            Match each item to the best action and say it aloud like a mechanic.`,
+          hint: "terminals→cover, rim→clean, brake pads→install, bad part→replace.",
+          pairs: [
+            { left: "terminals", options: ["cover","install","dry","test"], correct: "cover" },
+            { left: "rim", options: ["clean","cover","replace","install"], correct: "clean" },
+            { left: "brake pads", options: ["install","dry","tighten","cover"], correct: "install" },
+            { left: "bad part", options: ["replace","test","clean","cover"], correct: "replace" }
+          ],
+          speak: "Read each match out loud: ‘terminals — cover’, etc."
+        },
+        {
+          id: 6, type: "truefalse", title: "Safety rule: check before test (image)", timeLimitSec: 60, maxAttempts: 2,
+          imageKey: "inspector_clipboard_01.jpg",
+          promptHtml: `
+            The inspector watches and writes notes.
+            <br><br><b>True or False:</b> We <b>check</b> the <b>part</b> before we <b>test</b> the <b>car</b>.`,
+          hint: "Safe routine starts with check.",
+          correct: true,
+          speak: "Say the full sentence out loud."
+        },
+        {
+          id: 7, type: "mcq", title: "Tire + rim: stop the wrong plan (image)", timeLimitSec: 85, maxAttempts: 2,
+          imageKey: "tire_rim_closeup_01.jpg",
+          promptHtml: `
+            A driver is in a hurry and says: “It’s fine. I drove yesterday.”
+            The inspector answers: “In the city, one wheel failure can hit a pedestrian.”
+            <br><br><b>Choose the safest procedure.</b>`,
+          hint: "If you are not sure: stop → check → clean/dry → tighten → test.",
+          options: [
+            "A) I <b>test</b> drive immediately. If it feels okay, the driver can go.",
+            "B) I <b>stop</b> the driver, <b>check</b> the wheel <b>part</b>, <b>clean</b> the <b>rim</b>, <b>dry</b> it if needed, <b>tighten</b> what is loose with a <b>tool</b>, then <b>test</b> the <b>car</b> safely.",
+            "C) I only <b>cover</b> the <b>terminals</b> because electricity is always the main risk."
+          ],
+          correctIndex: 1,
+          speak: "Read the procedure out loud."
+        },
+        {
+          id: 8, type: "order", title: "Battery procedure: safe sequence (image)", timeLimitSec: 85, maxAttempts: 2,
+          imageKey: "battery_cover_01.jpg",
+          promptHtml: `
+            You see the <b>battery</b> area and a plastic <b>cover</b>.
+            The inspector says: “Sequence matters.”
+            <br><br><b>Put the steps in the safest order.</b>`,
+          hint: "Stop → cover terminals → tighten cover → test.",
+          items: ["test the battery","cover the terminals","tighten the cover","stop"],
+          correctOrder: ["stop","cover the terminals","tighten the cover","test the battery"],
+          speak: "Read the full order out loud."
+        },
+        {
+          id: 9, type: "mcq", title: "After install: what must happen? (image)", timeLimitSec: 75, maxAttempts: 2,
+          imageKey: "car_on_lift_01.jpg",
+          promptHtml: `
+            The car is ready after service. The customer says: “I’m late, I go now.”
+            Alex answers: “One step still protects people in the city.”
+            <br><br><b>Choose the correct final step.</b>`,
+          hint: "Final step = test.",
+          options: [
+            "A) We <b>test</b> the <b>car</b> before it leaves.",
+            "B) We <b>cover</b> the <b>terminals</b> even if we worked only on the wheels.",
+            "C) We <b>dry</b> the <b>brake pads</b> even if they are new and clean."
+          ],
+          correctIndex: 0,
+          speak: "Say the sentence out loud."
+        },
+        {
+          id: 10, type: "dropdown", title: "One word command: danger now (image)", timeLimitSec: 65, maxAttempts: 2,
+          imageKey: "warning_cone_shop_01.jpg",
+          promptHtml: `
+            A coworker reaches in with a tool and you see a risk.
+            The inspector wants one clear word — the word that prevents accidents.
+            <br><br>Complete:
+            <br><b>If something is unsafe, we ____.</b>`,
+          hint: "You pause immediately.",
+          textParts: ["If something is unsafe, we ","."],
+          choices: ["stop","install","test","dry"],
+          correctChoice: "stop",
+          speak: "Read the sentence out loud."
+        }
+      ]
+    };
+
+    /***********************
+     * State + storage
+     ***********************/
+    const STORAGE_KEY = "garage_trainer_state_img_v1";
+    const STORAGE_VERSION = 1;
+
+    let state = null;
+    let totalTimer = null;
+    let taskTimer = null;
+    let imageFailGuard = { taskId: null, handled: false };
+
+    function now(){ return Date.now(); }
+
+    function fmtTime(ms){
+      const s = Math.max(0, Math.floor(ms/1000));
+      const mm = String(Math.floor(s/60)).padStart(2,"0");
+      const ss = String(s%60).padStart(2,"0");
+      return `${mm}:${ss}`;
+    }
+
+    function computeElapsedMs(){
+      if(!state) return 0;
+      return (now() - state.sessionStartTs);
+    }
+
+    function saveState(){
+      if(!state) return;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        version: STORAGE_VERSION,
+        savedAt: now(),
+        state
+      }));
+    }
+
+    function loadState(){
+      try{
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if(!raw) return null;
+        const obj = JSON.parse(raw);
+        if(!obj || obj.version !== STORAGE_VERSION || !obj.state) return null;
+        return obj.state;
+      }catch(e){
+        return null;
+      }
+    }
+
+    function clearSaved(){
+      localStorage.removeItem(STORAGE_KEY);
+    }
+
+    /***********************
+     * Session init
+     ***********************/
+    function newSession(userName, group, taskIds=null){
+      const taskOrder = taskIds
+        ? LESSON.tasks.map(t=>t.id).filter(id => taskIds.includes(id))
+        : LESSON.tasks.map(t=>t.id);
+
+      return {
+        version: STORAGE_VERSION,
+        userName,
+        group: group || "po23",
+        topic: LESSON.topic,
+        level: LESSON.level,
+        sessionStartTs: now(),
+        taskOrder,
+        pos: 0,
+        score: 0,
+        skipped: 0,
+        results: {},
+        currentAttemptsUsed: 0,
+        currentTaskStartTs: now(),
+        retryMode: taskIds ? true : false
+      };
+    }
+
+    function getTaskById(taskId){ return LESSON.tasks.find(t => t.id === taskId); }
+    function getCurrentTask(){ return getTaskById(state.taskOrder[state.pos]); }
+
+    function defaultMaxAttempts(task){ return typeof task.maxAttempts === "number" ? task.maxAttempts : 2; }
+    function defaultTimeLimit(task){ return typeof task.timeLimitSec === "number" ? task.timeLimitSec : 60; }
+
+    /***********************
+     * UI helpers
+     ***********************/
+    const $ = (id)=>document.getElementById(id);
+
+    function setScreen(which){
+      $("screenIntro").classList.toggle("d-none", which !== "intro");
+      $("screenTask").classList.toggle("d-none", which !== "task");
+      $("screenFinish").classList.toggle("d-none", which !== "finish");
+    }
+
+    function renderVocab(){
+      $("topicText").textContent = LESSON.topic;
+      $("levelText").textContent = LESSON.level;
+      $("taskCountText").textContent = String(LESSON.tasks.length);
+
+      const nouns = LESSON.vocab.nouns.map(w=>`<span class="kbd-pill">${w}</span>`).join("");
+      const verbs = LESSON.vocab.verbs.map(w=>`<span class="kbd-pill">${w}</span>`).join("");
+      $("vocabNouns").innerHTML = nouns;
+      $("vocabVerbs").innerHTML = verbs;
+      $("bankNouns").innerHTML = nouns;
+      $("bankVerbs").innerHTML = verbs;
+    }
+
+    function showResumeBannerIfAny(){
+      const saved = loadState();
+      if(saved && saved.userName && saved.taskOrder && typeof saved.pos === "number"){
+        $("resumeBanner").classList.remove("d-none");
+        $("resumeName").textContent = saved.userName;
+        $("resumeTaskNum").textContent = Math.min(saved.pos + 1, saved.taskOrder.length);
+        $("resumeTotal").textContent = saved.taskOrder.length;
+        $("nameInput").value = saved.userName || "";
+        $("groupInput").value = saved.group || "po23";
+      }else{
+        $("resumeBanner").classList.add("d-none");
+      }
+    }
+
+    function setFeedback(kind, html){
+      const el = $("feedbackArea");
+      el.classList.remove("d-none","alert-success","alert-danger","alert-warning");
+      el.classList.add(kind === "success" ? "alert-success" : kind === "danger" ? "alert-danger" : "alert-warning");
+      el.innerHTML = html;
+    }
+
+    function clearFeedback(){
+      $("feedbackArea").classList.add("d-none");
+      $("feedbackArea").innerHTML = "";
+      $("hintArea").classList.add("d-none");
+      $("hintArea").innerHTML = "";
+      $("btnNext").classList.add("d-none");
+      $("btnSubmit").disabled = false;
+    }
+
+    function showHint(task){
+      if(!task.hint) return;
+      const el = $("hintArea");
+      el.classList.remove("d-none");
+      el.innerHTML = `<b>Hint:</b> ${task.hint}`;
+    }
+
+    /***********************
+     * Timers
+     ***********************/
+    function stopTimers(){
+      if(totalTimer){ clearInterval(totalTimer); totalTimer = null; }
+      if(taskTimer){ clearInterval(taskTimer); taskTimer = null; }
+    }
+
+    function startTotalTimer(){
+      if(totalTimer) clearInterval(totalTimer);
+      totalTimer = setInterval(()=>{
+        $("totalTimeText").textContent = fmtTime(computeElapsedMs());
+      }, 250);
+    }
+
+    function startTaskTimer(task){
+      if(taskTimer) clearInterval(taskTimer);
+      const limitMs = defaultTimeLimit(task) * 1000;
+      const started = state.currentTaskStartTs;
+
+      taskTimer = setInterval(()=>{
+        const left = Math.max(0, limitMs - (now() - started));
+        $("taskTimeText").textContent = fmtTime(left);
+        if(left <= 0){
+          clearInterval(taskTimer);
+          taskTimer = null;
+          if($("btnNext").classList.contains("d-none")){
+            markTaskSkipped("Time limit");
+            setFeedback("warning", `<b>Skipped:</b> Time limit reached.`);
+            $("btnSubmit").disabled = true;
+            $("btnNext").classList.remove("d-none");
+          }
+        }
+      }, 200);
+      $("taskTimeText").textContent = fmtTime(limitMs);
+    }
+
+    /***********************
+     * Image handling (auto-skip on missing/timeout)
+     ***********************/
+    function setTaskImage(task){
+      const img = $("taskImg");
+      const overlay = $("imgOverlay");
+
+      img.classList.add("d-none");
+      overlay.classList.remove("d-none");
+      overlay.innerHTML = `<div><div class="fw-semibold">Loading image…</div><div class="mini muted">If it fails, the task will auto-skip.</div></div>`;
+
+      const taskId = task.id;
+      imageFailGuard = { taskId, handled: false };
+
+      const src = task.imageKey ? `/images/${task.imageKey}` : null;
+      img.src = "";
+      img.alt = "";
+
+      if(!src){
+        // If no imageKey, allow task anyway (not used here)
+        overlay.innerHTML = `<div><div class="fw-semibold">No image</div><div class="mini muted">This task has no imageKey.</div></div>`;
+        return;
+      }
+
+      let timeoutHit = false;
+      const timeoutMs = 2500;
+      const timer = setTimeout(()=>{
+        timeoutHit = true;
+        if(imageFailGuard.taskId === taskId && !imageFailGuard.handled){
+          imageFailGuard.handled = true;
+          autoSkipBecauseImage(task, "Image timeout");
+        }
+      }, timeoutMs);
+
+      img.onload = ()=>{
+        clearTimeout(timer);
+        if(timeoutHit) return;
+        if(imageFailGuard.taskId !== taskId) return;
+        overlay.classList.add("d-none");
+        img.classList.remove("d-none");
+      };
+
+      img.onerror = ()=>{
+        clearTimeout(timer);
+        if(imageFailGuard.taskId !== taskId) return;
+        if(!imageFailGuard.handled){
+          imageFailGuard.handled = true;
+          autoSkipBecauseImage(task, "Image missing");
+        }
+      };
+
+      img.src = src;
+      img.alt = task.title || "task image";
+    }
+
+    function autoSkipBecauseImage(task, reason){
+      // Mark skipped, show message, then auto-advance
+      markTaskSkipped(reason);
+      $("btnSubmit").disabled = true;
+      $("btnNext").classList.remove("d-none");
+
+      const overlay = $("imgOverlay");
+      const img = $("taskImg");
+      img.classList.add("d-none");
+      overlay.classList.remove("d-none");
+      overlay.innerHTML = `<div><div class="fw-semibold">Image not available</div><div class="mini muted">Task skipped: ${reason}</div></div>`;
+
+      setFeedback("warning", `<b>Auto-skip:</b> ${reason}.`);
+      // auto-advance after a short moment (still safe if user clicks Next earlier)
+      setTimeout(()=>{
+        if(!$("btnNext").classList.contains("d-none")){
+          $("btnNext").click();
+        }
+      }, 900);
+    }
+
+    /***********************
+     * Render task UI by type
+     ***********************/
+    function escapeHtml(s){
+      return String(s).replace(/[&<>"']/g, (m)=>({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+      }[m]));
+    }
+    function escapeAttr(s){ return String(s).replace(/"/g,'&quot;'); }
+
+    function setChoiceSelection(container, index, isMulti=false){
+      const cards = [...container.querySelectorAll(".choice-card")];
+      if(!isMulti){
+        cards.forEach((c,i)=> c.classList.toggle("selected", i === index));
+      }else{
+        cards[index].classList.toggle("selected");
+      }
+    }
+
+    function renderAnswerArea(task){
+      const area = $("answerArea");
+      area.innerHTML = "";
+
+      if(task.type === "mcq"){
+        const wrap = document.createElement("div");
+        wrap.className = "d-grid gap-2";
+        task.options.forEach((opt, i)=>{
+          const card = document.createElement("div");
+          card.className = "choice-card";
+          card.setAttribute("data-idx", String(i));
+          card.innerHTML = `<div class="mini">${opt}</div>`;
+          card.addEventListener("click", ()=> setChoiceSelection(wrap, i, false));
+          wrap.appendChild(card);
+        });
+        wrap.setAttribute("data-type","single");
+        area.appendChild(wrap);
+        return;
+      }
+
+      if(task.type === "truefalse"){
+        const wrap = document.createElement("div");
+        wrap.className = "d-grid gap-2";
+        ["True","False"].forEach((label, i)=>{
+          const card = document.createElement("div");
+          card.className = "choice-card";
+          card.setAttribute("data-idx", String(i));
+          card.innerHTML = `<div class="mini"><b>${label}</b></div>`;
+          card.addEventListener("click", ()=> setChoiceSelection(wrap, i, false));
+          wrap.appendChild(card);
+        });
+        wrap.setAttribute("data-type","single");
+        area.appendChild(wrap);
+        return;
+      }
+
+      if(task.type === "order"){
+        const list = document.createElement("div");
+        list.className = "d-grid gap-2";
+        list.setAttribute("data-type","order");
+        const current = task.items.slice();
+
+        function renderList(){
+          list.innerHTML = "";
+          current.forEach((txt, idx)=>{
+            const row = document.createElement("div");
+            row.className = "choice-card";
+            row.innerHTML = `
+              <div class="d-flex align-items-center justify-content-between gap-2">
+                <div class="mini"><span class="badge bg-light text-dark me-2">#${idx+1}</span> ${escapeHtml(txt)}</div>
+                <div class="d-flex gap-1">
+                  <button class="btn btn-sm btn-outline-secondary btn-round" ${idx===0?"disabled":""} data-act="up">↑</button>
+                  <button class="btn btn-sm btn-outline-secondary btn-round" ${idx===current.length-1?"disabled":""} data-act="down">↓</button>
+                </div>
+              </div>`;
+            row.querySelectorAll("button").forEach(btn=>{
+              btn.addEventListener("click",(e)=>{
+                e.stopPropagation();
+                const act = btn.getAttribute("data-act");
+                if(act==="up" && idx>0){
+                  const tmp = current[idx-1]; current[idx-1]=current[idx]; current[idx]=tmp;
+                  renderList();
+                }
+                if(act==="down" && idx<current.length-1){
+                  const tmp = current[idx+1]; current[idx+1]=current[idx]; current[idx]=tmp;
+                  renderList();
+                }
+              });
+            });
+            list.appendChild(row);
+          });
+        }
+        renderList();
+        list._getOrder = ()=> current.slice();
+        area.appendChild(list);
+        return;
+      }
+
+      if(task.type === "dropdown"){
+        const wrap = document.createElement("div");
+        wrap.className = "choice-card";
+        wrap.setAttribute("data-type","dropdown");
+
+        const select = document.createElement("select");
+        select.className = "form-select";
+        select.innerHTML = `<option value="">Choose…</option>` + task.choices.map(c=>`<option value="${escapeAttr(c)}">${escapeHtml(c)}</option>`).join("");
+
+        wrap.innerHTML = `<div class="mini mb-2">${escapeHtml(task.textParts[0])}<b>____</b>${escapeHtml(task.textParts[1])}</div>`;
+        wrap.appendChild(select);
+        wrap._getValue = ()=> select.value;
+        area.appendChild(wrap);
+        return;
+      }
+
+      if(task.type === "matching_dropdown"){
+        const wrap = document.createElement("div");
+        wrap.className = "choice-card";
+        wrap.setAttribute("data-type","matching_dropdown");
+        const table = document.createElement("div");
+        table.className = "d-grid gap-2";
+
+        task.pairs.forEach((p, i)=>{
+          const row = document.createElement("div");
+          row.className = "p-2 rounded-3 border";
+          const select = document.createElement("select");
+          select.className = "form-select";
+          select.innerHTML = `<option value="">Choose…</option>` + p.options.map(c=>`<option value="${escapeAttr(c)}">${escapeHtml(c)}</option>`).join("");
+          row.innerHTML = `<div class="mini mb-1"><b>${escapeHtml(p.left)}</b></div>`;
+          row.appendChild(select);
+          row.setAttribute("data-pair-idx", String(i));
+          table.appendChild(row);
+        });
+
+        wrap.appendChild(table);
+        wrap._getValues = ()=>{
+          const rows = [...wrap.querySelectorAll('[data-pair-idx]')];
+          return rows.map(r=>{
+            const sel = r.querySelector("select");
+            return sel ? sel.value : "";
+          });
+        };
+        area.appendChild(wrap);
+        return;
+      }
+
+      area.innerHTML = `<div class="alert alert-warning">Unsupported task type: ${escapeHtml(task.type)}</div>`;
+    }
+
+    function resetAnswerUI(){
+      const area = $("answerArea");
+      area.querySelectorAll(".choice-card.selected").forEach(x=>x.classList.remove("selected"));
+      area.querySelectorAll(".choice-card.correct,.choice-card.wrong").forEach(x=>x.classList.remove("correct","wrong"));
+      area.querySelectorAll("select").forEach(sel=> sel.value = "");
+    }
+
+    function getUserAnswer(task){
+      const area = $("answerArea");
+      const wrap = area.firstElementChild;
+      if(!wrap) return null;
+
+      if(task.type === "mcq" || task.type === "truefalse"){
+        const selected = [...wrap.querySelectorAll(".choice-card.selected")][0];
+        if(!selected) return null;
+        return { kind: "index", value: Number(selected.getAttribute("data-idx")) };
+      }
+
+      if(task.type === "order"){
+        if(typeof wrap._getOrder === "function") return { kind: "order", value: wrap._getOrder() };
+        return null;
+      }
+
+      if(task.type === "dropdown"){
+        if(typeof wrap._getValue === "function") return { kind: "choice", value: wrap._getValue() };
+        return null;
+      }
+
+      if(task.type === "matching_dropdown"){
+        if(typeof wrap._getValues === "function") return { kind: "choices", value: wrap._getValues() };
+        return null;
+      }
+
+      return null;
+    }
+
+    function stripTags(html){
+      const div = document.createElement("div");
+      div.innerHTML = html;
+      return (div.textContent || div.innerText || "").trim();
+    }
+
+    function correctSummaryFor(task){
+      if(task.type === "mcq") return stripTags(task.options[task.correctIndex] || "");
+      if(task.type === "truefalse") return task.correct ? "True" : "False";
+      if(task.type === "order") return (task.correctOrder || []).join(" → ");
+      if(task.type === "dropdown") return String(task.correctChoice);
+      if(task.type === "matching_dropdown") return (task.pairs || []).map(p=>p.correct).join(" | ");
+      return "";
+    }
+
+    function summarizeUser(task, ans){
+      if(!ans) return "—";
+      if(task.type === "mcq") return `Option ${ans.value + 1}: ${stripTags(task.options[ans.value] || "")}`;
+      if(task.type === "truefalse") return ans.value === 0 ? "True" : "False";
+      if(task.type === "order") return (ans.value || []).join(" → ");
+      if(task.type === "dropdown") return ans.value || "—";
+      if(task.type === "matching_dropdown") return (ans.value || []).join(" | ");
+      return "—";
+    }
+
+    function evaluateAnswer(task, ans){
+      if(task.type === "mcq"){
+        if(!ans || ans.kind !== "index") return { ok:false, message:"Choose one option." };
+        return { ok: ans.value === task.correctIndex };
+      }
+      if(task.type === "truefalse"){
+        if(!ans || ans.kind !== "index") return { ok:false, message:"Choose True or False." };
+        const user = (ans.value === 0);
+        return { ok: user === task.correct };
+      }
+      if(task.type === "order"){
+        if(!ans || ans.kind !== "order") return { ok:false, message:"Reorder the steps, then submit." };
+        return { ok: JSON.stringify(ans.value) === JSON.stringify(task.correctOrder) };
+      }
+      if(task.type === "dropdown"){
+        if(!ans || ans.kind !== "choice" || !ans.value) return { ok:false, message:"Choose one option from the dropdown." };
+        return { ok: String(ans.value) === String(task.correctChoice) };
+      }
+      if(task.type === "matching_dropdown"){
+        if(!ans || ans.kind !== "choices") return { ok:false, message:"Match all items (choose for each)." };
+        if(ans.value.some(v=>!v)) return { ok:false, message:"Match all items (choose for each)." };
+        const correctVals = task.pairs.map(p=>p.correct);
+        return { ok: JSON.stringify(ans.value) === JSON.stringify(correctVals) };
+      }
+      return { ok:false, message:"Unsupported task type." };
+    }
+
+    function markSelections(task, isCorrect){
+      const area = $("answerArea");
+      const wrap = area.firstElementChild;
+      if(!wrap) return;
+      if(task.type === "mcq" || task.type === "truefalse"){
+        const cards = [...wrap.querySelectorAll(".choice-card")];
+        const selected = cards.find(c=>c.classList.contains("selected"));
+        if(selected) selected.classList.add(isCorrect ? "correct" : "wrong");
+      }
+    }
+
+    /***********************
+     * Progress + results
+     ***********************/
+    function markTaskSkipped(reason){
+      const task = getCurrentTask();
+      if(!task) return;
+
+      const taskId = task.id;
+      const timeMs = now() - state.currentTaskStartTs;
+
+      // avoid double
+      if(state.results[taskId] && (state.results[taskId].status === "correct" || state.results[taskId].status === "wrong" || state.results[taskId].status === "skipped")) return;
+
+      state.skipped += 1;
+      state.results[taskId] = {
+        status: "skipped",
+        attemptsUsed: state.currentAttemptsUsed,
+        timeMs,
+        userAnswer: `Skip: ${reason}`,
+        correctAnswer: correctSummaryFor(task)
+      };
+      saveState();
+      updateTopBar();
+    }
+
+    function updateTopBar(){
+      const total = state.taskOrder.length;
+      $("playerName").textContent = state.userName;
+      $("playerGroup").textContent = state.group || "po23";
+      $("taskIndex").textContent = Math.min(state.pos + 1, total);
+      $("taskTotal").textContent = total;
+      $("scoreText").textContent = String(state.score);
+      const maxAtt = defaultMaxAttempts(getCurrentTask());
+      $("attemptsText").textContent = `${state.currentAttemptsUsed}/${maxAtt}`;
+      $("skippedText").textContent = String(state.skipped);
+
+      const pct = Math.round((Math.min(state.pos, total) / total) * 100);
+      $("progressBar").style.width = `${pct}%`;
+    }
+
+    function goNext(){
+      clearFeedback();
+      resetAnswerUI();
+
+      state.pos += 1;
+      if(state.pos >= state.taskOrder.length){
+        finishLesson();
+        return;
+      }
+
+      state.currentAttemptsUsed = 0;
+      state.currentTaskStartTs = now();
+      saveState();
+      renderTask();
+    }
+
+    function buildShortReport(){
+      const totalElapsed = computeElapsedMs();
+      const taskSumm = state.taskOrder.map((taskId)=>{
+        const r = state.results[taskId];
+        const s = !r ? "N" : (r.status === "correct" ? "C" : r.status === "wrong" ? "W" : "S");
+        const a = r ? (r.attemptsUsed || 0) : 0;
+        return { id: taskId, s, a };
+      });
+
+      const wrongIds = state.taskOrder.filter(id => state.results[id]?.status === "wrong");
+
+      return {
+        name: state.userName,
+        group: state.group || "po23",
+        topic: state.topic,
+        level: state.level,
+        score: state.score,
+        skipped: state.skipped,
+        time_s: Math.floor(totalElapsed/1000),
+        wrong_ids: wrongIds,
+        tasks: taskSumm
+      };
+    }
+
+    function finishLesson(){
+      stopTimers();
+      saveState();
+
+      const totalElapsed = computeElapsedMs();
+      let correct = 0, wrong = 0, skipped = 0;
+      const wrongTaskIds = [];
+
+      state.taskOrder.forEach(taskId=>{
+        const r = state.results[taskId];
+        if(!r) return;
+        if(r.status === "correct") correct++;
+        else if(r.status === "wrong") { wrong++; wrongTaskIds.push(taskId); }
+        else if(r.status === "skipped") skipped++;
+      });
+
+      $("finishTime").textContent = fmtTime(totalElapsed);
+      $("finishScore").textContent = String(state.score);
+      $("finishCorrect").textContent = String(correct);
+      $("finishWrong").textContent = String(wrong);
+      $("finishSkipped").textContent = String(skipped);
+
+      const list = $("summaryList");
+      list.innerHTML = "";
+      state.taskOrder.forEach((taskId, idx)=>{
+        const task = getTaskById(taskId);
+        const r = state.results[taskId];
+        const status = r ? r.status : "not done";
+        const badge = status === "correct" ? "badge-soft-success"
+                    : status === "wrong" ? "badge-soft-danger"
+                    : status === "skipped" ? "badge-soft-warning"
+                    : "badge-soft";
+        const statusText = status === "correct" ? "Correct"
+                         : status === "wrong" ? "Wrong"
+                         : status === "skipped" ? "Skipped"
+                         : "Not done";
+
+        const row = document.createElement("div");
+        row.className = "p-3 mb-2 summary-row";
+        row.style.cursor = "pointer";
+        row.innerHTML = `
+          <div class="d-flex align-items-start justify-content-between gap-2">
+            <div>
+              <div class="fw-semibold">${idx+1}. ${escapeHtml(task.title)}</div>
+              <div class="mini muted">${escapeHtml(task.type)} · time: ${r ? fmtTime(r.timeMs) : "—"} · attempts: ${r ? r.attemptsUsed : "—"}</div>
+            </div>
+            <span class="badge ${badge}">${statusText}</span>
+          </div>
+          <div class="mt-2 d-none mini" data-details="1">
+            <div><b>Your:</b> ${escapeHtml(r ? r.userAnswer : "—")}</div>
+            <div><b>Correct:</b> ${escapeHtml(r ? r.correctAnswer : correctSummaryFor(task))}</div>
+          </div>
+        `;
+        row.addEventListener("click", ()=>{
+          const det = row.querySelector('[data-details="1"]');
+          det.classList.toggle("d-none");
+        });
+        list.appendChild(row);
+      });
+
+      $("btnRetryWrong").disabled = wrongTaskIds.length === 0;
+
+      const report = buildShortReport();
+      $("jsonPreview").textContent = JSON.stringify(report);
+
+      setScreen("finish");
+    }
+
+    /***********************
+     * Submit handling
+     ***********************/
+    function submitAnswer(){
+      const task = getCurrentTask();
+      if(!task) return;
+
+      const maxAttempts = defaultMaxAttempts(task);
+      const ans = getUserAnswer(task);
+      const evalRes = evaluateAnswer(task, ans);
+
+      if(evalRes.ok === false && evalRes.message){
+        setFeedback("warning", `<b>Not ready:</b> ${escapeHtml(evalRes.message)}`);
+        return;
+      }
+
+      state.currentAttemptsUsed += 1;
+      updateTopBar();
+
+      const timeMs = now() - state.currentTaskStartTs;
+
+      if(evalRes.ok){
+        state.score += 1;
+        state.results[task.id] = {
+          status: "correct",
+          attemptsUsed: state.currentAttemptsUsed,
+          timeMs,
+          userAnswer: summarizeUser(task, ans),
+          correctAnswer: correctSummaryFor(task)
+        };
+        saveState();
+        markSelections(task, true);
+
+        setFeedback("success", `<b>Correct.</b> +1 point.<br><span class="mini muted">Speak:</span> <span class="mini">${escapeHtml(task.speak || "Read your chosen answer out loud.")}</span>`);
+        $("btnSubmit").disabled = true;
+        $("btnNext").classList.remove("d-none");
+        return;
+      }
+
+      markSelections(task, false);
+
+      if(state.currentAttemptsUsed >= maxAttempts){
+        state.results[task.id] = {
+          status: "wrong",
+          attemptsUsed: state.currentAttemptsUsed,
+          timeMs,
+          userAnswer: summarizeUser(task, ans),
+          correctAnswer: correctSummaryFor(task)
+        };
+        saveState();
+
+        setFeedback("danger", `<b>Wrong.</b> Attempts finished.<br><span class="mini muted">Correct:</span> <span class="mini">${escapeHtml(correctSummaryFor(task))}</span><br><span class="mini muted">Speak:</span> <span class="mini">${escapeHtml(task.speak || "Read the correct answer out loud.")}</span>`);
+        $("btnSubmit").disabled = true;
+        $("btnNext").classList.remove("d-none");
+      }else{
+        saveState();
+        const left = maxAttempts - state.currentAttemptsUsed;
+        setFeedback("danger", `<b>Wrong.</b> Try again. Attempts left: <b>${left}</b>.`);
+      }
+    }
+
+    /***********************
+     * Render current task
+     ***********************/
+    function renderTask(){
+      if(taskTimer){ clearInterval(taskTimer); taskTimer = null; }
+      clearFeedback();
+
+      const task = getCurrentTask();
+      if(!task){ finishLesson(); return; }
+
+      $("taskTitle").textContent = task.title || `Task ${state.pos+1}`;
+      $("taskPrompt").innerHTML = task.promptHtml || "";
+
+      const total = state.taskOrder.length;
+      $("taskIndex").textContent = String(state.pos+1);
+      $("taskTotal").textContent = String(total);
+      $("progressBar").style.width = `${Math.round((state.pos / total) * 100)}%`;
+
+      setTaskImage(task);
+      renderAnswerArea(task);
+
+      startTotalTimer();
+      startTaskTimer(task);
+
+      $("btnSubmit").disabled = false;
+      $("btnNext").classList.add("d-none");
+
+      updateTopBar();
+      saveState();
+    }
+
+    /***********************
+     * Navigation + controls
+     ***********************/
+    function startFromIntro(resume=false){
+      const name = ($("nameInput").value || "").trim();
+      const group = ($("groupInput").value || "").trim() || "po23";
+
+      if(!resume && !name){
+        alert("Please enter your name.");
+        return;
+      }
+
+      if(resume){
+        const saved = loadState();
+        if(!saved){ alert("No saved progress found."); return; }
+        state = saved;
+      }else{
+        state = newSession(name, group);
+      }
+
+      state.group = state.group || group || "po23";
+      $("playerName").textContent = state.userName;
+      $("playerGroup").textContent = state.group;
+
+      state.currentTaskStartTs = now();
+      saveState();
+      setScreen("task");
+      renderTask();
+    }
+
+    function restartAll(){
+      const name = state?.userName || ($("nameInput").value || "").trim() || "Player";
+      const group = state?.group || ($("groupInput").value || "").trim() || "po23";
+      state = newSession(name, group);
+      saveState();
+      setScreen("task");
+      renderTask();
+    }
+
+    function retryWrong(){
+      const wrongIds = state.taskOrder.filter(taskId => state.results[taskId]?.status === "wrong");
+      if(wrongIds.length === 0){ alert("No wrong tasks to retry."); return; }
+      const name = state.userName || "Player";
+      const group = state.group || "po23";
+      state = newSession(name, group, wrongIds);
+      saveState();
+      setScreen("task");
+      renderTask();
+    }
+
+    function openGoogleFormWithResults(){
+      const reportJson = JSON.stringify(buildShortReport());
+      const url = new URL(GOOGLE_FORM_PREFILL_LINK);
+      url.searchParams.set("entry.1921741824", state.userName || "");
+      url.searchParams.set("entry.1886481554", state.group || "po23");
+      url.searchParams.set("entry.1988412302", reportJson);
+      window.open(url.toString(), "_blank");
+    }
+
+    async function copyJsonToClipboard(){
+      const text = JSON.stringify(buildShortReport());
+      try{
+        await navigator.clipboard.writeText(text);
+        alert("JSON copied.");
+      }catch(e){
+        const ta = document.createElement("textarea");
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        ta.remove();
+        alert("JSON copied.");
+      }
+    }
+
+    /***********************
+     * Wire events
+     ***********************/
+    function wireEvents(){
+      $("btnStart").addEventListener("click", ()=> startFromIntro(false));
+      $("btnResume").addEventListener("click", ()=> startFromIntro(true));
+      $("btnStartFresh").addEventListener("click", ()=>{
+        clearSaved();
+        showResumeBannerIfAny();
+      });
+
+      $("btnClearStorage").addEventListener("click", ()=>{
+        clearSaved();
+        showResumeBannerIfAny();
+        alert("Saved progress cleared.");
+      });
+
+      $("btnSubmit").addEventListener("click", submitAnswer);
+      $("btnNext").addEventListener("click", ()=>{
+        state.currentTaskStartTs = now();
+        goNext();
+      });
+
+      $("btnHint").addEventListener("click", ()=> showHint(getCurrentTask()));
+      $("btnResetAnswer").addEventListener("click", ()=>{
+        resetAnswerUI();
+        clearFeedback();
+      });
+
+      $("btnSkip").addEventListener("click", ()=>{
+        markTaskSkipped("Manual skip");
+        setFeedback("warning", `<b>Skipped:</b> You skipped this task.`);
+        $("btnSubmit").disabled = true;
+        $("btnNext").classList.remove("d-none");
+      });
+
+      $("btnRetryWrong").addEventListener("click", retryWrong);
+      $("btnRestartAll").addEventListener("click", restartAll);
+      $("btnBackToIntro").addEventListener("click", ()=>{
+        stopTimers();
+        setScreen("intro");
+        $("nameInput").value = state?.userName || $("nameInput").value || "";
+        $("groupInput").value = state?.group || $("groupInput").value || "po23";
+        showResumeBannerIfAny();
+      });
+
+      $("btnSendForm").addEventListener("click", openGoogleFormWithResults);
+      $("btnCopyJson").addEventListener("click", copyJsonToClipboard);
+
+      window.addEventListener("beforeunload", ()=> saveState());
+    }
+
+    /***********************
+     * Init
+     ***********************/
+    function init(){
+      renderVocab();
+      showResumeBannerIfAny();
+      wireEvents();
+      setScreen("intro");
+    }
+
+    init();
+  </script>
+</body>
+</html>
