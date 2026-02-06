@@ -730,7 +730,8 @@
       const taskId = task.id;
       imageFailGuard = { taskId, handled: false };
 
-      const src = task.imageKey ? `/images/${task.imageKey}` : null;
+const src = task.imageKey ? new URL(`images/${task.imageKey}`, window.location.href).href : null;
+
       img.src = "";
       img.alt = "";
 
@@ -741,7 +742,7 @@
       }
 
       let timeoutHit = false;
-      const timeoutMs = 2500;
+      const timeoutMs = 15000;
       const timer = setTimeout(()=>{
         timeoutHit = true;
         if(imageFailGuard.taskId === taskId && !imageFailGuard.handled){
@@ -1419,3 +1420,4 @@
   </script>
 </body>
 </html>
+
