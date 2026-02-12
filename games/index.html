@@ -11,43 +11,41 @@
 
   <style>
     :root{
-      --bg: #f6f7fb;
-      --card: #ffffff;
-      --line: rgba(0,0,0,.10);
-      --muted: rgba(0,0,0,.60);
-      --radius: 16px;
-      --cell-h: 86px;
+      --bg:#f6f7fb;
+      --card:#ffffff;
+      --line:rgba(0,0,0,.10);
+      --muted:rgba(0,0,0,.60);
+      --radius:16px;
+      --cell-h:86px;
 
-      /* Team colors */
-      --t0: #2563eb; /* blue */
-      --t1: #16a34a; /* green */
-      --t2: #f59e0b; /* amber */
-      --t3: #ef4444; /* red */
+      --t0:#2563eb; /* blue */
+      --t1:#16a34a; /* green */
+      --t2:#f59e0b; /* amber */
+      --t3:#ef4444; /* red */
     }
 
-    html, body { height: 100%; }
-    body { margin: 0; background: var(--bg); color: #111; }
+    html, body { height:100%; }
+    body { margin:0; background:var(--bg); color:#111; }
 
-    .app {
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
+    .app{
+      height:100vh;
+      display:flex;
+      flex-direction:column;
+      overflow:hidden;
     }
 
-    /* Minimal top strip */
     .topstrip{
-      flex: 0 0 auto;
-      background: var(--card);
-      border-bottom: 1px solid var(--line);
-      padding: 10px 12px;
+      background:var(--card);
+      border-bottom:1px solid var(--line);
+      padding:10px 12px;
+      flex:0 0 auto;
     }
 
-    .teams {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(210px, 1fr));
-      gap: 10px;
-      align-items: stretch;
+    .teams{
+      display:grid;
+      grid-template-columns:repeat(4, minmax(210px, 1fr));
+      gap:10px;
+      align-items:stretch;
     }
     @media (max-width: 992px){
       .teams { grid-template-columns: repeat(2, minmax(180px, 1fr)); }
@@ -57,312 +55,276 @@
     }
 
     .team-card{
-      position: relative;
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      padding: 10px;
-      cursor: pointer;
-      user-select: none;
-      box-shadow: 0 6px 18px rgba(0,0,0,.05);
+      position:relative;
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      padding:10px;
+      cursor:pointer;
+      user-select:none;
+      box-shadow:0 6px 18px rgba(0,0,0,.05);
     }
     .team-card.active{
-      box-shadow: 0 0 0 3px rgba(13,110,253,.18), 0 10px 26px rgba(0,0,0,.07);
-      border-color: rgba(13,110,253,.55);
+      border-color:rgba(13,110,253,.55);
+      box-shadow:0 0 0 3px rgba(13,110,253,.18), 0 10px 26px rgba(0,0,0,.07);
     }
-
-    /* left color bar */
     .team-card::before{
       content:"";
       position:absolute;
       left:10px; top:10px; bottom:10px;
       width:8px;
-      border-radius: 10px;
-      background: var(--team);
-      opacity: .95;
+      border-radius:10px;
+      background:var(--team);
+      opacity:.95;
     }
 
-    .team-inner{
-      padding-left: 18px; /* make room for bar */
-      display: grid;
-      gap: 8px;
-    }
-
-    .team-top{
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 8px;
-      align-items: center;
-    }
+    .team-inner{ padding-left:18px; display:grid; gap:8px; }
+    .team-top{ display:grid; grid-template-columns: 1fr auto; gap:8px; align-items:center; }
 
     .name-input{
-      border-radius: 12px !important;
-      border: 1px solid var(--line) !important;
-      font-weight: 700;
+      border-radius:12px !important;
+      border:1px solid var(--line) !important;
+      font-weight:800;
     }
-
     .score{
-      font-weight: 950;
-      font-size: 26px;
-      line-height: 1;
-      padding: 8px 10px;
-      border-radius: 12px;
-      background: rgba(0,0,0,.04);
-      border: 1px solid rgba(0,0,0,.08);
-      min-width: 86px;
-      text-align: center;
+      font-weight:950;
+      font-size:28px;
+      line-height:1;
+      padding:8px 10px;
+      border-radius:12px;
+      background:rgba(0,0,0,.04);
+      border:1px solid rgba(0,0,0,.08);
+      min-width:92px;
+      text-align:center;
     }
 
     .team-tools{
-      display: grid;
-      grid-template-columns: auto 1fr auto;
-      gap: 8px;
-      align-items: center;
+      display:grid;
+      grid-template-columns:auto 1fr auto;
+      gap:8px;
+      align-items:center;
     }
-
     .pts-input{
-      border-radius: 12px !important;
-      border: 1px solid var(--line) !important;
-      text-align: center;
-      font-weight: 800;
+      border-radius:12px !important;
+      border:1px solid var(--line) !important;
+      text-align:center;
+      font-weight:900;
     }
-
     .btn-round{
-      border-radius: 12px;
-      font-weight: 900;
-      padding: 8px 12px;
-      line-height: 1.1;
+      border-radius:12px;
+      font-weight:950;
+      padding:8px 12px;
+      line-height:1.1;
     }
-
     .btn-plus{
-      background: rgba(22,163,74,.10);
-      border: 1px solid rgba(22,163,74,.25);
-      color: #0f6a2b;
+      background:rgba(22,163,74,.10);
+      border:1px solid rgba(22,163,74,.25);
+      color:#0f6a2b;
     }
     .btn-minus{
-      background: rgba(239,68,68,.10);
-      border: 1px solid rgba(239,68,68,.25);
-      color: #8a1c1c;
+      background:rgba(239,68,68,.10);
+      border:1px solid rgba(239,68,68,.25);
+      color:#8a1c1c;
     }
 
-    /* Board */
-    .board-area{
-      flex: 1 1 auto;
-      padding: 10px 12px 14px;
-      overflow: hidden;
-    }
-    .board-wrap{
-      height: 100%;
-      overflow: auto;
-      padding-bottom: 6px;
-    }
-    .board{
-      min-width: 980px;
-      display: grid;
-      gap: 10px;
-      align-content: start;
-    }
+    .board-area{ flex:1 1 auto; padding:10px 12px 14px; overflow:hidden; }
+    .board-wrap{ height:100%; overflow:auto; padding-bottom:6px; }
+    .board{ min-width:980px; display:grid; gap:10px; align-content:start; }
 
     .cat{
-      height: 64px;
-      border-radius: var(--radius);
-      background: var(--card);
-      border: 1px solid var(--line);
-      box-shadow: 0 6px 18px rgba(0,0,0,.05);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 8px;
-      font-weight: 900;
-      letter-spacing: .3px;
-      text-transform: uppercase;
-      font-size: 13px;
-      color: rgba(0,0,0,.72);
+      height:64px;
+      border-radius:var(--radius);
+      background:var(--card);
+      border:1px solid var(--line);
+      box-shadow:0 6px 18px rgba(0,0,0,.05);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      padding:8px;
+      font-weight:950;
+      letter-spacing:.3px;
+      text-transform:uppercase;
+      font-size:13px;
+      color:rgba(0,0,0,.72);
     }
 
     .cell-btn{
-      height: var(--cell-h);
-      border-radius: var(--radius);
-      border: 1px solid var(--line);
-      background: linear-gradient(180deg, #ffffff, #f1f3fb);
-      color: #0b1b44;
-      font-weight: 950;
-      font-size: 24px;
-      width: 100%;
-      box-shadow: 0 6px 18px rgba(0,0,0,.05);
+      height:var(--cell-h);
+      border-radius:var(--radius);
+      border:1px solid var(--line);
+      background:linear-gradient(180deg, #fff, #f1f3fb);
+      color:#0b1b44;
+      font-weight:950;
+      font-size:24px;
+      width:100%;
+      box-shadow:0 6px 18px rgba(0,0,0,.05);
     }
-    .cell-btn:hover{ filter: brightness(1.03); }
+    .cell-btn:hover{ filter:brightness(1.03); }
     .cell-btn:disabled{
-      background: #eceef6;
-      color: rgba(0,0,0,.25);
-      border-color: rgba(0,0,0,.08);
-      text-decoration: line-through;
-      box-shadow: none;
+      background:#eceef6;
+      color:rgba(0,0,0,.25);
+      border-color:rgba(0,0,0,.08);
+      text-decoration:line-through;
+      box-shadow:none;
     }
 
     /* Fullscreen modal */
-    .modal-dialog.modal-fullscreen{ margin: 0; }
+    .modal-dialog.modal-fullscreen{ margin:0; }
     .modal-content{
-      height: 100vh;
-      border-radius: 0;
-      border: 0;
-      background: #ffffff;
+      height:100vh;
+      border-radius:0;
+      border:0;
+      background:#fff;
     }
     .modal-header{
-      border-bottom: 1px solid var(--line);
-      padding: 12px 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
+      border-bottom:1px solid var(--line);
+      padding:12px 16px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
     }
-    .meta{
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 800;
-    }
-    .modal-title{
-      font-weight: 950;
-      letter-spacing: .2px;
-    }
-    .header-right{
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+    .meta{ color:var(--muted); font-size:12px; font-weight:900; }
+    .modal-title{ font-weight:950; letter-spacing:.2px; }
+    .header-right{ display:flex; align-items:center; gap:10px; }
 
     .timer-pill{
-      border-radius: 14px;
-      padding: 8px 12px;
-      background: rgba(0,0,0,.04);
-      border: 1px solid rgba(0,0,0,.10);
-      font-weight: 950;
-      min-width: 110px;
-      text-align: center;
-      font-variant-numeric: tabular-nums;
+      border-radius:14px;
+      padding:8px 12px;
+      background:rgba(0,0,0,.04);
+      border:1px solid rgba(0,0,0,.10);
+      font-weight:950;
+      min-width:120px;
+      text-align:center;
+      font-variant-numeric:tabular-nums;
+      font-size:18px;
     }
     .timer-pill.urgent{
-      background: rgba(239,68,68,.10);
-      border-color: rgba(239,68,68,.25);
-      color: #8a1c1c;
-      animation: pulse 1s infinite;
+      background:rgba(239,68,68,.10);
+      border-color:rgba(239,68,68,.25);
+      color:#8a1c1c;
+      animation:pulse 1s infinite;
     }
-
     @keyframes pulse{
-      0%{ transform: scale(1); }
-      50%{ transform: scale(1.03); }
-      100%{ transform: scale(1); }
+      0%{ transform:scale(1); }
+      50%{ transform:scale(1.03); }
+      100%{ transform:scale(1); }
     }
 
     .modal-body{
-      padding: 14px 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
+      padding:14px 16px;
+      display:flex;
+      flex-direction:column;
+      gap:14px;
     }
 
     .qbox{
-      flex: 1 1 auto;
-      border-radius: 20px;
-      background: #f4f7ff;
-      border: 1px solid rgba(13,110,253,.18);
-      padding: 18px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
+      flex:1 1 auto;
+      border-radius:22px;
+      background:#f4f7ff;
+      border:1px solid rgba(13,110,253,.18);
+      padding:22px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
     }
+    /* BIGGER question text */
     .qtext{
-      font-weight: 950;
-      font-size: clamp(22px, 3.2vw, 48px);
-      line-height: 1.1;
-      max-width: 1100px;
+      font-weight:950;
+      font-size:clamp(32px, 4.4vw, 78px);
+      line-height:1.08;
+      max-width:1200px;
     }
 
     .abox{
-      display: none;
-      border-radius: 20px;
-      background: rgba(25,135,84,.08);
-      border: 1px solid rgba(25,135,84,.22);
-      padding: 14px 16px;
+      display:none;
+      border-radius:22px;
+      background:rgba(25,135,84,.08);
+      border:1px solid rgba(25,135,84,.22);
+      padding:16px 18px;
     }
     .atext{
-      font-weight: 950;
-      font-size: clamp(18px, 2.1vw, 32px);
+      font-weight:950;
+      font-size:clamp(22px, 2.6vw, 44px);
+      line-height:1.12;
     }
 
     .controls{
-      flex: 0 0 auto;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      align-items: center;
-      justify-content: space-between;
+      flex:0 0 auto;
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      align-items:center;
+      justify-content:space-between;
     }
-
     .footerbar{
-      flex: 0 0 auto;
-      display: flex;
-      gap: 8px;
-      justify-content: flex-end;
-      border-top: 1px solid var(--line);
-      padding: 10px 12px;
-      background: var(--card);
+      flex:0 0 auto;
+      display:flex;
+      gap:8px;
+      justify-content:flex-end;
+      border-top:1px solid var(--line);
+      padding:10px 12px;
+      background:var(--card);
     }
 
-    /* FX overlay */
+    /* FX overlay (LONGER) */
     #fxOverlay{
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      opacity: 0;
-      z-index: 3000;
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      opacity:0;
+      z-index:3000;
     }
     #fxOverlay.correct{
-      background: radial-gradient(circle at center, rgba(34,197,94,.35), rgba(34,197,94,.10), rgba(255,255,255,0));
-      animation: flashInOut 700ms ease-out forwards;
+      background: radial-gradient(circle at center,
+        rgba(34,197,94,.55),
+        rgba(34,197,94,.22),
+        rgba(255,255,255,0));
+      animation: flashLong 1600ms ease-out forwards;
     }
     #fxOverlay.wrong{
-      background: radial-gradient(circle at center, rgba(239,68,68,.42), rgba(239,68,68,.16), rgba(255,255,255,0));
-      animation: flashInOut 850ms ease-out forwards;
+      background: radial-gradient(circle at center,
+        rgba(239,68,68,.62),
+        rgba(239,68,68,.26),
+        rgba(255,255,255,0));
+      animation: flashLong 1900ms ease-out forwards;
     }
-    @keyframes flashInOut{
-      0%{ opacity: 0; transform: scale(1); }
-      20%{ opacity: 1; transform: scale(1.02); }
-      100%{ opacity: 0; transform: scale(1); }
+    @keyframes flashLong{
+      0%   { opacity:0; transform:scale(1); }
+      12%  { opacity:1; transform:scale(1.02); }
+      70%  { opacity:1; transform:scale(1.02); }
+      100% { opacity:0; transform:scale(1); }
     }
 
     /* shake */
-    .shake{
-      animation: shake 600ms ease-in-out;
-    }
+    .shake{ animation: shake 900ms ease-in-out; }
     @keyframes shake{
       0%,100%{ transform: translateX(0); }
-      10%{ transform: translateX(-10px); }
-      20%{ transform: translateX(10px); }
-      30%{ transform: translateX(-8px); }
-      40%{ transform: translateX(8px); }
-      50%{ transform: translateX(-6px); }
-      60%{ transform: translateX(6px); }
-      70%{ transform: translateX(-3px); }
-      80%{ transform: translateX(3px); }
+      10%{ transform: translateX(-12px); }
+      20%{ transform: translateX(12px); }
+      30%{ transform: translateX(-10px); }
+      40%{ transform: translateX(10px); }
+      50%{ transform: translateX(-8px); }
+      60%{ transform: translateX(8px); }
+      70%{ transform: translateX(-5px); }
+      80%{ transform: translateX(5px); }
     }
 
-    .muted{ color: var(--muted); }
-    .tiny{ font-size: 12px; font-weight: 800; color: var(--muted); }
+    .muted{ color:var(--muted); }
+    .tiny{ font-size:12px; font-weight:900; color:var(--muted); }
   </style>
 </head>
 
 <body>
   <div id="fxOverlay"></div>
 
-  <!-- Put correct.mp3 and wrong.mp3 in the SAME folder as this HTML (you can replace later) -->
+  <!-- Put correct.mp3 and wrong.mp3 in the SAME folder as this HTML -->
   <audio id="sndCorrect" preload="auto" src="correct.mp3"></audio>
   <audio id="sndWrong" preload="auto" src="wrong.mp3"></audio>
 
   <div class="app" id="appRoot">
-
     <div class="topstrip">
       <div class="d-flex gap-2 justify-content-end mb-2">
         <button class="btn btn-outline-secondary btn-sm" id="btnReset">Reset board</button>
@@ -389,16 +351,8 @@
           </div>
 
           <div class="header-right">
-            <!-- Timer preset: default 60 minutes (as you asked) -->
-            <select id="timerPreset" class="form-select form-select-sm" style="width: 150px; border-radius: 12px;">
-              <option value="60">60 seconds</option>
-              <option value="120">2 minutes</option>
-              <option value="300">5 minutes</option>
-              <option value="3600" selected>60 minutes</option>
-            </select>
-
-            <div class="timer-pill" id="timerPill">60:00</div>
-
+            <!-- FIXED: always 60 seconds -->
+            <div class="timer-pill" id="timerPill">01:00</div>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
         </div>
@@ -440,101 +394,80 @@
 
   <script>
     /***********************
-     * DATA (same tricky set from before — keep or edit)
+     * DATA (edit anytime)
      ***********************/
     const DATA = {
       values: [100, 200, 300, 400, 500],
       categories: [
-        {
-          title: "SHAPES (2D)",
-          clues: [
-            { q: "Give TWO adjectives from the list that fit a circle.", a: "round + smooth (accept: round + flat)" },
-            { q: "Which shape is NOT always ‘long’: square / rectangle / circle ? Explain in 1 word.", a: "circle (or square). Key idea: not long." },
-            { q: "Fix the description by changing ONE word: “A triangle has four corners.”", a: "triangle has three corners (or triangle→rectangle/square)" },
-            { q: "Name the shape: “4 corners, but the opposite sides are longer.”", a: "rectangle" },
-            { q: "Trick: “flat + sharp” can describe TWO shapes. Name both.", a: "triangle and square (accept: rectangle if justified)" },
-          ],
-        },
-        {
-          title: "3D (SOLIDS)",
-          clues: [
-            { q: "Name the 3D shape: “It can roll. It has no corners.”", a: "sphere" },
-            { q: "Pick the BEST match: “like a can” → cube / cylinder / cone", a: "cylinder" },
-            { q: "Fix ONE word: “A cone has a flat top and flat bottom.”", a: "cylinder (or: cone has a point + round base)" },
-            { q: "Two-step: “It rolls, but it also has two flat faces.” What is it?", a: "cylinder" },
-            { q: "Trick: “point + can roll” — which shape?", a: "cone (not sphere)" },
-          ],
-        },
-        {
-          title: "MATERIALS",
-          clues: [
-            { q: "Which material is most likely ‘transparent’ AND ‘hard’?", a: "glass" },
-            { q: "Trick choice: Which material is most likely ‘soft’: metal / fabric / glass ?", a: "fabric" },
-            { q: "Fix the odd part: “A wooden object is usually slippery.” Change ONE word.", a: "wooden→plastic/glass OR slippery→rough/hard" },
-            { q: "Describe: “clothes material” using ONE word.", a: "fabric" },
-            { q: "Hard mode: Give ONE material that can be BOTH smooth and rough.", a: "metal / plastic / wood / glass (any with reason)" },
-          ],
-        },
-        {
-          title: "SURFACE",
-          clues: [
-            { q: "Opposites: choose the best pair: rough ↔ ____", a: "smooth" },
-            { q: "Trick: Which surface is dangerous in a bathroom?", a: "slippery" },
-            { q: "Fix ONE word: “Soft is the opposite of rough.”", a: "soft↔hard OR rough↔smooth" },
-            { q: "Two-step: Give TWO words: not soft + not rough.", a: "hard + smooth" },
-            { q: "Trick: “smooth” is in two lists. Say ONE reason why that’s OK.", a: "It describes touch/surface quality." },
-          ],
-        },
-        {
-          title: "SIZE & LENGTH",
-          clues: [
-            { q: "Give TWO words: opposite of wide + opposite of long.", a: "narrow + short" },
-            { q: "Trick: Which pair can BOTH be true: big & narrow / small & wide ?", a: "Both can be true (with explanation)." },
-            { q: "Fix ONE word: “Narrow is the opposite of short.”", a: "narrow↔wide OR short↔long" },
-            { q: "Two-step: “A rectangle can be ____ and ____.” Choose 2: long / short / round / sharp.", a: "long + short (both possible) OR long + sharp (corners)" },
-            { q: "Hard: Make a 4-word phrase using ONLY: big/small/wide/narrow/long/short.", a: "Example: small narrow short long (teacher decides if logical)" },
-          ],
-        },
-        {
-          title: "CONDITION",
-          clues: [
-            { q: "Choose 2 conditions that can happen without breaking: scratched / broken / dirty / clean", a: "scratched + dirty" },
-            { q: "Trick: “clean” is NOT always good. Give 1 example object type.", a: "Example: clean but broken phone / scratched glass etc." },
-            { q: "Fix ONE word: “Scratched means in two pieces.”", a: "broken (or: scratched = has marks)" },
-            { q: "Two-step: Create a 5-word description: material + condition + surface + 3D shape.", a: "Example: dirty smooth plastic cylinder (any correct combo)" },
-            { q: "Hard: Minimal pair: Change ONE word to make it opposite — “dirty glass” → ____ ____", a: "clean glass" },
-          ],
-        },
+        { title:"SHAPES (2D)", clues:[
+          { q:"Give TWO adjectives from the list that fit a circle.", a:"round + smooth (accept: round + flat)" },
+          { q:"Which shape is NOT always ‘long’: square / rectangle / circle ? Explain in 1 word.", a:"circle (or square). Key idea: not long." },
+          { q:"Fix the description by changing ONE word: “A triangle has four corners.”", a:"triangle has three corners (or triangle→rectangle/square)" },
+          { q:"Name the shape: “4 corners, but the opposite sides are longer.”", a:"rectangle" },
+          { q:"Trick: “flat + sharp” can describe TWO shapes. Name both.", a:"triangle and square (accept: rectangle if justified)" },
+        ]},
+        { title:"3D (SOLIDS)", clues:[
+          { q:"Name the 3D shape: “It can roll. It has no corners.”", a:"sphere" },
+          { q:"Pick the BEST match: “like a can” → cube / cylinder / cone", a:"cylinder" },
+          { q:"Fix ONE word: “A cone has a flat top and flat bottom.”", a:"cylinder (or: cone has a point + round base)" },
+          { q:"Two-step: “It rolls, but it also has two flat faces.” What is it?", a:"cylinder" },
+          { q:"Trick: “point + can roll” — which shape?", a:"cone (not sphere)" },
+        ]},
+        { title:"MATERIALS", clues:[
+          { q:"Which material is most likely ‘transparent’ AND ‘hard’?", a:"glass" },
+          { q:"Trick choice: Which material is most likely ‘soft’: metal / fabric / glass ?", a:"fabric" },
+          { q:"Fix the odd part: “A wooden object is usually slippery.” Change ONE word.", a:"wooden→plastic/glass OR slippery→rough/hard" },
+          { q:"Describe: “clothes material” using ONE word.", a:"fabric" },
+          { q:"Hard mode: Give ONE material that can be BOTH smooth and rough.", a:"metal / plastic / wood / glass (any with reason)" },
+        ]},
+        { title:"SURFACE", clues:[
+          { q:"Opposites: choose the best pair: rough ↔ ____", a:"smooth" },
+          { q:"Trick: Which surface is dangerous in a bathroom?", a:"slippery" },
+          { q:"Fix ONE word: “Soft is the opposite of rough.”", a:"soft↔hard OR rough↔smooth" },
+          { q:"Two-step: Give TWO words: not soft + not rough.", a:"hard + smooth" },
+          { q:"Trick: “smooth” is in two lists. Say ONE reason why that’s OK.", a:"It describes touch/surface quality." },
+        ]},
+        { title:"SIZE & LENGTH", clues:[
+          { q:"Give TWO words: opposite of wide + opposite of long.", a:"narrow + short" },
+          { q:"Trick: Which pair can BOTH be true: big & narrow / small & wide ?", a:"Both can be true (with explanation)." },
+          { q:"Fix ONE word: “Narrow is the opposite of short.”", a:"narrow↔wide OR short↔long" },
+          { q:"Two-step: “A rectangle can be ____ and ____.” Choose 2: long / short / round / sharp.", a:"long + short (both possible) OR long + sharp (corners)" },
+          { q:"Hard: Make a 4-word phrase using ONLY: big/small/wide/narrow/long/short.", a:"Example: small narrow short long (teacher decides if logical)" },
+        ]},
+        { title:"CONDITION", clues:[
+          { q:"Choose 2 conditions that can happen without breaking: scratched / broken / dirty / clean", a:"scratched + dirty" },
+          { q:"Trick: “clean” is NOT always good. Give 1 example object type.", a:"Example: clean but broken phone / scratched glass etc." },
+          { q:"Fix ONE word: “Scratched means in two pieces.”", a:"broken (or: scratched = has marks)" },
+          { q:"Two-step: Create a 5-word description: material + condition + surface + 3D shape.", a:"Example: dirty smooth plastic cylinder (any correct combo)" },
+          { q:"Hard: Minimal pair: Change ONE word to make it opposite — “dirty glass” → ____ ____", a:"clean glass" },
+        ]},
       ],
     };
 
     /***********************
      * STATE (persists on reload)
      ***********************/
-    const LS_KEY = "quiz_grid_fx_timer_manualpoints_v2";
-    const TEAM_COLORS = ["var(--t0)", "var(--t1)", "var(--t2)", "var(--t3)"];
-    const defaultTeams = ["Team 1", "Team 2", "Team 3", "Team 4"];
+    const LS_KEY = "quiz_grid_fx_timer_60s_bigfont_v3";
+    const TEAM_COLORS = ["var(--t0)","var(--t1)","var(--t2)","var(--t3)"];
+    const defaultTeams = ["Team 1","Team 2","Team 3","Team 4"];
 
     let state = {
       used: {},
       scores: {},
       teamNames: {},
       activeTeam: 0,
-      teamStep: { 0: 100, 1: 100, 2: 100, 3: 100 } // manual add/sub step per team
+      teamStep: {0:100,1:100,2:100,3:100}
     };
 
     let currentClue = null;
 
     function clueId(catIndex, rowIndex){ return `${catIndex}-${rowIndex}`; }
-
     function save(){ localStorage.setItem(LS_KEY, JSON.stringify(state)); }
-
     function load(){
       const raw = localStorage.getItem(LS_KEY);
       if(!raw) return;
       try { state = Object.assign(state, JSON.parse(raw)); } catch(e){}
     }
-
     function ensureTeams(){
       for(let i=0;i<defaultTeams.length;i++){
         if(state.scores[i] == null) state.scores[i] = 0;
@@ -544,7 +477,6 @@
       }
       if(state.activeTeam == null) state.activeTeam = 0;
     }
-
     function addScore(teamIndex, delta){
       state.scores[teamIndex] = (state.scores[teamIndex] || 0) + delta;
       save();
@@ -639,8 +571,8 @@
     }
 
     function updateActiveTeamName(){
-      const el = document.getElementById("activeTeamName");
-      el.textContent = state.teamNames[state.activeTeam] || `Team ${state.activeTeam+1}`;
+      document.getElementById("activeTeamName").textContent =
+        state.teamNames[state.activeTeam] || `Team ${state.activeTeam+1}`;
     }
 
     /***********************
@@ -663,7 +595,6 @@
       DATA.values.forEach((value, rowIndex) => {
         DATA.categories.forEach((cat, catIndex) => {
           const id = clueId(catIndex, rowIndex);
-
           const btn = document.createElement("button");
           btn.className = "cell-btn";
           btn.textContent = value;
@@ -680,22 +611,19 @@
     }
 
     /***********************
-     * Fullscreen modal + timer
+     * Modal + FIXED 60 seconds timer
      ***********************/
     const clueModalEl = document.getElementById("clueModal");
     const clueModal = new bootstrap.Modal(clueModalEl);
 
+    const FIXED_SECONDS = 60; // ✅ always 60 seconds
     let timerInterval = null;
     let timeLeft = 0;
 
     function formatTime(sec){
       sec = Math.max(0, sec | 0);
-      const h = Math.floor(sec / 3600);
-      const m = Math.floor((sec % 3600) / 60);
+      const m = Math.floor(sec / 60);
       const s = sec % 60;
-      if(h > 0){
-        return String(h).padStart(2,"0") + ":" + String(m).padStart(2,"0") + ":" + String(s).padStart(2,"0");
-      }
       return String(m).padStart(2,"0") + ":" + String(s).padStart(2,"0");
     }
 
@@ -706,9 +634,9 @@
       }
     }
 
-    function startTimer(seconds){
+    function startTimer(){
       stopTimer();
-      timeLeft = seconds;
+      timeLeft = FIXED_SECONDS;
 
       const pill = document.getElementById("timerPill");
       pill.classList.remove("urgent");
@@ -718,7 +646,6 @@
         timeLeft--;
         pill.textContent = formatTime(timeLeft);
 
-        // last 10 seconds = urgent pulse (still works even if you choose minutes)
         if(timeLeft <= 10) pill.classList.add("urgent");
         if(timeLeft <= 0){
           stopTimer();
@@ -748,14 +675,10 @@
       document.getElementById("modalTitle").textContent = "Question";
       updateActiveTeamName();
 
-      // timer uses selected preset each time
-      const preset = Number(document.getElementById("timerPreset").value || 3600);
-      startTimer(preset);
-
+      startTimer(); // ✅ fixed 60s each time
       clueModal.show();
     }
 
-    // stop timer when modal closes
     clueModalEl.addEventListener("hidden.bs.modal", () => {
       stopTimer();
     });
@@ -787,9 +710,9 @@
 
     function triggerFX(type){
       const overlay = document.getElementById("fxOverlay");
-      overlay.className = "";            // reset
-      void overlay.offsetWidth;          // reflow to restart animation
-      overlay.classList.add(type);       // 'correct' or 'wrong'
+      overlay.className = "";
+      void overlay.offsetWidth; // restart animation
+      overlay.classList.add(type);
     }
 
     function shakeApp(){
@@ -797,7 +720,7 @@
       app.classList.remove("shake");
       void app.offsetWidth;
       app.classList.add("shake");
-      setTimeout(() => app.classList.remove("shake"), 650);
+      setTimeout(() => app.classList.remove("shake"), 950);
     }
 
     /***********************
@@ -814,8 +737,8 @@
       playSound("sndCorrect");
       triggerFX("correct");
 
-      // close after the green flash
-      setTimeout(() => clueModal.hide(), 350);
+      // keep the green longer (overlay is long); close a bit later
+      setTimeout(() => clueModal.hide(), 900);
     };
 
     document.getElementById("btnWrong").onclick = () => {
@@ -828,8 +751,7 @@
       triggerFX("wrong");
       shakeApp();
 
-      // close after the red shake
-      setTimeout(() => clueModal.hide(), 450);
+      setTimeout(() => clueModal.hide(), 1100);
     };
 
     document.getElementById("btnMarkUsed").onclick = () => {
@@ -850,7 +772,7 @@
     };
 
     /***********************
-     * Keyboard (hidden but works)
+     * Keyboard (hidden)
      * R reveal, C correct, W wrong
      ***********************/
     document.addEventListener("keydown", (e) => {
