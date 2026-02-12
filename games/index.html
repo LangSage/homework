@@ -1,1 +1,875 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Quiz Grid</title>
 
+  <!-- Bootstrap 5.0.2 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+  <style>
+    :root{
+      --bg: #f6f7fb;
+      --card: #ffffff;
+      --line: rgba(0,0,0,.10);
+      --muted: rgba(0,0,0,.60);
+      --radius: 16px;
+      --cell-h: 86px;
+
+      /* Team colors */
+      --t0: #2563eb; /* blue */
+      --t1: #16a34a; /* green */
+      --t2: #f59e0b; /* amber */
+      --t3: #ef4444; /* red */
+    }
+
+    html, body { height: 100%; }
+    body { margin: 0; background: var(--bg); color: #111; }
+
+    .app {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Minimal top strip */
+    .topstrip{
+      flex: 0 0 auto;
+      background: var(--card);
+      border-bottom: 1px solid var(--line);
+      padding: 10px 12px;
+    }
+
+    .teams {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(210px, 1fr));
+      gap: 10px;
+      align-items: stretch;
+    }
+    @media (max-width: 992px){
+      .teams { grid-template-columns: repeat(2, minmax(180px, 1fr)); }
+    }
+    @media (max-width: 520px){
+      .teams { grid-template-columns: 1fr; }
+    }
+
+    .team-card{
+      position: relative;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 10px;
+      cursor: pointer;
+      user-select: none;
+      box-shadow: 0 6px 18px rgba(0,0,0,.05);
+    }
+    .team-card.active{
+      box-shadow: 0 0 0 3px rgba(13,110,253,.18), 0 10px 26px rgba(0,0,0,.07);
+      border-color: rgba(13,110,253,.55);
+    }
+
+    /* left color bar */
+    .team-card::before{
+      content:"";
+      position:absolute;
+      left:10px; top:10px; bottom:10px;
+      width:8px;
+      border-radius: 10px;
+      background: var(--team);
+      opacity: .95;
+    }
+
+    .team-inner{
+      padding-left: 18px; /* make room for bar */
+      display: grid;
+      gap: 8px;
+    }
+
+    .team-top{
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .name-input{
+      border-radius: 12px !important;
+      border: 1px solid var(--line) !important;
+      font-weight: 700;
+    }
+
+    .score{
+      font-weight: 950;
+      font-size: 26px;
+      line-height: 1;
+      padding: 8px 10px;
+      border-radius: 12px;
+      background: rgba(0,0,0,.04);
+      border: 1px solid rgba(0,0,0,.08);
+      min-width: 86px;
+      text-align: center;
+    }
+
+    .team-tools{
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .pts-input{
+      border-radius: 12px !important;
+      border: 1px solid var(--line) !important;
+      text-align: center;
+      font-weight: 800;
+    }
+
+    .btn-round{
+      border-radius: 12px;
+      font-weight: 900;
+      padding: 8px 12px;
+      line-height: 1.1;
+    }
+
+    .btn-plus{
+      background: rgba(22,163,74,.10);
+      border: 1px solid rgba(22,163,74,.25);
+      color: #0f6a2b;
+    }
+    .btn-minus{
+      background: rgba(239,68,68,.10);
+      border: 1px solid rgba(239,68,68,.25);
+      color: #8a1c1c;
+    }
+
+    /* Board */
+    .board-area{
+      flex: 1 1 auto;
+      padding: 10px 12px 14px;
+      overflow: hidden;
+    }
+    .board-wrap{
+      height: 100%;
+      overflow: auto;
+      padding-bottom: 6px;
+    }
+    .board{
+      min-width: 980px;
+      display: grid;
+      gap: 10px;
+      align-content: start;
+    }
+
+    .cat{
+      height: 64px;
+      border-radius: var(--radius);
+      background: var(--card);
+      border: 1px solid var(--line);
+      box-shadow: 0 6px 18px rgba(0,0,0,.05);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 8px;
+      font-weight: 900;
+      letter-spacing: .3px;
+      text-transform: uppercase;
+      font-size: 13px;
+      color: rgba(0,0,0,.72);
+    }
+
+    .cell-btn{
+      height: var(--cell-h);
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, #ffffff, #f1f3fb);
+      color: #0b1b44;
+      font-weight: 950;
+      font-size: 24px;
+      width: 100%;
+      box-shadow: 0 6px 18px rgba(0,0,0,.05);
+    }
+    .cell-btn:hover{ filter: brightness(1.03); }
+    .cell-btn:disabled{
+      background: #eceef6;
+      color: rgba(0,0,0,.25);
+      border-color: rgba(0,0,0,.08);
+      text-decoration: line-through;
+      box-shadow: none;
+    }
+
+    /* Fullscreen modal */
+    .modal-dialog.modal-fullscreen{ margin: 0; }
+    .modal-content{
+      height: 100vh;
+      border-radius: 0;
+      border: 0;
+      background: #ffffff;
+    }
+    .modal-header{
+      border-bottom: 1px solid var(--line);
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .meta{
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .modal-title{
+      font-weight: 950;
+      letter-spacing: .2px;
+    }
+    .header-right{
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .timer-pill{
+      border-radius: 14px;
+      padding: 8px 12px;
+      background: rgba(0,0,0,.04);
+      border: 1px solid rgba(0,0,0,.10);
+      font-weight: 950;
+      min-width: 110px;
+      text-align: center;
+      font-variant-numeric: tabular-nums;
+    }
+    .timer-pill.urgent{
+      background: rgba(239,68,68,.10);
+      border-color: rgba(239,68,68,.25);
+      color: #8a1c1c;
+      animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse{
+      0%{ transform: scale(1); }
+      50%{ transform: scale(1.03); }
+      100%{ transform: scale(1); }
+    }
+
+    .modal-body{
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .qbox{
+      flex: 1 1 auto;
+      border-radius: 20px;
+      background: #f4f7ff;
+      border: 1px solid rgba(13,110,253,.18);
+      padding: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+    .qtext{
+      font-weight: 950;
+      font-size: clamp(22px, 3.2vw, 48px);
+      line-height: 1.1;
+      max-width: 1100px;
+    }
+
+    .abox{
+      display: none;
+      border-radius: 20px;
+      background: rgba(25,135,84,.08);
+      border: 1px solid rgba(25,135,84,.22);
+      padding: 14px 16px;
+    }
+    .atext{
+      font-weight: 950;
+      font-size: clamp(18px, 2.1vw, 32px);
+    }
+
+    .controls{
+      flex: 0 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .footerbar{
+      flex: 0 0 auto;
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+      border-top: 1px solid var(--line);
+      padding: 10px 12px;
+      background: var(--card);
+    }
+
+    /* FX overlay */
+    #fxOverlay{
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0;
+      z-index: 3000;
+    }
+    #fxOverlay.correct{
+      background: radial-gradient(circle at center, rgba(34,197,94,.35), rgba(34,197,94,.10), rgba(255,255,255,0));
+      animation: flashInOut 700ms ease-out forwards;
+    }
+    #fxOverlay.wrong{
+      background: radial-gradient(circle at center, rgba(239,68,68,.42), rgba(239,68,68,.16), rgba(255,255,255,0));
+      animation: flashInOut 850ms ease-out forwards;
+    }
+    @keyframes flashInOut{
+      0%{ opacity: 0; transform: scale(1); }
+      20%{ opacity: 1; transform: scale(1.02); }
+      100%{ opacity: 0; transform: scale(1); }
+    }
+
+    /* shake */
+    .shake{
+      animation: shake 600ms ease-in-out;
+    }
+    @keyframes shake{
+      0%,100%{ transform: translateX(0); }
+      10%{ transform: translateX(-10px); }
+      20%{ transform: translateX(10px); }
+      30%{ transform: translateX(-8px); }
+      40%{ transform: translateX(8px); }
+      50%{ transform: translateX(-6px); }
+      60%{ transform: translateX(6px); }
+      70%{ transform: translateX(-3px); }
+      80%{ transform: translateX(3px); }
+    }
+
+    .muted{ color: var(--muted); }
+    .tiny{ font-size: 12px; font-weight: 800; color: var(--muted); }
+  </style>
+</head>
+
+<body>
+  <div id="fxOverlay"></div>
+
+  <!-- Put correct.mp3 and wrong.mp3 in the SAME folder as this HTML (you can replace later) -->
+  <audio id="sndCorrect" preload="auto" src="correct.mp3"></audio>
+  <audio id="sndWrong" preload="auto" src="wrong.mp3"></audio>
+
+  <div class="app" id="appRoot">
+
+    <div class="topstrip">
+      <div class="d-flex gap-2 justify-content-end mb-2">
+        <button class="btn btn-outline-secondary btn-sm" id="btnReset">Reset board</button>
+        <button class="btn btn-outline-secondary btn-sm" id="btnResetScores">Reset scores</button>
+      </div>
+      <div class="teams" id="teamsRow"></div>
+    </div>
+
+    <div class="board-area">
+      <div class="board-wrap">
+        <div id="board" class="board"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fullscreen modal -->
+  <div class="modal fade" id="clueModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen m-0">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div>
+            <div class="meta" id="modalMeta"></div>
+            <div class="modal-title" id="modalTitle">Question</div>
+          </div>
+
+          <div class="header-right">
+            <!-- Timer preset: default 60 minutes (as you asked) -->
+            <select id="timerPreset" class="form-select form-select-sm" style="width: 150px; border-radius: 12px;">
+              <option value="60">60 seconds</option>
+              <option value="120">2 minutes</option>
+              <option value="300">5 minutes</option>
+              <option value="3600" selected>60 minutes</option>
+            </select>
+
+            <div class="timer-pill" id="timerPill">60:00</div>
+
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+        </div>
+
+        <div class="modal-body">
+          <div class="qbox">
+            <div class="qtext" id="modalQuestion"></div>
+          </div>
+
+          <div class="abox" id="answerBox">
+            <div class="tiny mb-1">Answer (teacher)</div>
+            <div class="atext" id="modalAnswer"></div>
+          </div>
+
+          <div class="controls">
+            <div class="d-flex flex-wrap gap-2">
+              <button class="btn btn-outline-primary btn-round" id="btnReveal">Reveal</button>
+              <button class="btn btn-success btn-round" id="btnCorrect">Correct (+)</button>
+              <button class="btn btn-danger btn-round" id="btnWrong">Wrong (−)</button>
+            </div>
+            <div class="muted">
+              Active: <span id="activeTeamName" style="font-weight:950;"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="footerbar">
+          <button class="btn btn-outline-secondary btn-sm" id="btnMarkUsed">Mark used</button>
+          <button class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+          crossorigin="anonymous"></script>
+
+  <script>
+    /***********************
+     * DATA (same tricky set from before — keep or edit)
+     ***********************/
+    const DATA = {
+      values: [100, 200, 300, 400, 500],
+      categories: [
+        {
+          title: "SHAPES (2D)",
+          clues: [
+            { q: "Give TWO adjectives from the list that fit a circle.", a: "round + smooth (accept: round + flat)" },
+            { q: "Which shape is NOT always ‘long’: square / rectangle / circle ? Explain in 1 word.", a: "circle (or square). Key idea: not long." },
+            { q: "Fix the description by changing ONE word: “A triangle has four corners.”", a: "triangle has three corners (or triangle→rectangle/square)" },
+            { q: "Name the shape: “4 corners, but the opposite sides are longer.”", a: "rectangle" },
+            { q: "Trick: “flat + sharp” can describe TWO shapes. Name both.", a: "triangle and square (accept: rectangle if justified)" },
+          ],
+        },
+        {
+          title: "3D (SOLIDS)",
+          clues: [
+            { q: "Name the 3D shape: “It can roll. It has no corners.”", a: "sphere" },
+            { q: "Pick the BEST match: “like a can” → cube / cylinder / cone", a: "cylinder" },
+            { q: "Fix ONE word: “A cone has a flat top and flat bottom.”", a: "cylinder (or: cone has a point + round base)" },
+            { q: "Two-step: “It rolls, but it also has two flat faces.” What is it?", a: "cylinder" },
+            { q: "Trick: “point + can roll” — which shape?", a: "cone (not sphere)" },
+          ],
+        },
+        {
+          title: "MATERIALS",
+          clues: [
+            { q: "Which material is most likely ‘transparent’ AND ‘hard’?", a: "glass" },
+            { q: "Trick choice: Which material is most likely ‘soft’: metal / fabric / glass ?", a: "fabric" },
+            { q: "Fix the odd part: “A wooden object is usually slippery.” Change ONE word.", a: "wooden→plastic/glass OR slippery→rough/hard" },
+            { q: "Describe: “clothes material” using ONE word.", a: "fabric" },
+            { q: "Hard mode: Give ONE material that can be BOTH smooth and rough.", a: "metal / plastic / wood / glass (any with reason)" },
+          ],
+        },
+        {
+          title: "SURFACE",
+          clues: [
+            { q: "Opposites: choose the best pair: rough ↔ ____", a: "smooth" },
+            { q: "Trick: Which surface is dangerous in a bathroom?", a: "slippery" },
+            { q: "Fix ONE word: “Soft is the opposite of rough.”", a: "soft↔hard OR rough↔smooth" },
+            { q: "Two-step: Give TWO words: not soft + not rough.", a: "hard + smooth" },
+            { q: "Trick: “smooth” is in two lists. Say ONE reason why that’s OK.", a: "It describes touch/surface quality." },
+          ],
+        },
+        {
+          title: "SIZE & LENGTH",
+          clues: [
+            { q: "Give TWO words: opposite of wide + opposite of long.", a: "narrow + short" },
+            { q: "Trick: Which pair can BOTH be true: big & narrow / small & wide ?", a: "Both can be true (with explanation)." },
+            { q: "Fix ONE word: “Narrow is the opposite of short.”", a: "narrow↔wide OR short↔long" },
+            { q: "Two-step: “A rectangle can be ____ and ____.” Choose 2: long / short / round / sharp.", a: "long + short (both possible) OR long + sharp (corners)" },
+            { q: "Hard: Make a 4-word phrase using ONLY: big/small/wide/narrow/long/short.", a: "Example: small narrow short long (teacher decides if logical)" },
+          ],
+        },
+        {
+          title: "CONDITION",
+          clues: [
+            { q: "Choose 2 conditions that can happen without breaking: scratched / broken / dirty / clean", a: "scratched + dirty" },
+            { q: "Trick: “clean” is NOT always good. Give 1 example object type.", a: "Example: clean but broken phone / scratched glass etc." },
+            { q: "Fix ONE word: “Scratched means in two pieces.”", a: "broken (or: scratched = has marks)" },
+            { q: "Two-step: Create a 5-word description: material + condition + surface + 3D shape.", a: "Example: dirty smooth plastic cylinder (any correct combo)" },
+            { q: "Hard: Minimal pair: Change ONE word to make it opposite — “dirty glass” → ____ ____", a: "clean glass" },
+          ],
+        },
+      ],
+    };
+
+    /***********************
+     * STATE (persists on reload)
+     ***********************/
+    const LS_KEY = "quiz_grid_fx_timer_manualpoints_v2";
+    const TEAM_COLORS = ["var(--t0)", "var(--t1)", "var(--t2)", "var(--t3)"];
+    const defaultTeams = ["Team 1", "Team 2", "Team 3", "Team 4"];
+
+    let state = {
+      used: {},
+      scores: {},
+      teamNames: {},
+      activeTeam: 0,
+      teamStep: { 0: 100, 1: 100, 2: 100, 3: 100 } // manual add/sub step per team
+    };
+
+    let currentClue = null;
+
+    function clueId(catIndex, rowIndex){ return `${catIndex}-${rowIndex}`; }
+
+    function save(){ localStorage.setItem(LS_KEY, JSON.stringify(state)); }
+
+    function load(){
+      const raw = localStorage.getItem(LS_KEY);
+      if(!raw) return;
+      try { state = Object.assign(state, JSON.parse(raw)); } catch(e){}
+    }
+
+    function ensureTeams(){
+      for(let i=0;i<defaultTeams.length;i++){
+        if(state.scores[i] == null) state.scores[i] = 0;
+        if(state.teamNames[i] == null) state.teamNames[i] = defaultTeams[i];
+        if(state.teamStep == null) state.teamStep = {};
+        if(state.teamStep[i] == null) state.teamStep[i] = 100;
+      }
+      if(state.activeTeam == null) state.activeTeam = 0;
+    }
+
+    function addScore(teamIndex, delta){
+      state.scores[teamIndex] = (state.scores[teamIndex] || 0) + delta;
+      save();
+      renderTeams();
+    }
+
+    /***********************
+     * Teams UI (colored + manual points)
+     ***********************/
+    function renderTeams(){
+      const row = document.getElementById("teamsRow");
+      row.innerHTML = "";
+
+      defaultTeams.forEach((_, i) => {
+        const card = document.createElement("div");
+        card.className = "team-card " + (state.activeTeam === i ? "active" : "");
+        card.style.setProperty("--team", TEAM_COLORS[i]);
+
+        card.onclick = () => {
+          state.activeTeam = i;
+          save();
+          renderTeams();
+          updateActiveTeamName();
+        };
+
+        const inner = document.createElement("div");
+        inner.className = "team-inner";
+
+        const top = document.createElement("div");
+        top.className = "team-top";
+
+        const nameInput = document.createElement("input");
+        nameInput.className = "form-control form-control-sm name-input";
+        nameInput.value = state.teamNames[i];
+        nameInput.onclick = (e) => e.stopPropagation();
+        nameInput.oninput = (e) => {
+          state.teamNames[i] = e.target.value || defaultTeams[i];
+          save();
+          updateActiveTeamName();
+        };
+
+        const score = document.createElement("div");
+        score.className = "score";
+        score.textContent = state.scores[i];
+
+        top.appendChild(nameInput);
+        top.appendChild(score);
+
+        const tools = document.createElement("div");
+        tools.className = "team-tools";
+
+        const minusBtn = document.createElement("button");
+        minusBtn.className = "btn btn-minus btn-round";
+        minusBtn.textContent = "−";
+        minusBtn.onclick = (e) => {
+          e.stopPropagation();
+          const step = Number(state.teamStep[i] || 0) || 0;
+          addScore(i, -step);
+        };
+
+        const ptsInput = document.createElement("input");
+        ptsInput.type = "number";
+        ptsInput.className = "form-control form-control-sm pts-input";
+        ptsInput.value = state.teamStep[i];
+        ptsInput.min = "0";
+        ptsInput.step = "10";
+        ptsInput.onclick = (e) => e.stopPropagation();
+        ptsInput.oninput = (e) => {
+          state.teamStep[i] = Number(e.target.value || 0);
+          save();
+        };
+
+        const plusBtn = document.createElement("button");
+        plusBtn.className = "btn btn-plus btn-round";
+        plusBtn.textContent = "+";
+        plusBtn.onclick = (e) => {
+          e.stopPropagation();
+          const step = Number(state.teamStep[i] || 0) || 0;
+          addScore(i, step);
+        };
+
+        tools.appendChild(minusBtn);
+        tools.appendChild(ptsInput);
+        tools.appendChild(plusBtn);
+
+        inner.appendChild(top);
+        inner.appendChild(tools);
+
+        card.appendChild(inner);
+        row.appendChild(card);
+      });
+    }
+
+    function updateActiveTeamName(){
+      const el = document.getElementById("activeTeamName");
+      el.textContent = state.teamNames[state.activeTeam] || `Team ${state.activeTeam+1}`;
+    }
+
+    /***********************
+     * Board
+     ***********************/
+    function renderBoard(){
+      const board = document.getElementById("board");
+      const cols = DATA.categories.length;
+
+      board.style.gridTemplateColumns = `repeat(${cols}, minmax(150px, 1fr))`;
+      board.innerHTML = "";
+
+      DATA.categories.forEach(cat => {
+        const h = document.createElement("div");
+        h.className = "cat";
+        h.textContent = cat.title;
+        board.appendChild(h);
+      });
+
+      DATA.values.forEach((value, rowIndex) => {
+        DATA.categories.forEach((cat, catIndex) => {
+          const id = clueId(catIndex, rowIndex);
+
+          const btn = document.createElement("button");
+          btn.className = "cell-btn";
+          btn.textContent = value;
+
+          if(state.used[id]){
+            btn.disabled = true;
+            btn.textContent = "USED";
+          }
+
+          btn.onclick = () => openClue(catIndex, rowIndex, value);
+          board.appendChild(btn);
+        });
+      });
+    }
+
+    /***********************
+     * Fullscreen modal + timer
+     ***********************/
+    const clueModalEl = document.getElementById("clueModal");
+    const clueModal = new bootstrap.Modal(clueModalEl);
+
+    let timerInterval = null;
+    let timeLeft = 0;
+
+    function formatTime(sec){
+      sec = Math.max(0, sec | 0);
+      const h = Math.floor(sec / 3600);
+      const m = Math.floor((sec % 3600) / 60);
+      const s = sec % 60;
+      if(h > 0){
+        return String(h).padStart(2,"0") + ":" + String(m).padStart(2,"0") + ":" + String(s).padStart(2,"0");
+      }
+      return String(m).padStart(2,"0") + ":" + String(s).padStart(2,"0");
+    }
+
+    function stopTimer(){
+      if(timerInterval){
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+    }
+
+    function startTimer(seconds){
+      stopTimer();
+      timeLeft = seconds;
+
+      const pill = document.getElementById("timerPill");
+      pill.classList.remove("urgent");
+      pill.textContent = formatTime(timeLeft);
+
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        pill.textContent = formatTime(timeLeft);
+
+        // last 10 seconds = urgent pulse (still works even if you choose minutes)
+        if(timeLeft <= 10) pill.classList.add("urgent");
+        if(timeLeft <= 0){
+          stopTimer();
+          pill.textContent = "TIME";
+          pill.classList.add("urgent");
+        }
+      }, 1000);
+    }
+
+    function openClue(catIndex, rowIndex, value){
+      const cat = DATA.categories[catIndex];
+      const clue = cat.clues[rowIndex];
+
+      currentClue = {
+        clueId: clueId(catIndex, rowIndex),
+        catIndex, rowIndex, value,
+        q: clue.q,
+        a: clue.a,
+        catTitle: cat.title
+      };
+
+      document.getElementById("modalMeta").textContent = `${currentClue.catTitle} • ${currentClue.value}`;
+      document.getElementById("modalQuestion").textContent = currentClue.q;
+      document.getElementById("modalAnswer").textContent = currentClue.a;
+
+      document.getElementById("answerBox").style.display = "none";
+      document.getElementById("modalTitle").textContent = "Question";
+      updateActiveTeamName();
+
+      // timer uses selected preset each time
+      const preset = Number(document.getElementById("timerPreset").value || 3600);
+      startTimer(preset);
+
+      clueModal.show();
+    }
+
+    // stop timer when modal closes
+    clueModalEl.addEventListener("hidden.bs.modal", () => {
+      stopTimer();
+    });
+
+    function reveal(){
+      document.getElementById("answerBox").style.display = "block";
+      document.getElementById("modalTitle").textContent = "Answer shown";
+    }
+
+    function markUsed(){
+      if(!currentClue) return;
+      state.used[currentClue.clueId] = true;
+      save();
+      renderBoard();
+    }
+
+    /***********************
+     * FX + sound
+     ***********************/
+    function playSound(id){
+      const el = document.getElementById(id);
+      if(!el) return;
+      try{
+        el.currentTime = 0;
+        const p = el.play();
+        if(p && typeof p.catch === "function") p.catch(() => {});
+      }catch(e){}
+    }
+
+    function triggerFX(type){
+      const overlay = document.getElementById("fxOverlay");
+      overlay.className = "";            // reset
+      void overlay.offsetWidth;          // reflow to restart animation
+      overlay.classList.add(type);       // 'correct' or 'wrong'
+    }
+
+    function shakeApp(){
+      const app = document.getElementById("appRoot");
+      app.classList.remove("shake");
+      void app.offsetWidth;
+      app.classList.add("shake");
+      setTimeout(() => app.classList.remove("shake"), 650);
+    }
+
+    /***********************
+     * Buttons
+     ***********************/
+    document.getElementById("btnReveal").onclick = reveal;
+
+    document.getElementById("btnCorrect").onclick = () => {
+      if(!currentClue) return;
+      stopTimer();
+      addScore(state.activeTeam, currentClue.value);
+      markUsed();
+
+      playSound("sndCorrect");
+      triggerFX("correct");
+
+      // close after the green flash
+      setTimeout(() => clueModal.hide(), 350);
+    };
+
+    document.getElementById("btnWrong").onclick = () => {
+      if(!currentClue) return;
+      stopTimer();
+      addScore(state.activeTeam, -currentClue.value);
+      markUsed();
+
+      playSound("sndWrong");
+      triggerFX("wrong");
+      shakeApp();
+
+      // close after the red shake
+      setTimeout(() => clueModal.hide(), 450);
+    };
+
+    document.getElementById("btnMarkUsed").onclick = () => {
+      markUsed();
+      clueModal.hide();
+    };
+
+    document.getElementById("btnReset").onclick = () => {
+      state.used = {};
+      save();
+      renderBoard();
+    };
+
+    document.getElementById("btnResetScores").onclick = () => {
+      Object.keys(state.scores).forEach(k => state.scores[k] = 0);
+      save();
+      renderTeams();
+    };
+
+    /***********************
+     * Keyboard (hidden but works)
+     * R reveal, C correct, W wrong
+     ***********************/
+    document.addEventListener("keydown", (e) => {
+      const tag = (document.activeElement && document.activeElement.tagName) || "";
+      if(tag === "INPUT" || tag === "TEXTAREA") return;
+
+      if(e.key.toLowerCase() === "r") reveal();
+      if(e.key.toLowerCase() === "c") document.getElementById("btnCorrect").click();
+      if(e.key.toLowerCase() === "w") document.getElementById("btnWrong").click();
+    });
+
+    /***********************
+     * INIT
+     ***********************/
+    load();
+    ensureTeams();
+    renderTeams();
+    renderBoard();
+    updateActiveTeamName();
+  </script>
+</body>
+</html>
