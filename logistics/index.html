@@ -1,1 +1,1031 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
 
+</body>
+</html><!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Warehouse Vocab Trainer</title>
+
+  <!-- Bootstrap 5.0.2 (your preferred CDN) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+  <style>
+    :root{
+      --green:#2f9e44;
+      --green-soft:#eaf7ee;
+      --border:#b7e4c7;
+      --ink:#0f172a;
+    }
+    body{ background:#f6f7f8; color:var(--ink); }
+    .app-wrap{ max-width:1100px; margin:0 auto; padding:18px; }
+    .card-soft{
+      background:var(--green-soft);
+      border:1px solid var(--border);
+      border-left:10px solid var(--green);
+      border-radius:16px;
+      padding:16px;
+      box-shadow:0 8px 20px rgba(0,0,0,.06);
+    }
+    .panel{
+      background:#fff;
+      border:1px solid rgba(0,0,0,.12);
+      border-radius:16px;
+      padding:16px;
+      box-shadow:0 6px 18px rgba(0,0,0,.05);
+    }
+    .small-muted{ opacity:.85; }
+    .pill-nav .nav-link{ border-radius:999px; }
+    .pill-nav .nav-link.active{ background:var(--green); }
+    .kbd{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      background:#f1f3f5; border:1px solid rgba(0,0,0,.12);
+      padding:2px 8px; border-radius:8px; font-size:.9rem;
+    }
+    .score-pill{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:6px 10px; border-radius:999px;
+      background:#fff; border:1px solid rgba(0,0,0,.12);
+      font-weight:600;
+    }
+    .ok{ border-color:var(--green)!important; background:#ecfff1!important; }
+    .bad{ border-color:#e03131!important; background:#fff1f1!important; }
+    .qcard{
+      border:1px solid rgba(0,0,0,.12);
+      border-radius:14px;
+      padding:14px;
+      margin-bottom:12px;
+      background:#fff;
+    }
+    .qtitle{ font-weight:700; margin-bottom:6px; }
+    .tight td{ padding:6px 10px; }
+    .sticky-topbar{
+      position:sticky; top:0; z-index:10;
+      background:rgba(246,247,248,.92);
+      backdrop-filter: blur(6px);
+      border-bottom:1px solid rgba(0,0,0,.08);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="sticky-topbar">
+    <div class="app-wrap py-2">
+      <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+        <div class="d-flex align-items-center gap-2">
+          <div class="fw-bold" style="font-size:1.15rem;">Warehouse Vocab Trainer</div>
+          <span class="badge" style="background:#2f9e44;">Nouns + Verbs</span>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <span class="score-pill">Progress: <span id="progressText">0%</span></span>
+          <span class="score-pill">Score: <span id="totalScoreText">0</span></span>
+        </div>
+      </div>
+      <div class="progress mt-2" style="height:10px;border-radius:999px;">
+        <div id="progressBar" class="progress-bar" role="progressbar" style="width:0%; background:#2f9e44;"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="app-wrap">
+    <!-- TOP: Name / Group -->
+    <div class="card-soft mb-3">
+      <div class="row g-2 align-items-end">
+        <div class="col-12 col-md-4">
+          <label class="form-label mb-1 fw-bold">Name</label>
+          <input id="studentName" class="form-control" placeholder="Enter name" autocomplete="off">
+        </div>
+        <div class="col-12 col-md-4">
+          <label class="form-label mb-1 fw-bold">Group</label>
+          <input id="studentGroup" class="form-control" placeholder="e.g. ПО.23А" autocomplete="off">
+        </div>
+        <div class="col-12 col-md-4 d-flex gap-2">
+          <button class="btn btn-success w-100" id="saveUserBtn">Save</button>
+          <button class="btn btn-outline-secondary w-100" id="resetAllBtn" title="Clear all answers">Reset</button>
+        </div>
+      </div>
+      <div class="small-muted mt-2">
+        Tip: do tasks in order. Use <span class="kbd">Check</span> to lock the score for each section.
+      </div>
+    </div>
+
+    <!-- NAV -->
+    <ul class="nav nav-pills pill-nav mb-3 flex-wrap gap-2" id="tabs">
+      <li class="nav-item"><button class="nav-link active" data-tab="tab1" type="button">1) Flash Quiz</button></li>
+      <li class="nav-item"><button class="nav-link" data-tab="tab2" type="button">2) Match</button></li>
+      <li class="nav-item"><button class="nav-link" data-tab="tab3" type="button">3) Safety Signs</button></li>
+      <li class="nav-item"><button class="nav-link" data-tab="tab4" type="button">4) Dialogues</button></li>
+      <li class="nav-item"><button class="nav-link" data-tab="tab5" type="button">5) One-word Fix</button></li>
+      <li class="nav-item"><button class="nav-link" data-tab="tab6" type="button">Submit</button></li>
+    </ul>
+
+    <!-- TAB 1 -->
+    <div id="tab1" class="tab-panel">
+      <div class="panel">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
+          <div>
+            <div class="fw-bold" style="font-size:1.1rem;">TASK 1 — Flash Quiz (meaning → word)</div>
+            <div class="small-muted">Choose the correct word. 12 questions. Random order.</div>
+          </div>
+          <div class="d-flex gap-2">
+            <button class="btn btn-outline-secondary" id="newFlashBtn">New set</button>
+            <button class="btn btn-success" id="checkFlashBtn">Check</button>
+          </div>
+        </div>
+
+        <div id="flashArea"></div>
+
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mt-2">
+          <div class="small-muted">After you click <b>Check</b>, your score is saved.</div>
+          <div class="score-pill">Section score: <span id="flashScore">0</span> / 12</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2 -->
+    <div id="tab2" class="tab-panel d-none">
+      <div class="panel">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
+          <div>
+            <div class="fw-bold" style="font-size:1.1rem;">TASK 2 — Match verbs (1–14) to objects (A–N)</div>
+            <div class="small-muted">Write like: 1–A, 2–D, 3–L… (use dropdowns)</div>
+          </div>
+          <div class="d-flex gap-2">
+            <button class="btn btn-outline-secondary" id="resetMatchBtn">Reset</button>
+            <button class="btn btn-success" id="checkMatchBtn">Check</button>
+          </div>
+        </div>
+
+        <div class="row g-3">
+          <div class="col-12 col-lg-7">
+            <div id="matchArea"></div>
+          </div>
+          <div class="col-12 col-lg-5">
+            <div class="qcard">
+              <div class="fw-bold mb-2">Objects (A–N)</div>
+              <table class="table table-sm mb-0 tight">
+                <tbody id="objectsTable"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mt-2">
+          <div class="small-muted">After you click <b>Check</b>, your score is saved.</div>
+          <div class="score-pill">Section score: <span id="matchScore">0</span> / 14</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3 -->
+    <div id="tab3" class="tab-panel d-none">
+      <div class="panel">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
+          <div>
+            <div class="fw-bold" style="font-size:1.1rem;">TASK 3 — Safety instruction signs (choose TWO)</div>
+            <div class="small-muted">Pick the best TWO signs for each situation.</div>
+          </div>
+          <div class="d-flex gap-2">
+            <button class="btn btn-outline-secondary" id="resetSignsBtn">Reset</button>
+            <button class="btn btn-success" id="checkSignsBtn">Check</button>
+          </div>
+        </div>
+
+        <div class="qcard mb-3">
+          <div class="fw-bold mb-2">Signs</div>
+          <div class="d-flex flex-wrap gap-2" id="signsLegend"></div>
+        </div>
+
+        <div id="signsArea"></div>
+
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mt-2">
+          <div class="small-muted">After you click <b>Check</b>, your score is saved.</div>
+          <div class="score-pill">Section score: <span id="signsScore">0</span> / 8</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4 -->
+    <div id="tab4" class="tab-panel d-none">
+      <div class="panel">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
+          <div>
+            <div class="fw-bold" style="font-size:1.1rem;">TASK 4 — Micro-dialogues (fill the blanks)</div>
+            <div class="small-muted">One word (or term) per blank.</div>
+          </div>
+          <div class="d-flex gap-2">
+            <button class="btn btn-outline-secondary" id="resetDlgBtn">Reset</button>
+            <button class="btn btn-success" id="checkDlgBtn">Check</button>
+          </div>
+        </div>
+
+        <div id="dlgArea"></div>
+
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mt-2">
+          <div class="small-muted">After you click <b>Check</b>, your score is saved.</div>
+          <div class="score-pill">Section score: <span id="dlgScore">0</span> / 12</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 5 -->
+    <div id="tab5" class="tab-panel d-none">
+      <div class="panel">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
+          <div>
+            <div class="fw-bold" style="font-size:1.1rem;">TASK 5 — One-word Fix (spot the wrong word)</div>
+            <div class="small-muted">Replace ONE wrong word with the correct one.</div>
+          </div>
+          <div class="d-flex gap-2">
+            <button class="btn btn-outline-secondary" id="resetFixBtn">Reset</button>
+            <button class="btn btn-success" id="checkFixBtn">Check</button>
+          </div>
+        </div>
+
+        <div id="fixArea"></div>
+
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mt-2">
+          <div class="small-muted">After you click <b>Check</b>, your score is saved.</div>
+          <div class="score-pill">Section score: <span id="fixScore">0</span> / 12</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 6 -->
+    <div id="tab6" class="tab-panel d-none">
+      <div class="panel">
+        <div class="fw-bold" style="font-size:1.1rem;">Submit results</div>
+        <div class="small-muted mb-3">
+          When you click submit, the trainer sends <b>Name</b>, <b>Group</b>, and <b>JSON results</b> to your hidden Google Form.
+        </div>
+
+        <div class="qcard">
+          <div class="d-flex flex-wrap gap-2 align-items-center justify-content-between">
+            <div>
+              <div class="fw-bold">Ready to send?</div>
+              <div class="small-muted">Make sure Name + Group are filled.</div>
+            </div>
+            <div class="d-flex gap-2">
+              <button class="btn btn-outline-secondary" id="copyJsonBtn">Copy JSON</button>
+              <button class="btn btn-success" id="submitBtn">Submit</button>
+            </div>
+          </div>
+          <hr>
+          <div class="small-muted mb-2">Preview JSON:</div>
+          <pre id="jsonPreview" style="white-space:pre-wrap; background:#0b1220; color:#e6edf3; padding:12px; border-radius:12px; border:1px solid rgba(255,255,255,.12); max-height:340px; overflow:auto;"></pre>
+          <div id="submitStatus" class="mt-2 small-muted"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="small-muted text-center mt-4">
+      Built for fast classroom practice • Works offline • Saves progress in browser
+    </div>
+  </div>
+
+  <script>
+    /***********************
+     * Google Form settings
+     ***********************/
+    const FORM_VIEW_URL = "https://docs.google.com/forms/d/e/1FAIpQLSfhgAxbZiFv1vwfYGZR-kwwVplw7oPaavMKb_B_K4w4yJBiVA/viewform";
+    const FORM_RESPONSE_URL = FORM_VIEW_URL.replace("/viewform", "/formResponse");
+
+    const ENTRY_NAME  = "entry.1921741824";
+    const ENTRY_GROUP = "entry.1886481554";
+    const ENTRY_JSON  = "entry.1988412302";
+
+    /***********************
+     * Data
+     ***********************/
+    const WORDS = [
+      { w:"pallet", d:"a flat platform used to move goods" },
+      { w:"box", d:"a container for items (often smaller)" },
+      { w:"carton", d:"a cardboard box used for shipping" },
+      { w:"wrap", d:"plastic film used to cover cargo" },
+      { w:"label", d:"a sticker with cargo information" },
+      { w:"barcode", d:"a code (lines/squares) for identification" },
+      { w:"scanner", d:"a device that reads a barcode" },
+      { w:"dock", d:"the loading/unloading area for trucks" },
+      { w:"truck", d:"a vehicle that carries cargo" },
+      { w:"shelf", d:"a storage rack for goods" },
+      { w:"temperature sticker", d:"a sticker showing if cargo stayed cold" },
+      { w:"battery", d:"a power unit inside some shipments" },
+      { w:"drum", d:"a large container for liquids" },
+      { w:"spill kit", d:"tools/materials to handle and clean a spill safely" },
+      { w:"quarantine zone", d:"a special area for unsafe cargo" },
+      { w:"report", d:"a short written incident note" },
+
+      { w:"inspect", d:"check carefully" },
+      { w:"scan", d:"read a barcode using a scanner" },
+      { w:"label (verb)", d:"put a label on cargo" },
+      { w:"wrap (verb)", d:"cover cargo with wrap" },
+      { w:"repack", d:"pack again in new packaging" },
+      { w:"seal", d:"close tightly after packing" },
+      { w:"store", d:"put in storage (on shelf/area)" },
+      { w:"load", d:"put cargo into a truck" },
+      { w:"unload", d:"take cargo out of a truck" },
+      { w:"separate", d:"keep items apart" },
+      { w:"quarantine (verb)", d:"move to quarantine zone (do not ship)" },
+      { w:"report (verb)", d:"tell/write about a problem" },
+      { w:"clean", d:"remove dirt/liquid" },
+      { w:"stop", d:"do not continue / stop movement" }
+    ];
+
+    // TASK 2
+    const VERBS_14 = [
+      "inspect","scan","label","wrap","repack","seal","store","load","unload","separate","quarantine","report","clean","stop"
+    ];
+    const OBJECTS_AN = [
+      ["A","the spill"],
+      ["B","the truck"],
+      ["C","the damaged cargo"],
+      ["D","the barcode"],
+      ["E","the pallet (with shrink wrap)"],
+      ["F","the carton"],
+      ["G","the cargo on a shelf"],
+      ["H","movement / the operation"],
+      ["I","the incident to a supervisor"],
+      ["J","the cargo in the quarantine zone"],
+      ["K","the pallet at the dock"],
+      ["L","the label on a box/carton"],
+      ["M","the drum for leaks"],
+      ["N","the carton after repacking"]
+    ];
+    const KEY_MATCH = { 1:"M",2:"D",3:"L",4:"E",5:"F",6:"N",7:"G",8:"B",9:"K",10:"C",11:"J",12:"I",13:"A",14:"H" };
+
+    // TASK 3 Signs
+    const SIGNS = [
+      ["OK","✅ OK TO SHIP"],
+      ["FRAG","📦 FRAGILE — DO NOT DROP"],
+      ["BAT","🔋 BATTERY INSIDE"],
+      ["NLOAD","⚠️ DO NOT LOAD — DAMAGE"],
+      ["SPILL","🧯 SPILL RISK — STOP & REPORT"],
+      ["QZ","🟧 QUARANTINE ZONE"],
+      ["LBL","🏷️ LABEL / BARCODE CHECK"],
+      ["TEMP","🧊 CHECK TEMPERATURE STICKER"]
+    ];
+    const SIGN_SITUATIONS = [
+      ["A","A pallet is fully wrapped and clean, but it must stay cold.", ["TEMP","OK"]],
+      ["B","A carton is damaged and needs repacking before shipping.", ["NLOAD","LBL"]],
+      ["C","A drum is wet outside and smells strong.", ["SPILL","QZ"]],
+      ["D","A shipment contains batteries and must be identified correctly.", ["BAT","LBL"]],
+      ["E","A pallet is ready, but the barcode does not scan on the first try.", ["LBL","OK"]],
+      ["F","A fragile carton is marked OK, but it will be placed under heavy cargo.", ["FRAG","NLOAD"]],
+      ["G","Two cartons have the same label, but different items inside.", ["LBL","NLOAD"]],
+      ["H","A drum is sealed, but there is liquid on the floor nearby.", ["SPILL","LBL"]]
+    ];
+
+    // TASK 4 Dialogues (12 blanks total)
+    const DIALOGUES = [
+      { id:"d1", text:'“Please <input data-k="scan" class="form-control d-inline-block" style="width:140px" /> the barcode.” — “OK, I’ll use the <input data-k="scanner" class="form-control d-inline-block" style="width:160px" />.”' },
+      { id:"d2", text:'“This carton is torn.” — “Then <input data-k="repack" class="form-control d-inline-block" style="width:140px" /> it and <input data-k="seal" class="form-control d-inline-block" style="width:140px" /> it.”' },
+      { id:"d3", text:'“Where do we put unsafe cargo?” — “In the <input data-k="quarantine zone" class="form-control d-inline-block" style="width:180px" />.”' },
+      { id:"d4", text:'“Truck is at the <input data-k="dock" class="form-control d-inline-block" style="width:140px" />.” — “Let’s <input data-k="load" class="form-control d-inline-block" style="width:140px" /> the pallets.”' },
+      { id:"d5", text:'“There is liquid on the floor.” — “<input data-k="stop" class="form-control d-inline-block" style="width:120px" /> and get the <input data-k="spill kit" class="form-control d-inline-block" style="width:160px" />.”' },
+      { id:"d6", text:'“What should I do after an incident?” — “<input data-k="report" class="form-control d-inline-block" style="width:140px" /> it and write a <input data-k="report" class="form-control d-inline-block" style="width:140px" />.”' },
+      // Extra 6 blanks
+      { id:"d7", text:'“The pallet wrap is loose.” — “Then <input data-k="wrap" class="form-control d-inline-block" style="width:140px" /> the pallet.”' },
+      { id:"d8", text:'“This label looks wrong.” — “<input data-k="scan" class="form-control d-inline-block" style="width:120px" /> the box again and check the <input data-k="barcode" class="form-control d-inline-block" style="width:150px" />.”' },
+      { id:"d9", text:'“This drum might be unsafe.” — “<input data-k="inspect" class="form-control d-inline-block" style="width:140px" /> it first, then <input data-k="quarantine" class="form-control d-inline-block" style="width:160px" /> it.”' },
+      { id:"d10", text:'“Where should we keep this cargo?” — “<input data-k="store" class="form-control d-inline-block" style="width:140px" /> it on the <input data-k="shelf" class="form-control d-inline-block" style="width:140px" />.”' },
+      { id:"d11", text:'“The truck is full.” — “Then <input data-k="separate" class="form-control d-inline-block" style="width:160px" /> the heavy cargo from the fragile cartons.”' },
+      { id:"d12", text:'“The barcode is fine, but the label is missing.” — “<input data-k="label" class="form-control d-inline-block" style="width:140px" /> it before you <input data-k="load" class="form-control d-inline-block" style="width:140px" /> the truck.”' }
+    ];
+
+    // TASK 5 One-word Fix (12)
+    const FIX_ITEMS = [
+      { id:"f1",  s:"Scan the pallet with the barcode.",           key:["scanner"] },
+      { id:"f2",  s:"Unload the truck onto the temperature sticker.", key:["dock","shelf"] },
+      { id:"f3",  s:"Use the spill kit to wrap the spill.",        key:["clean"] },
+      { id:"f4",  s:"Store the cargo in the dock for two weeks.",  key:["shelf"] },
+      { id:"f5",  s:"Quarantine the cargo on the truck during delivery.", key:["quarantine zone"] },
+      { id:"f6",  s:"Seal the scanner after repacking.",          key:["carton","box"] },
+      { id:"f7",  s:"Clean the spill and then label the supervisor.", key:["report"] },
+      { id:"f8",  s:"Inspect the report for leaks.",              key:["drum"] },
+      { id:"f9",  s:"Scan the label with the pallet.",            key:["scanner"] },
+      { id:"f10", s:"Load the shelf at the dock.",                key:["truck"] },
+      { id:"f11", s:"Use the barcode to clean the spill.",        key:["spill kit"] },
+      { id:"f12", s:"Report the cargo in the quarantine zone.",   key:["quarantine"] }
+    ];
+
+    /***********************
+     * State (saved)
+     ***********************/
+    const LS_KEY = "warehouse_vocab_trainer_v1";
+    const state = loadState() || {
+      name:"",
+      group:"",
+      startedAt: new Date().toISOString(),
+      flash:{ setSeed: Date.now(), answers:{}, locked:false, score:0 },
+      match:{ answers:{}, locked:false, score:0 },
+      signs:{ answers:{}, locked:false, score:0 },
+      dlg:{ answers:{}, locked:false, score:0 },
+      fix:{ answers:{}, locked:false, score:0 }
+    };
+
+    /***********************
+     * Helpers
+     ***********************/
+    function saveState(){ localStorage.setItem(LS_KEY, JSON.stringify(state)); refreshMeta(); refreshJsonPreview(); }
+    function loadState(){ try{ return JSON.parse(localStorage.getItem(LS_KEY)); }catch(e){ return null; } }
+    function norm(s){ return (s||"").toString().trim().toLowerCase().replace(/\s+/g," "); }
+    function shuffle(arr, seed){
+      // deterministic-ish shuffle with seed
+      let a = arr.slice();
+      let t = seed >>> 0;
+      function rnd(){
+        t += 0x6D2B79F5;
+        let x = t;
+        x = Math.imul(x ^ x >>> 15, x | 1);
+        x ^= x + Math.imul(x ^ x >>> 7, x | 61);
+        return ((x ^ x >>> 14) >>> 0) / 4294967296;
+      }
+      for(let i=a.length-1;i>0;i--){
+        const j = Math.floor(rnd()*(i+1));
+        [a[i],a[j]] = [a[j],a[i]];
+      }
+      return a;
+    }
+
+    function setTab(id){
+      document.querySelectorAll(".tab-panel").forEach(p=>p.classList.add("d-none"));
+      document.getElementById(id).classList.remove("d-none");
+      document.querySelectorAll("#tabs .nav-link").forEach(b=>b.classList.remove("active"));
+      document.querySelector(`#tabs .nav-link[data-tab="${id}"]`).classList.add("active");
+      refreshJsonPreview();
+      window.scrollTo({top:0, behavior:"smooth"});
+    }
+
+    function sectionDoneCount(){
+      let done = 0;
+      if(state.flash.locked) done++;
+      if(state.match.locked) done++;
+      if(state.signs.locked) done++;
+      if(state.dlg.locked) done++;
+      if(state.fix.locked) done++;
+      return done;
+    }
+
+    function totalScore(){
+      return state.flash.score + state.match.score + state.signs.score + state.dlg.score + state.fix.score;
+    }
+
+    function refreshMeta(){
+      const done = sectionDoneCount();
+      const pct = Math.round((done/5)*100);
+      document.getElementById("progressBar").style.width = pct + "%";
+      document.getElementById("progressText").textContent = pct + "%";
+      document.getElementById("totalScoreText").textContent = totalScore();
+
+      document.getElementById("flashScore").textContent = state.flash.score;
+      document.getElementById("matchScore").textContent = state.match.score;
+      document.getElementById("signsScore").textContent = state.signs.score;
+      document.getElementById("dlgScore").textContent = state.dlg.score;
+      document.getElementById("fixScore").textContent = state.fix.score;
+    }
+
+    function buildJson(){
+      return {
+        lesson: "Warehouse vocab trainer (nouns+verbs)",
+        startedAt: state.startedAt,
+        finishedAt: new Date().toISOString(),
+        name: state.name,
+        group: state.group,
+        progress: {
+          flashLocked: state.flash.locked,
+          matchLocked: state.match.locked,
+          signsLocked: state.signs.locked,
+          dlgLocked: state.dlg.locked,
+          fixLocked: state.fix.locked
+        },
+        scores: {
+          flash: state.flash.score,  // /12
+          match: state.match.score,  // /14
+          signs: state.signs.score,  // /8
+          dialogues: state.dlg.score,// /12
+          fix: state.fix.score,      // /12
+          total: totalScore()
+        },
+        answers: {
+          flash: state.flash.answers,
+          match: state.match.answers,
+          signs: state.signs.answers,
+          dialogues: state.dlg.answers,
+          fix: state.fix.answers
+        }
+      };
+    }
+
+    function refreshJsonPreview(){
+      const pre = document.getElementById("jsonPreview");
+      if(!pre) return;
+      pre.textContent = JSON.stringify(buildJson(), null, 2);
+    }
+
+    /***********************
+     * Render: Task 1 Flash Quiz
+     ***********************/
+    function makeFlashSet(){
+      // 12 questions from WORDS list
+      const pool = WORDS.map((x,i)=>({i, ...x}));
+      const pick = shuffle(pool, state.flash.setSeed).slice(0, 12);
+
+      const area = document.getElementById("flashArea");
+      area.innerHTML = "";
+
+      pick.forEach((item, idx) => {
+        const qid = "flash_" + idx;
+        // options: correct + 3 random different words
+        const other = shuffle(pool.filter(p=>p.i!==item.i), state.flash.setSeed + idx*77).slice(0,3);
+        const opts = shuffle([item, ...other], state.flash.setSeed + idx*131);
+
+        const wrap = document.createElement("div");
+        wrap.className = "qcard";
+        wrap.dataset.qid = qid;
+
+        wrap.innerHTML = `
+          <div class="qtitle">${idx+1}) ${item.d}</div>
+          <div class="row g-2">
+            ${opts.map(o=>`
+              <div class="col-12 col-md-6">
+                <label class="form-check qopt mb-0">
+                  <input class="form-check-input" type="radio" name="${qid}" value="${o.w}">
+                  <span class="form-check-label">${o.w}</span>
+                </label>
+              </div>
+            `).join("")}
+          </div>
+        `;
+        area.appendChild(wrap);
+
+        // restore previous
+        const prev = state.flash.answers[qid];
+        if(prev){
+          const r = wrap.querySelector(`input[type="radio"][value="${CSS.escape(prev)}"]`);
+          if(r) r.checked = true;
+        }
+
+        // store correct in dataset (not visible)
+        wrap.dataset.correct = item.w;
+      });
+
+      // if locked, disable
+      if(state.flash.locked){
+        area.querySelectorAll("input").forEach(i=>i.disabled = true);
+        document.getElementById("checkFlashBtn").disabled = true;
+      } else {
+        document.getElementById("checkFlashBtn").disabled = false;
+      }
+    }
+
+    function checkFlash(){
+      if(state.flash.locked) return;
+      let score = 0;
+
+      document.querySelectorAll("#flashArea .qcard").forEach(card=>{
+        card.classList.remove("ok","bad");
+        const qid = card.dataset.qid;
+        const correct = card.dataset.correct;
+        const chosen = card.querySelector("input:checked")?.value || "";
+        state.flash.answers[qid] = chosen;
+
+        if(chosen && norm(chosen) === norm(correct)){
+          score++;
+          card.classList.add("ok");
+        } else {
+          card.classList.add("bad");
+        }
+      });
+
+      state.flash.score = score;
+      state.flash.locked = true;
+      saveState();
+      document.querySelectorAll("#flashArea input").forEach(i=>i.disabled = true);
+      document.getElementById("checkFlashBtn").disabled = true;
+    }
+
+    /***********************
+     * Render: Task 2 Match
+     ***********************/
+    function renderMatch(){
+      const area = document.getElementById("matchArea");
+      area.innerHTML = "";
+
+      for(let i=1;i<=14;i++){
+        const row = document.createElement("div");
+        row.className = "qcard";
+        row.dataset.q = String(i);
+
+        const verb = VERBS_14[i-1];
+        row.innerHTML = `
+          <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+            <div class="fw-bold">${i}. <span class="text-success">${verb}</span></div>
+            <select class="form-select" style="max-width:140px;">
+              <option value="">—</option>
+              ${OBJECTS_AN.map(([k])=>`<option value="${k}">${k}</option>`).join("")}
+            </select>
+          </div>
+        `;
+        area.appendChild(row);
+
+        const sel = row.querySelector("select");
+        const prev = state.match.answers[i];
+        if(prev) sel.value = prev;
+
+        if(state.match.locked) sel.disabled = true;
+
+        sel.addEventListener("change", ()=>{
+          state.match.answers[i] = sel.value;
+          saveState();
+        });
+      }
+
+      // objects table
+      const tbody = document.getElementById("objectsTable");
+      tbody.innerHTML = OBJECTS_AN.map(([k,txt])=>`<tr><td class="fw-bold" style="width:52px;">${k})</td><td>${txt}</td></tr>`).join("");
+
+      document.getElementById("checkMatchBtn").disabled = state.match.locked;
+    }
+
+    function checkMatch(){
+      if(state.match.locked) return;
+      let score = 0;
+      document.querySelectorAll("#matchArea .qcard").forEach(card=>{
+        card.classList.remove("ok","bad");
+        const q = card.dataset.q;
+        const chosen = card.querySelector("select").value;
+        state.match.answers[q] = chosen;
+
+        if(chosen && chosen === KEY_MATCH[q]){
+          score++;
+          card.classList.add("ok");
+        } else {
+          card.classList.add("bad");
+        }
+      });
+      state.match.score = score;
+      state.match.locked = true;
+      saveState();
+      document.querySelectorAll("#matchArea select").forEach(s=>s.disabled=true);
+      document.getElementById("checkMatchBtn").disabled = true;
+    }
+
+    /***********************
+     * Render: Task 3 Signs
+     ***********************/
+    function renderSigns(){
+      const legend = document.getElementById("signsLegend");
+      legend.innerHTML = SIGNS.map(([id,txt])=>{
+        return `<span class="badge" style="background:#fff;color:#111;border:1px solid rgba(0,0,0,.15);padding:8px 10px;border-radius:999px;">${txt}</span>`;
+      }).join("");
+
+      const area = document.getElementById("signsArea");
+      area.innerHTML = "";
+
+      SIGN_SITUATIONS.forEach(([sid, text, key])=>{
+        const card = document.createElement("div");
+        card.className = "qcard";
+        card.dataset.sid = sid;
+        card.dataset.key = key.join("|");
+
+        const checks = SIGNS.map(([id,txt])=>{
+          const checked = (state.signs.answers[sid]||[]).includes(id) ? "checked" : "";
+          return `
+            <label class="form-check me-3 mb-2" style="min-width:240px;">
+              <input class="form-check-input" type="checkbox" value="${id}" ${checked}>
+              <span class="form-check-label">${txt}</span>
+            </label>
+          `;
+        }).join("");
+
+        card.innerHTML = `
+          <div class="qtitle">${sid}) ${text}</div>
+          <div class="small-muted mb-2">Choose exactly <b>TWO</b>.</div>
+          <div class="d-flex flex-wrap">${checks}</div>
+        `;
+        area.appendChild(card);
+
+        // disable if locked
+        if(state.signs.locked){
+          card.querySelectorAll("input").forEach(i=>i.disabled=true);
+        } else {
+          card.querySelectorAll("input").forEach(i=>{
+            i.addEventListener("change", ()=>{
+              // keep max 2 checked
+              const all = [...card.querySelectorAll("input:checked")].map(x=>x.value);
+              if(all.length > 2){
+                i.checked = false;
+                return;
+              }
+              state.signs.answers[sid] = [...card.querySelectorAll("input:checked")].map(x=>x.value);
+              saveState();
+            });
+          });
+        }
+      });
+
+      document.getElementById("checkSignsBtn").disabled = state.signs.locked;
+    }
+
+    function checkSigns(){
+      if(state.signs.locked) return;
+      let score = 0;
+
+      document.querySelectorAll("#signsArea .qcard").forEach(card=>{
+        card.classList.remove("ok","bad");
+        const sid = card.dataset.sid;
+        const chosen = [...card.querySelectorAll("input:checked")].map(x=>x.value);
+        state.signs.answers[sid] = chosen;
+
+        const key = card.dataset.key.split("|").sort().join("|");
+        const ch = chosen.slice().sort().join("|");
+
+        if(chosen.length === 2 && ch === key){
+          score++;
+          card.classList.add("ok");
+        } else {
+          card.classList.add("bad");
+        }
+      });
+
+      state.signs.score = score; // /8
+      state.signs.locked = true;
+      saveState();
+      document.querySelectorAll("#signsArea input").forEach(i=>i.disabled=true);
+      document.getElementById("checkSignsBtn").disabled = true;
+    }
+
+    /***********************
+     * Render: Task 4 Dialogues
+     ***********************/
+    function renderDialogues(){
+      const area = document.getElementById("dlgArea");
+      area.innerHTML = "";
+
+      DIALOGUES.forEach((d, idx)=>{
+        const card = document.createElement("div");
+        card.className = "qcard";
+        card.dataset.did = d.id;
+        card.innerHTML = `<div class="qtitle">${idx+1})</div><div>${d.text}</div>`;
+        area.appendChild(card);
+
+        // restore
+        card.querySelectorAll("input").forEach(inp=>{
+          const k = inp.dataset.k;
+          const saved = state.dlg.answers[d.id + "|" + k];
+          if(saved) inp.value = saved;
+
+          if(state.dlg.locked){
+            inp.disabled = true;
+          } else {
+            inp.addEventListener("input", ()=>{
+              state.dlg.answers[d.id + "|" + k] = inp.value;
+              saveState();
+            });
+          }
+        });
+      });
+
+      document.getElementById("checkDlgBtn").disabled = state.dlg.locked;
+    }
+
+    function checkDialogues(){
+      if(state.dlg.locked) return;
+      let score = 0;
+      let total = 0;
+
+      document.querySelectorAll("#dlgArea .qcard").forEach(card=>{
+        card.classList.remove("ok","bad");
+        let allOk = true;
+
+        card.querySelectorAll("input").forEach(inp=>{
+          total++;
+          const expected = inp.dataset.k;
+          const got = norm(inp.value);
+
+          // accept label verb as "label" (not "label (verb)")
+          const exp = norm(expected);
+
+          if(got === exp){
+            score++;
+            inp.classList.add("ok");
+            inp.classList.remove("bad");
+          } else {
+            allOk = false;
+            inp.classList.add("bad");
+            inp.classList.remove("ok");
+          }
+        });
+
+        card.classList.add(allOk ? "ok" : "bad");
+      });
+
+      state.dlg.score = score; // /12
+      state.dlg.locked = true;
+      saveState();
+      document.querySelectorAll("#dlgArea input").forEach(i=>i.disabled=true);
+      document.getElementById("checkDlgBtn").disabled = true;
+    }
+
+    /***********************
+     * Render: Task 5 Fix
+     ***********************/
+    function renderFix(){
+      const area = document.getElementById("fixArea");
+      area.innerHTML = "";
+
+      FIX_ITEMS.forEach((it, idx)=>{
+        const card = document.createElement("div");
+        card.className = "qcard";
+        card.dataset.fid = it.id;
+
+        const saved = state.fix.answers[it.id] || "";
+        card.innerHTML = `
+          <div class="qtitle">${idx+1}) ${it.s}</div>
+          <div class="d-flex flex-wrap gap-2 align-items-center">
+            <span class="small-muted">Correct word/term:</span>
+            <input class="form-control" style="max-width:260px;" placeholder="type answer" value="${saved}">
+          </div>
+        `;
+        area.appendChild(card);
+
+        const inp = card.querySelector("input");
+        if(state.fix.locked){
+          inp.disabled = true;
+        } else {
+          inp.addEventListener("input", ()=>{
+            state.fix.answers[it.id] = inp.value;
+            saveState();
+          });
+        }
+      });
+
+      document.getElementById("checkFixBtn").disabled = state.fix.locked;
+    }
+
+    function checkFix(){
+      if(state.fix.locked) return;
+      let score = 0;
+
+      document.querySelectorAll("#fixArea .qcard").forEach(card=>{
+        card.classList.remove("ok","bad");
+        const fid = card.dataset.fid;
+        const inp = card.querySelector("input");
+        const got = norm(inp.value);
+
+        const item = FIX_ITEMS.find(x=>x.id===fid);
+        const ok = item.key.map(norm).includes(got);
+
+        if(ok){
+          score++;
+          card.classList.add("ok");
+          inp.classList.add("ok");
+          inp.classList.remove("bad");
+        } else {
+          card.classList.add("bad");
+          inp.classList.add("bad");
+          inp.classList.remove("ok");
+        }
+
+        state.fix.answers[fid] = inp.value;
+      });
+
+      state.fix.score = score; // /12
+      state.fix.locked = true;
+      saveState();
+      document.querySelectorAll("#fixArea input").forEach(i=>i.disabled=true);
+      document.getElementById("checkFixBtn").disabled = true;
+    }
+
+    /***********************
+     * Submit to Google Form
+     ***********************/
+    async function submitToForm(){
+      const status = document.getElementById("submitStatus");
+      status.textContent = "";
+
+      if(!state.name || !state.group){
+        status.innerHTML = `<span class="text-danger fw-bold">Fill Name + Group first.</span>`;
+        return;
+      }
+
+      const payloadJson = JSON.stringify(buildJson());
+
+      const body = new URLSearchParams();
+      body.append(ENTRY_NAME, state.name);
+      body.append(ENTRY_GROUP, state.group);
+      body.append(ENTRY_JSON, payloadJson);
+
+      try{
+        await fetch(FORM_RESPONSE_URL, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body
+        });
+
+        status.innerHTML = `<span class="text-success fw-bold">Submitted ✅</span> (Google Forms does not return a visible response in this mode.)`;
+      } catch(e){
+        status.innerHTML = `<span class="text-danger fw-bold">Submit failed.</span> Check internet or form settings.`;
+      }
+    }
+
+    /***********************
+     * Wire UI
+     ***********************/
+    document.querySelectorAll("#tabs .nav-link").forEach(btn=>{
+      btn.addEventListener("click", ()=> setTab(btn.dataset.tab));
+    });
+
+    document.getElementById("saveUserBtn").addEventListener("click", ()=>{
+      state.name = document.getElementById("studentName").value.trim();
+      state.group = document.getElementById("studentGroup").value.trim();
+      saveState();
+    });
+
+    document.getElementById("resetAllBtn").addEventListener("click", ()=>{
+      if(!confirm("Reset ALL answers and scores?")) return;
+      localStorage.removeItem(LS_KEY);
+      location.reload();
+    });
+
+    document.getElementById("newFlashBtn").addEventListener("click", ()=>{
+      if(state.flash.locked) return;
+      state.flash.setSeed = Date.now();
+      state.flash.answers = {};
+      saveState();
+      makeFlashSet();
+    });
+    document.getElementById("checkFlashBtn").addEventListener("click", checkFlash);
+
+    document.getElementById("checkMatchBtn").addEventListener("click", checkMatch);
+    document.getElementById("resetMatchBtn").addEventListener("click", ()=>{
+      if(state.match.locked) return;
+      state.match.answers = {};
+      saveState();
+      renderMatch();
+    });
+
+    document.getElementById("checkSignsBtn").addEventListener("click", checkSigns);
+    document.getElementById("resetSignsBtn").addEventListener("click", ()=>{
+      if(state.signs.locked) return;
+      state.signs.answers = {};
+      saveState();
+      renderSigns();
+    });
+
+    document.getElementById("checkDlgBtn").addEventListener("click", checkDialogues);
+    document.getElementById("resetDlgBtn").addEventListener("click", ()=>{
+      if(state.dlg.locked) return;
+      state.dlg.answers = {};
+      saveState();
+      renderDialogues();
+    });
+
+    document.getElementById("checkFixBtn").addEventListener("click", checkFix);
+    document.getElementById("resetFixBtn").addEventListener("click", ()=>{
+      if(state.fix.locked) return;
+      state.fix.answers = {};
+      saveState();
+      renderFix();
+    });
+
+    document.getElementById("copyJsonBtn").addEventListener("click", async ()=>{
+      const txt = JSON.stringify(buildJson(), null, 2);
+      await navigator.clipboard.writeText(txt);
+      document.getElementById("submitStatus").innerHTML = `<span class="text-success fw-bold">JSON copied ✅</span>`;
+    });
+
+    document.getElementById("submitBtn").addEventListener("click", submitToForm);
+
+    /***********************
+     * Init
+     ***********************/
+    function init(){
+      document.getElementById("studentName").value = state.name;
+      document.getElementById("studentGroup").value = state.group;
+
+      makeFlashSet();
+      renderMatch();
+      renderSigns();
+      renderDialogues();
+      renderFix();
+
+      refreshMeta();
+      refreshJsonPreview();
+    }
+    init();
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+          crossorigin="anonymous"></script>
+</body>
+</html>
