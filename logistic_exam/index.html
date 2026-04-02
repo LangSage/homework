@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Logistics Vocab Quiz</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    html, body {
+      min-height: 100%;
+      background: #020617;
+    }
+    body {
+      -webkit-user-select: none;
+      user-select: none;
+      -webkit-touch-callout: none;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+    img {
+      pointer-events: none;
+      -webkit-user-drag: none;
+    }
+    .no-select, .no-select * {
+      -webkit-user-select: none !important;
+      user-select: none !important;
+    }
+    .app-shell {
+      background:
+        radial-gradient(circle at top, rgba(37,99,235,.22), transparent 34%),
+        radial-gradient(circle at bottom right, rgba(14,165,233,.18), transparent 28%),
+        linear-gradient(180deg, #020617 0%, #0f172a 100%);
+    }
+    textarea, input {
+      caret-color: transparent;
+    }
+    .json-box {
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+  </style>
+</head>
+<body class="text-slate-100 no-select">
+  <div id="app" class="app-shell min-h-screen"></div>
+
+  <script>
+    const TASK_BANK = [
+      { id: 1, type: "mcq", prompt: "What is it?", image: "pallet.jpg", options: ["pallet", "dock", "report", "battery"], answer: 0 },
+      { id: 2, type: "mcq", prompt: "What is it?", image: "box.jpg", options: ["box", "scanner", "truck", "label"], answer: 0 },
+      { id: 3, type: "mcq", prompt: "What is it?", image: "carton.jpg", options: ["carton", "shelf", "barcode", "drum"], answer: 0 },
+      { id: 4, type: "mcq", prompt: "What is it?", image: "wrap.jpg", options: ["wrap", "dock", "report", "scanner"], answer: 0 },
+      { id: 5, type: "mcq", prompt: "What is it?", image: "label.jpg", options: ["label", "battery", "truck", "spill kit"], answer: 0 },
+      { id: 6, type: "mcq", prompt: "What is it?", image: "barcode.jpg", options: ["barcode", "shelf", "report", "box"], answer: 0 },
+      { id: 7, type: "mcq", prompt: "What is it?", image: "scanner.jpg", options: ["scanner", "pallet", "drum", "seal"], answer: 0 },
+      { id: 8, type: "mcq", prompt: "Where does the truck stop?", image: "dock.jpg", options: ["dock", "shelf", "quarantine zone", "report"], answer: 0 },
+      { id: 9, type: "mcq", prompt: "What is it?", image: "truck.jpg", options: ["truck", "scanner", "label", "clean"], answer: 0 },
+      { id: 10, type: "mcq", prompt: "Where do boxes stay?", image: "shelf.jpg", options: ["shelf", "dock", "battery", "spill kit"], answer: 0 },
+      { id: 11, type: "mcq", prompt: "Cold goods need a ...", image: "temperature_sticker.jpg", options: ["temperature sticker", "barcode", "battery", "drum"], answer: 0 },
+      { id: 12, type: "mcq", prompt: "Scanner needs a ...", image: "battery.jpg", options: ["battery", "label", "dock", "report"], answer: 0 },
+      { id: 13, type: "mcq", prompt: "What is it?", image: "drum.jpg", options: ["drum", "carton", "shelf", "scanner"], answer: 0 },
+      { id: 14, type: "mcq", prompt: "Use this for a liquid spill.", image: "spill_kit.jpg", options: ["spill kit", "label", "truck", "shelf"], answer: 0 },
+      { id: 15, type: "mcq", prompt: "Bad goods go here.", image: "quarantine_zone.jpg", options: ["quarantine zone", "dock", "pallet", "box"], answer: 0 },
+      { id: 16, type: "mcq", prompt: "Use the scanner to ___ the barcode.", image: "scan_action.jpg", options: ["scan", "store", "seal", "separate"], answer: 0 },
+      { id: 17, type: "mcq", prompt: "Put a new ___ on the box.", image: "label_action.jpg", options: ["label", "battery", "dock", "report"], answer: 0 },
+      { id: 18, type: "mcq", prompt: "Look carefully at the carton. ___ it.", image: "inspect_action.jpg", options: ["inspect", "load", "clean", "wrap"], answer: 0 },
+      { id: 19, type: "mcq", prompt: "The box is open. ___ it.", image: "seal_action.jpg", options: ["seal", "scan", "unload", "separate"], answer: 0 },
+      { id: 20, type: "mcq", prompt: "Two small boxes into one carton. ___ it.", image: "repack_action.jpg", options: ["repack", "stop", "store", "report"], answer: 0 },
+      { id: 21, type: "mcq", prompt: "Put the pallet on the shelf. ___ it there.", image: "store_action.jpg", options: ["store", "scan", "load", "seal"], answer: 0 },
+      { id: 22, type: "mcq", prompt: "Move goods into the truck. ___ it.", image: "load_action.jpg", options: ["load", "clean", "inspect", "stop"], answer: 0 },
+      { id: 23, type: "mcq", prompt: "Move goods out of the truck. ___ it.", image: "unload_action.jpg", options: ["unload", "wrap", "label", "store"], answer: 0 },
+      { id: 24, type: "mcq", prompt: "Bad battery away from good battery. ___ them.", image: "separate_action.jpg", options: ["separate", "seal", "scan", "load"], answer: 0 },
+      { id: 25, type: "mcq", prompt: "Wet and damaged goods go to the ___ .", image: "damaged_goods.jpg", options: ["quarantine zone", "dock", "shelf", "truck"], answer: 0 },
+      { id: 26, type: "mcq", prompt: "There is liquid on the floor. Use the ___ .", image: "spill_floor.jpg", options: ["spill kit", "scanner", "label", "pallet"], answer: 0 },
+      { id: 27, type: "mcq", prompt: "There is liquid on the floor. ___ it.", image: "clean_action.jpg", options: ["clean", "load", "seal", "scan"], answer: 0 },
+      { id: 28, type: "mcq", prompt: "There is a dangerous spill. ___ work.", image: "stop_action.jpg", options: ["stop", "store", "label", "repack"], answer: 0 },
+      { id: 29, type: "mcq", prompt: "After the problem, write a ___.", image: "report_action.jpg", options: ["report", "battery", "dock", "carton"], answer: 0 },
+      { id: 30, type: "mcq", prompt: "Put plastic around the carton. ___ it.", image: "wrap_action.jpg", options: ["wrap", "inspect", "unload", "report"], answer: 0 },
+
+      { id: 31, type: "true_false", prompt: "A pallet can hold boxes.", image: "warehouse_scene_1.jpg", statement: true },
+      { id: 32, type: "true_false", prompt: "A barcode is used for sleeping.", image: "warehouse_scene_2.jpg", statement: false },
+      { id: 33, type: "true_false", prompt: "A scanner can read a barcode.", image: "scanner_barcode_scene.jpg", statement: true },
+      { id: 34, type: "true_false", prompt: "A dock is a place inside a pencil case.", image: "dock_scene.jpg", statement: false },
+      { id: 35, type: "true_false", prompt: "A spill kit helps with a liquid spill.", image: "spill_scene.jpg", statement: true },
+      { id: 36, type: "true_false", prompt: "A quarantine zone is for good goods ready to go.", image: "quarantine_scene.jpg", statement: false },
+      { id: 37, type: "true_false", prompt: "To load means to move goods into a truck.", image: "loading_scene.jpg", statement: true },
+      { id: 38, type: "true_false", prompt: "To unload means to put plastic around a box.", image: "unloading_scene.jpg", statement: false },
+
+      { id: 39, type: "multi2", prompt: "Choose 2 things you can see in logistics.", image: "warehouse_scene_3.jpg", options: ["pallet", "scanner", "banana", "sofa"], answers: [0, 1] },
+      { id: 40, type: "multi2", prompt: "Choose 2 action words.", image: "warehouse_scene_4.jpg", options: ["scan", "label", "shelf", "truck"], answers: [0, 1] },
+      { id: 41, type: "multi2", prompt: "Choose 2 places for warehouse goods.", image: "warehouse_scene_5.jpg", options: ["shelf", "dock", "cloud", "window"], answers: [0, 1] },
+      { id: 42, type: "multi2", prompt: "Choose 2 things used for checking goods.", image: "inspection_scene.jpg", options: ["scanner", "label", "pillow", "drum"], answers: [0, 1] },
+      { id: 43, type: "multi2", prompt: "Choose 2 words for problem goods.", image: "damaged_goods_scene.jpg", options: ["spill kit", "quarantine zone", "flower", "biscuit"], answers: [0, 1] },
+      { id: 44, type: "multi2", prompt: "Choose 2 loading words.", image: "truck_loading_scene.jpg", options: ["load", "unload", "sing", "jump"], answers: [0, 1] },
+      { id: 45, type: "multi2", prompt: "Choose 2 things for box work.", image: "packing_station_scene.jpg", options: ["wrap", "seal", "river", "lamp"], answers: [0, 1] }
+    ];
+
+    const PAGE_ID = 1;
+    const STORAGE_KEY = "logistics_vocab_quiz_v6";
+    const COOKIE_KEY = "lgzq6";
+    const IMG_BASE = "images/logistics/";
+    const FORM_ACTION = "https://docs.google.com/forms/d/e/1FAIpQLSfhgAxbZiFv1vwfYGZR-kwwVplw7oPaavMKb_B_K4w4yJBiVA/formResponse";
+    const ENTRY_NAME = "entry.1921741824";
+    const ENTRY_GROUP = "entry.1886481554";
+    const ENTRY_JSON = "entry.1988412302";
+    const FULL_MODE_COUNT = TASK_BANK.length;
+    const GROUP_OPTIONS = ["OPU22.2", "OPU22.1", "OPU23"];
+    let state = null;
+
+    function shuffle(arr) {
+      const a = arr.slice();
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    function now() {
+      return Date.now();
+    }
+
+    function safeEncode(str) {
+      return btoa(unescape(encodeURIComponent(str)));
+    }
+
+    function safeDecode(str) {
+      return decodeURIComponent(escape(atob(str)));
+    }
+
+    function setCookie(name, value, days = 7) {
+      const expires = new Date(Date.now() + days * 86400000).toUTCString();
+      document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/; SameSite=Lax`;
+    }
+
+    function getCookie(name) {
+      const key = name + "=";
+      const parts = document.cookie.split(";").map(v => v.trim());
+      for (const part of parts) {
+        if (part.indexOf(key) === 0) return decodeURIComponent(part.substring(key.length));
+      }
+      return null;
+    }
+
+    function clearCookie(name) {
+      document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; SameSite=Lax`;
+    }
+
+    function saveState() {
+      if (!state) return;
+      const raw = JSON.stringify(state);
+      try { localStorage.setItem(STORAGE_KEY, raw); } catch (e) {}
+      try { setCookie(COOKIE_KEY, safeEncode(raw), 7); } catch (e) {}
+    }
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) return JSON.parse(raw);
+      } catch (e) {}
+      try {
+        const fromCookie = getCookie(COOKIE_KEY);
+        if (fromCookie) return JSON.parse(safeDecode(fromCookie));
+      } catch (e) {}
+      return null;
+    }
+
+    function clearState() {
+      try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+      clearCookie(COOKIE_KEY);
+      state = null;
+    }
+
+    function getTaskById(id) {
+      return TASK_BANK.find(t => t.id === id);
+    }
+
+    function makePresentedTask(task) {
+      if (task.type === "mcq") {
+        const options = task.options.map((text, idx) => ({ text, correct: idx === task.answer }));
+        return {
+          id: task.id,
+          type: task.type,
+          prompt: task.prompt,
+          image: IMG_BASE + task.image,
+          options: shuffle(options)
+        };
+      }
+      if (task.type === "true_false") {
+        return {
+          id: task.id,
+          type: task.type,
+          prompt: task.prompt,
+          image: IMG_BASE + task.image,
+          options: shuffle([
+            { text: "True", value: true, correct: task.statement === true },
+            { text: "False", value: false, correct: task.statement === false }
+          ])
+        };
+      }
+      if (task.type === "multi2") {
+        const options = task.options.map((text, idx) => ({ text, idx, correct: task.answers.includes(idx) }));
+        return {
+          id: task.id,
+          type: task.type,
+          prompt: task.prompt,
+          image: IMG_BASE + task.image,
+          options: shuffle(options)
+        };
+      }
+      return null;
+    }
+
+    function buildPresentedList(mode) {
+      const ids = shuffle(TASK_BANK.map(t => t.id));
+      const count = mode === "5" ? FULL_MODE_COUNT : 15;
+      return ids.slice(0, count).map(id => makePresentedTask(getTaskById(id)));
+    }
+
+    function normalizeGroup(value) {
+      return GROUP_OPTIONS.includes(value) ? value : GROUP_OPTIONS[0];
+    }
+
+    function startQuiz(mode) {
+      const nameInput = document.getElementById("studentName");
+      const groupInput = document.getElementById("studentGroup");
+      const studentName = (nameInput?.value || "").trim();
+      const studentGroup = normalizeGroup((groupInput?.value || "").trim());
+
+      state = {
+        version: 6,
+        pageId: PAGE_ID,
+        mode,
+        active: true,
+        done: false,
+        sent: false,
+        current: 0,
+        correct: 0,
+        leaveCount: 0,
+        startedAt: now(),
+        finishedAt: null,
+        lastPenaltyAt: 0,
+        studentName,
+        studentGroup,
+        answers: [],
+        selection: [],
+        presented: buildPresentedList(mode),
+        resultJson: ""
+      };
+      saveState();
+      render();
+    }
+
+    function getUnusedTaskIds() {
+      const used = new Set((state?.presented || []).map(t => t.id));
+      return TASK_BANK.filter(t => !used.has(t.id)).map(t => t.id);
+    }
+
+    function swapCurrentTask() {
+      if (!state || state.done) return;
+      const currentTask = state.presented[state.current];
+      if (!currentTask) return;
+
+      let candidates = getUnusedTaskIds();
+      if (!candidates.length) {
+        candidates = TASK_BANK
+          .filter(t => t.id !== currentTask.id && !state.answers.some(a => a && a.taskId === t.id))
+          .map(t => t.id);
+      }
+      if (!candidates.length) {
+        candidates = TASK_BANK.filter(t => t.id !== currentTask.id).map(t => t.id);
+      }
+      if (!candidates.length) return;
+
+      const newId = shuffle(candidates)[0];
+      state.presented[state.current] = makePresentedTask(getTaskById(newId));
+      state.selection = [];
+    }
+
+    function applyLeavePenalty() {
+      if (!state || state.done || !state.active) return;
+      const t = now();
+      if (t - (state.lastPenaltyAt || 0) < 1200) return;
+      state.lastPenaltyAt = t;
+      state.leaveCount += 1;
+      swapCurrentTask();
+      saveState();
+    }
+
+    function buildResultObject(s) {
+      const finished = s.finishedAt || now();
+      const minutes = Math.max(1, Math.round((finished - s.startedAt) / 60000));
+      const total = s.presented.length;
+      const wrong = total - s.correct;
+      const scorePercent = Math.round((s.correct / total) * 100);
+      return {
+        pageId: s.pageId,
+        mode: s.mode,
+        name: s.studentName || "",
+        group: s.studentGroup || "",
+        total,
+        correct: s.correct,
+        wrong,
+        scorePercent,
+        leaveCount: s.leaveCount,
+        minutes,
+        startedAt: new Date(s.startedAt).toISOString(),
+        finishedAt: new Date(finished).toISOString(),
+        version: s.version
+      };
+    }
+
+    function submitHiddenStats() {
+      if (!state || !state.done || state.sent) return;
+      const resultObj = buildResultObject(state);
+      const json = JSON.stringify(resultObj);
+      state.resultJson = json;
+
+      const iframe = document.createElement("iframe");
+      iframe.name = "hidden_submit_frame_" + Date.now();
+      iframe.style.display = "none";
+      document.body.appendChild(iframe);
+
+      const form = document.createElement("form");
+      form.action = FORM_ACTION;
+      form.method = "POST";
+      form.target = iframe.name;
+      form.style.display = "none";
+
+      const fields = {
+        [ENTRY_NAME]: resultObj.name,
+        [ENTRY_GROUP]: resultObj.group,
+        [ENTRY_JSON]: json
+      };
+
+      Object.entries(fields).forEach(([name, value]) => {
+        const input = document.createElement("input");
+        input.type = "hidden";
+        input.name = name;
+        input.value = value;
+        form.appendChild(input);
+      });
+
+      document.body.appendChild(form);
+      try {
+        form.submit();
+        state.sent = true;
+        saveState();
+      } catch (e) {}
+
+      setTimeout(() => {
+        try { form.remove(); } catch (e) {}
+        try { iframe.remove(); } catch (e) {}
+      }, 4000);
+    }
+
+    function finishQuiz() {
+      state.done = true;
+      state.active = false;
+      state.finishedAt = now();
+      state.resultJson = JSON.stringify(buildResultObject(state), null, 2);
+      saveState();
+      submitHiddenStats();
+      render();
+    }
+
+    function nextAfterAnswer(taskId, payload, isCorrect) {
+      state.answers[state.current] = {
+        taskId,
+        ...payload,
+        correct: isCorrect
+      };
+      if (isCorrect) state.correct += 1;
+
+      if (state.current >= state.presented.length - 1) {
+        finishQuiz();
+      } else {
+        state.current += 1;
+        state.selection = [];
+        saveState();
+        render();
+      }
+    }
+
+    function answerMcq(optionIndex) {
+      if (!state || state.done) return;
+      if (state.answers[state.current]) return;
+
+      const task = state.presented[state.current];
+      const option = task.options[optionIndex];
+      const isCorrect = !!option.correct;
+      nextAfterAnswer(task.id, { selected: optionIndex }, isCorrect);
+    }
+
+    function toggleMulti(optionIndex) {
+      if (!state || state.done) return;
+      if (state.answers[state.current]) return;
+
+      const task = state.presented[state.current];
+      if (task.type !== "multi2") return;
+
+      const set = new Set(state.selection || []);
+      if (set.has(optionIndex)) {
+        set.delete(optionIndex);
+      } else if (set.size < 2) {
+        set.add(optionIndex);
+      }
+      state.selection = [...set].sort((a,b)=>a-b);
+      saveState();
+      render();
+    }
+
+    function submitMulti() {
+      if (!state || state.done) return;
+      if (state.answers[state.current]) return;
+      const task = state.presented[state.current];
+      if (task.type !== "multi2") return;
+      if ((state.selection || []).length !== 2) return;
+
+      const correctIndices = task.options
+        .map((opt, idx) => opt.correct ? idx : -1)
+        .filter(idx => idx !== -1)
+        .sort((a,b)=>a-b);
+      const selected = [...state.selection].sort((a,b)=>a-b);
+      const isCorrect = JSON.stringify(correctIndices) === JSON.stringify(selected);
+      nextAfterAnswer(task.id, { selected }, isCorrect);
+    }
+
+    function getStatusWord(s) {
+      const ratio = s.correct / s.presented.length;
+      if (ratio >= 0.9) return "Dock A";
+      if (ratio >= 0.75) return "Dock B";
+      if (ratio >= 0.55) return "Dock C";
+      return "Dock D";
+    }
+
+    function renderStartScreen(saved) {
+      const app = document.getElementById("app");
+      app.innerHTML = `
+        <div class="min-h-screen flex items-center justify-center p-4 sm:p-6">
+          <div class="w-full max-w-2xl rounded-3xl border border-slate-800 bg-slate-900/70 backdrop-blur shadow-2xl p-5 sm:p-8">
+            <div class="text-center">
+              <div class="inline-flex items-center gap-2 rounded-full border border-sky-500/30 bg-sky-500/10 px-3 py-1 text-xs sm:text-sm text-sky-300">Logistics Words</div>
+              <h1 class="mt-4 text-2xl sm:text-4xl font-bold tracking-tight">Choose mode</h1>
+            </div>
+
+            <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="rounded-3xl border border-slate-800 bg-slate-950/50 p-4 sm:p-5">
+                <label class="text-xs text-slate-400">Name</label>
+                <input id="studentName" type="text" autocomplete="off" spellcheck="false" class="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-900/90 px-4 py-3 text-slate-100 outline-none" value="${saved?.studentName ? saved.studentName.replace(/"/g, '&quot;') : ''}">
+              </div>
+              <div class="rounded-3xl border border-slate-800 bg-slate-950/50 p-4 sm:p-5">
+                <label class="text-xs text-slate-400">Group</label>
+                <select id="studentGroup" class="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-900/90 px-4 py-3 text-slate-100 outline-none">
+                  ${GROUP_OPTIONS.map(group => `<option value="${group}" ${(normalizeGroup(saved?.studentGroup || GROUP_OPTIONS[0]) === group) ? "selected" : ""}>${group}</option>`).join("")}
+                </select>
+              </div>
+            </div>
+
+            <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <button id="mode4Btn" class="rounded-3xl border border-emerald-500/30 bg-emerald-500/10 p-6 text-left hover:bg-emerald-500/20 transition">
+                <div class="text-sm text-emerald-300">4</div>
+                <div class="mt-2 text-3xl font-bold">15</div>
+                <div class="mt-1 text-sm text-slate-300">questions</div>
+              </button>
+
+              <button id="mode5Btn" class="rounded-3xl border border-violet-500/30 bg-violet-500/10 p-6 text-left hover:bg-violet-500/20 transition">
+                <div class="text-sm text-violet-300">5</div>
+                <div class="mt-2 text-3xl font-bold">${FULL_MODE_COUNT}</div>
+                <div class="mt-1 text-sm text-slate-300">questions</div>
+              </button>
+            </div>
+
+            ${saved ? `
+              <div class="mt-6 rounded-2xl border border-amber-500/20 bg-amber-500/10 p-4">
+                <div class="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
+                  <div>
+                    <div class="text-sm text-amber-300">Saved</div>
+                    <div class="text-slate-200 text-sm">${saved.done ? "finished" : "in progress"}</div>
+                  </div>
+                  <div class="flex gap-3">
+                    <button id="resumeBtn" class="rounded-2xl bg-slate-100 px-4 py-2 text-slate-900 font-semibold hover:bg-white transition">${saved.done ? "Open" : "Continue"}</button>
+                    <button id="newBtn" class="rounded-2xl border border-slate-700 px-4 py-2 text-slate-200 hover:bg-slate-800 transition">New</button>
+                  </div>
+                </div>
+              </div>
+            ` : ""}
+          </div>
+        </div>
+      `;
+
+      document.getElementById("mode4Btn").addEventListener("click", () => startQuiz("4"));
+      document.getElementById("mode5Btn").addEventListener("click", () => startQuiz("5"));
+
+      const resumeBtn = document.getElementById("resumeBtn");
+      const newBtn = document.getElementById("newBtn");
+      if (resumeBtn) {
+        resumeBtn.addEventListener("click", () => {
+          state = saved;
+          render();
+        });
+      }
+      if (newBtn) {
+        newBtn.addEventListener("click", () => {
+          clearState();
+          render();
+        });
+      }
+    }
+
+    function renderOptions(task) {
+      if (task.type === "multi2") {
+        return `
+          <div class="mt-2 text-sm text-slate-400">Choose 2 answers</div>
+          <div class="mt-5 grid grid-cols-1 gap-3">
+            ${task.options.map((opt, idx) => {
+              const active = (state.selection || []).includes(idx);
+              return `
+                <button data-idx="${idx}" class="multi-btn rounded-2xl border ${active ? 'border-sky-400 bg-sky-500/20' : 'border-slate-700 bg-slate-950/70'} p-4 sm:p-5 text-left text-base sm:text-lg hover:border-sky-500/50 hover:bg-slate-900 transition">
+                  <span class="font-semibold text-slate-200">${String.fromCharCode(65 + idx)}.</span>
+                  <span class="ml-2 text-slate-100">${opt.text}</span>
+                </button>
+              `;
+            }).join("")}
+          </div>
+          <button id="submitMultiBtn" class="mt-4 w-full rounded-2xl ${((state.selection || []).length === 2) ? 'bg-slate-100 text-slate-900' : 'bg-slate-800 text-slate-500'} px-5 py-4 font-semibold transition">
+            OK
+          </button>
+        `;
+      }
+
+      return `
+        <div class="mt-6 grid grid-cols-1 gap-3">
+          ${task.options.map((opt, idx) => `
+            <button data-idx="${idx}" class="answer-btn rounded-2xl border border-slate-700 bg-slate-950/70 p-4 sm:p-5 text-left text-base sm:text-lg hover:border-sky-500/50 hover:bg-slate-900 transition">
+              <span class="font-semibold text-slate-200">${String.fromCharCode(65 + idx)}.</span>
+              <span class="ml-2 text-slate-100">${opt.text}</span>
+            </button>
+          `).join("")}
+        </div>
+      `;
+    }
+
+    function renderQuiz() {
+      const app = document.getElementById("app");
+
+      if (state.done) {
+        const resultPretty = state.resultJson || JSON.stringify(buildResultObject(state), null, 2);
+        const minutes = Math.max(1, Math.round(((state.finishedAt || now()) - state.startedAt) / 60000));
+
+        app.innerHTML = `
+          <div class="min-h-screen flex items-center justify-center p-4 sm:p-6">
+            <div class="w-full max-w-3xl rounded-3xl border border-slate-800 bg-slate-900/80 backdrop-blur shadow-2xl p-5 sm:p-8">
+              <div class="flex items-center justify-between gap-3">
+                <div class="inline-flex rounded-full border border-sky-500/30 bg-sky-500/10 px-3 py-1 text-xs sm:text-sm text-sky-300">${getStatusWord(state)}</div>
+                <div class="text-xs sm:text-sm text-slate-400">Mode ${state.mode}</div>
+              </div>
+
+              <div class="mt-6 text-center">
+                <div class="text-slate-400 text-sm uppercase tracking-[0.25em]">Result</div>
+              </div>
+
+              <div class="mt-4 rounded-3xl border border-slate-800 bg-slate-950/70 p-4 sm:p-6 overflow-x-auto">
+                <pre class="json-box text-left text-sm sm:text-base text-emerald-300">${resultPretty.replace(/</g, '&lt;')}</pre>
+              </div>
+
+              <div class="mt-6 grid grid-cols-3 gap-3 text-center">
+                <div class="rounded-2xl border border-slate-800 bg-slate-950/50 p-3">
+                  <div class="text-xs text-slate-400">Q</div>
+                  <div class="mt-1 text-lg font-bold">${state.presented.length}</div>
+                </div>
+                <div class="rounded-2xl border border-slate-800 bg-slate-950/50 p-3">
+                  <div class="text-xs text-slate-400">T</div>
+                  <div class="mt-1 text-lg font-bold">${minutes}m</div>
+                </div>
+                <div class="rounded-2xl border border-slate-800 bg-slate-950/50 p-3">
+                  <div class="text-xs text-slate-400">S</div>
+                  <div class="mt-1 text-lg font-bold">${state.leaveCount}</div>
+                </div>
+              </div>
+
+              <div class="mt-6 flex justify-center">
+                <button id="restartBtn" class="rounded-2xl bg-slate-100 px-5 py-3 text-slate-900 font-semibold hover:bg-white transition">Restart</button>
+              </div>
+            </div>
+          </div>
+        `;
+
+        document.getElementById("restartBtn").addEventListener("click", () => {
+          clearState();
+          render();
+        });
+        return;
+      }
+
+      const task = state.presented[state.current];
+      const progress = Math.round((state.current / state.presented.length) * 100);
+      const typeBadge = task.type === "true_false" ? "True / False" : task.type === "multi2" ? "Choose 2" : "Task";
+
+      app.innerHTML = `
+        <div class="min-h-screen p-3 sm:p-5 lg:p-8">
+          <div class="mx-auto w-full max-w-5xl">
+            <div class="rounded-3xl border border-slate-800 bg-slate-900/75 backdrop-blur shadow-2xl overflow-hidden">
+              <div class="border-b border-slate-800 p-4 sm:p-5">
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div class="flex items-center gap-3 flex-wrap">
+                    <div class="rounded-2xl border border-sky-500/20 bg-sky-500/10 px-3 py-2 text-sm text-sky-300">Mode ${state.mode}</div>
+                    <div class="rounded-2xl border border-slate-700 px-3 py-2 text-sm text-slate-300">${state.current + 1} / ${state.presented.length}</div>
+                    ${state.studentName ? `<div class="rounded-2xl border border-slate-700 px-3 py-2 text-sm text-slate-300">${state.studentName.replace(/</g, '&lt;')}</div>` : ''}
+                  </div>
+                  <div class="w-full sm:w-64 rounded-full bg-slate-800 h-3 overflow-hidden">
+                    <div class="h-full rounded-full bg-gradient-to-r from-sky-500 to-emerald-400" style="width:${progress}%"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 lg:grid-cols-[1.05fr_1fr] gap-0">
+                <div class="border-b lg:border-b-0 lg:border-r border-slate-800 p-4 sm:p-6">
+                  <div class="flex min-h-[240px] sm:min-h-[340px] items-center justify-center rounded-3xl border border-slate-800 bg-slate-950/60 overflow-hidden">
+                    <img src="${task.image}" alt="" class="max-h-[320px] sm:max-h-[420px] w-auto max-w-full object-contain" onerror="this.closest('.flex').innerHTML='<div class=\\'text-slate-500 text-sm\\'>image</div>';" />
+                  </div>
+                </div>
+
+                <div class="p-4 sm:p-6">
+                  <div class="inline-flex rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-xs text-emerald-300">${typeBadge}</div>
+                  <h2 class="mt-4 text-xl sm:text-3xl font-bold leading-tight">${task.prompt}</h2>
+                  ${renderOptions(task)}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      if (task.type === "multi2") {
+        document.querySelectorAll(".multi-btn").forEach(btn => {
+          btn.addEventListener("click", () => toggleMulti(Number(btn.dataset.idx)));
+        });
+        const submitBtn = document.getElementById("submitMultiBtn");
+        if (submitBtn) submitBtn.addEventListener("click", submitMulti);
+      } else {
+        document.querySelectorAll(".answer-btn").forEach(btn => {
+          btn.addEventListener("click", () => answerMcq(Number(btn.dataset.idx)));
+        });
+      }
+    }
+
+    function render() {
+      const saved = loadState();
+      if (!state && saved) state = saved;
+      if (!state) {
+        renderStartScreen(saved);
+        return;
+      }
+      if (state.done && !state.sent) submitHiddenStats();
+      renderQuiz();
+    }
+
+    function blockActions() {
+      const blocked = ["copy", "cut", "paste", "contextmenu", "selectstart", "dragstart"];
+      blocked.forEach(type => {
+        document.addEventListener(type, event => {
+          event.preventDefault();
+          return false;
+        }, { passive: false });
+      });
+
+      document.addEventListener("keydown", event => {
+        const key = (event.key || "").toLowerCase();
+        const combo = event.ctrlKey || event.metaKey;
+        if (
+          (combo && ["a", "c", "x", "v", "u", "s", "p"].includes(key)) ||
+          key === "f12" ||
+          (combo && event.shiftKey && ["i", "j", "c", "s"].includes(key))
+        ) {
+          event.preventDefault();
+          event.stopPropagation();
+          return false;
+        }
+      }, { passive: false });
+    }
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) {
+        applyLeavePenalty();
+      } else {
+        render();
+      }
+    });
+
+    window.addEventListener("pagehide", () => {
+      applyLeavePenalty();
+    });
+
+    window.addEventListener("blur", () => {
+      if (document.visibilityState !== "visible") return;
+      applyLeavePenalty();
+    });
+
+    blockActions();
+    state = loadState();
+    render();
+  </script>
+</body>
+</html>
