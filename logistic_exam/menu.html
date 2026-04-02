@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Logistics Menu</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    html, body {
+      min-height: 100%;
+      background: #020617;
+    }
+    .app-shell {
+      background:
+        radial-gradient(circle at top, rgba(37,99,235,.22), transparent 34%),
+        radial-gradient(circle at bottom right, rgba(14,165,233,.18), transparent 28%),
+        linear-gradient(180deg, #020617 0%, #0f172a 100%);
+    }
+  </style>
+</head>
+<body class="text-slate-100">
+  <div class="app-shell min-h-screen p-4 sm:p-6 lg:p-8">
+    <div class="mx-auto max-w-5xl">
+      <div class="rounded-3xl border border-slate-800 bg-slate-900/75 backdrop-blur shadow-2xl p-5 sm:p-8">
+        <div class="inline-flex items-center gap-2 rounded-full border border-sky-500/30 bg-sky-500/10 px-3 py-1 text-xs sm:text-sm text-sky-300">Main menu</div>
+        <h1 class="mt-4 text-3xl sm:text-5xl font-bold tracking-tight">Logistics lessons</h1>
+        <div class="mt-2 text-slate-400">Save name and group once, then open any topic.</div>
+
+        <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="rounded-3xl border border-slate-800 bg-slate-950/50 p-5">
+            <label class="text-xs text-slate-400">Name</label>
+            <input id="studentName" type="text" autocomplete="off" spellcheck="false" class="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-900/90 px-4 py-3 text-slate-100 outline-none" placeholder="Student name" />
+          </div>
+          <div class="rounded-3xl border border-slate-800 bg-slate-950/50 p-5">
+            <label class="text-xs text-slate-400">Group</label>
+            <select id="studentGroup" class="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-900/90 px-4 py-3 text-slate-100 outline-none">
+              <option value="OPU22.2">OPU22.2</option>
+              <option value="OPU22.1">OPU22.1</option>
+              <option value="OPU23">OPU23</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="mt-4 flex flex-wrap items-center gap-3">
+          <button id="saveProfileBtn" class="rounded-2xl bg-slate-100 px-5 py-3 text-slate-900 font-semibold hover:bg-white transition">Save</button>
+          <div id="saveStatus" class="text-sm text-slate-400"></div>
+        </div>
+
+        <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+          <a href="index.html" class="rounded-3xl border border-emerald-500/30 bg-emerald-500/10 p-5 hover:bg-emerald-500/20 transition">
+            <div class="text-sm text-emerald-300">Topic 1</div>
+            <div class="mt-2 text-2xl font-bold">Warehouse basics</div>
+            <div class="mt-2 text-sm text-slate-300">Pallets, barcode, scanner, dock, truck and storage actions.</div>
+          </a>
+          <a href="index2.html" class="rounded-3xl border border-violet-500/30 bg-violet-500/10 p-5 hover:bg-violet-500/20 transition">
+            <div class="text-sm text-violet-300">Topic 2</div>
+            <div class="mt-2 text-2xl font-bold">Orders and packing list</div>
+            <div class="mt-2 text-sm text-slate-300">Order, item, quantity, shortage and checking actions.</div>
+          </a>
+          <a href="index3.html" class="rounded-3xl border border-sky-500/30 bg-sky-500/10 p-5 hover:bg-sky-500/20 transition">
+            <div class="text-sm text-sky-300">Topic 3</div>
+            <div class="mt-2 text-2xl font-bold">Returns and claims</div>
+            <div class="mt-2 text-sm text-slate-300">Customer returns, refund, replacement and warehouse decisions.</div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const PROFILE_STORAGE_KEY = "student_profile_shared_v1";
+    const GROUP_OPTIONS = ["OPU22.2", "OPU22.1", "OPU23"];
+
+    function normalizeGroup(value) {
+      return GROUP_OPTIONS.includes(value) ? value : GROUP_OPTIONS[0];
+    }
+
+    function loadProfile() {
+      try {
+        const raw = localStorage.getItem(PROFILE_STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          return {
+            name: (parsed.name || "").trim(),
+            group: normalizeGroup(parsed.group || GROUP_OPTIONS[0])
+          };
+        }
+      } catch (e) {}
+      return { name: "", group: GROUP_OPTIONS[0] };
+    }
+
+    function saveProfile() {
+      const name = document.getElementById("studentName").value.trim();
+      const group = normalizeGroup(document.getElementById("studentGroup").value);
+      const profile = { name, group };
+      try {
+        localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(profile));
+        document.getElementById("saveStatus").textContent = "Saved";
+      } catch (e) {
+        document.getElementById("saveStatus").textContent = "Not saved";
+      }
+    }
+
+    const profile = loadProfile();
+    document.getElementById("studentName").value = profile.name;
+    document.getElementById("studentGroup").value = profile.group;
+    document.getElementById("saveProfileBtn").addEventListener("click", saveProfile);
+    document.getElementById("studentName").addEventListener("input", saveProfile);
+    document.getElementById("studentGroup").addEventListener("change", saveProfile);
+  </script>
+</body>
+</html>

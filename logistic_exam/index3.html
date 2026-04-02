@@ -616,7 +616,10 @@
     const ENTRY_JSON = "entry.1988412302";
     const FULL_MODE_COUNT = TASK_BANK.length;
     const GROUP_OPTIONS = ["OPU22.2", "OPU22.1", "OPU23"];
+    const PROFILE_STORAGE_KEY = "student_profile_shared_v1";
+    const MENU_URL = "menu.html";
     let state = null;
+    let safeNavigation = false;
 
     function shuffle(arr) {
       const a = arr.slice();
@@ -732,11 +735,38 @@
       return GROUP_OPTIONS.includes(value) ? value : GROUP_OPTIONS[0];
     }
 
+    function getStudentProfile() {
+      try {
+        const raw = localStorage.getItem(PROFILE_STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          return {
+            name: (parsed.name || "").trim(),
+            group: normalizeGroup(parsed.group || GROUP_OPTIONS[0])
+          };
+        }
+      } catch (e) {}
+      return { name: "", group: GROUP_OPTIONS[0] };
+    }
+
+    function saveStudentProfile(name, group) {
+      const profile = {
+        name: (name || "").trim(),
+        group: normalizeGroup(group || GROUP_OPTIONS[0])
+      };
+      try { localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(profile)); } catch (e) {}
+      return profile;
+    }
+
+    function goToMenu() {
+      safeNavigation = true;
+      window.location.href = MENU_URL;
+    }
+
     function startQuiz(mode) {
-      const nameInput = document.getElementById("studentName");
-      const groupInput = document.getElementById("studentGroup");
-      const studentName = (nameInput?.value || "").trim();
-      const studentGroup = normalizeGroup((groupInput?.value || "").trim());
+      const profile = getStudentProfile();
+      const studentName = profile.name;
+      const studentGroup = profile.group;
 
       state = {
         version: 1,
@@ -789,6 +819,7 @@
     }
 
     function applyLeavePenalty() {
+      if (safeNavigation) return;
       if (!state || state.done || !state.active) return;
       const t = now();
       if (t - (state.lastPenaltyAt || 0) < 1200) return;
@@ -946,25 +977,28 @@
     }
 
     function renderStartScreen(saved) {
+      const profile = getStudentProfile();
       const app = document.getElementById("app");
       app.innerHTML = `
         <div class="min-h-screen flex items-center justify-center p-4 sm:p-6">
           <div class="w-full max-w-2xl rounded-3xl border border-slate-800 bg-slate-900/70 backdrop-blur shadow-2xl p-5 sm:p-8">
-            <div class="text-center">
-              <div class="inline-flex items-center gap-2 rounded-full border border-sky-500/30 bg-sky-500/10 px-3 py-1 text-xs sm:text-sm text-sky-300">Returns and Claims</div>
-              <h1 class="mt-4 text-2xl sm:text-4xl font-bold tracking-tight">Choose mode</h1>
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <div class="inline-flex items-center gap-2 rounded-full border border-sky-500/30 bg-sky-500/10 px-3 py-1 text-xs sm:text-sm text-sky-300">Returns Words</div>
+                <h1 class="mt-4 text-2xl sm:text-4xl font-bold tracking-tight">Topic 3</h1>
+                <div class="mt-2 text-sm sm:text-base text-slate-400">Returns, claims and replacement</div>
+              </div>
+              <button id="menuBtnStart" class="rounded-2xl border border-slate-700 px-4 py-2 text-sm text-slate-200 hover:bg-slate-800 transition">Main menu</button>
             </div>
 
             <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div class="rounded-3xl border border-slate-800 bg-slate-950/50 p-4 sm:p-5">
-                <label class="text-xs text-slate-400">Name</label>
-                <input id="studentName" type="text" autocomplete="off" spellcheck="false" class="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-900/90 px-4 py-3 text-slate-100 outline-none" value="${saved?.studentName ? saved.studentName.replace(/"/g, '&quot;') : ''}">
+                <div class="text-xs text-slate-400">Name</div>
+                <div class="mt-2 text-lg font-semibold text-slate-100">${profile.name || "—"}</div>
               </div>
               <div class="rounded-3xl border border-slate-800 bg-slate-950/50 p-4 sm:p-5">
-                <label class="text-xs text-slate-400">Group</label>
-                <select id="studentGroup" class="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-900/90 px-4 py-3 text-slate-100 outline-none">
-                  ${GROUP_OPTIONS.map(group => `<option value="${group}" ${(normalizeGroup(saved?.studentGroup || GROUP_OPTIONS[0]) === group) ? "selected" : ""}>${group}</option>`).join("")}
-                </select>
+                <div class="text-xs text-slate-400">Group</div>
+                <div class="mt-2 text-lg font-semibold text-slate-100">${profile.group || "—"}</div>
               </div>
             </div>
 
@@ -1000,6 +1034,7 @@
         </div>
       `;
 
+      document.getElementById("menuBtnStart").addEventListener("click", goToMenu);
       document.getElementById("mode4Btn").addEventListener("click", () => startQuiz("4"));
       document.getElementById("mode5Btn").addEventListener("click", () => startQuiz("5"));
 
@@ -1064,7 +1099,7 @@
             <div class="w-full max-w-3xl rounded-3xl border border-slate-800 bg-slate-900/80 backdrop-blur shadow-2xl p-5 sm:p-8">
               <div class="flex items-center justify-between gap-3">
                 <div class="inline-flex rounded-full border border-sky-500/30 bg-sky-500/10 px-3 py-1 text-xs sm:text-sm text-sky-300">${getStatusWord(state)}</div>
-                <div class="text-xs sm:text-sm text-slate-400">Mode ${state.mode}</div>
+                <button id="menuBtnResult" class="rounded-2xl border border-slate-700 px-4 py-2 text-sm text-slate-200 hover:bg-slate-800 transition">Main menu</button>
               </div>
 
               <div class="mt-6 text-center">
@@ -1090,13 +1125,14 @@
                 </div>
               </div>
 
-              <div class="mt-6 flex justify-center">
+              <div class="mt-6 flex justify-center gap-3">
                 <button id="restartBtn" class="rounded-2xl bg-slate-100 px-5 py-3 text-slate-900 font-semibold hover:bg-white transition">Restart</button>
               </div>
             </div>
           </div>
         `;
 
+        document.getElementById("menuBtnResult").addEventListener("click", goToMenu);
         document.getElementById("restartBtn").addEventListener("click", () => {
           clearState();
           render();
@@ -1113,13 +1149,17 @@
           <div class="mx-auto w-full max-w-5xl">
             <div class="rounded-3xl border border-slate-800 bg-slate-900/75 backdrop-blur shadow-2xl overflow-hidden">
               <div class="border-b border-slate-800 p-4 sm:p-5">
-                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                  <div class="flex items-center gap-3 flex-wrap">
-                    <div class="rounded-2xl border border-sky-500/20 bg-sky-500/10 px-3 py-2 text-sm text-sky-300">Mode ${state.mode}</div>
-                    <div class="rounded-2xl border border-slate-700 px-3 py-2 text-sm text-slate-300">${state.current + 1} / ${state.presented.length}</div>
-                    ${state.studentName ? `<div class="rounded-2xl border border-slate-700 px-3 py-2 text-sm text-slate-300">${state.studentName.replace(/</g, '&lt;')}</div>` : ''}
+                <div class="flex flex-col gap-3">
+                  <div class="flex flex-wrap items-center justify-between gap-3">
+                    <div class="flex items-center gap-3 flex-wrap">
+                      <div class="rounded-2xl border border-sky-500/20 bg-sky-500/10 px-3 py-2 text-sm text-sky-300">Mode ${state.mode}</div>
+                      <div class="rounded-2xl border border-slate-700 px-3 py-2 text-sm text-slate-300">${state.current + 1} / ${state.presented.length}</div>
+                      ${state.studentName ? `<div class="rounded-2xl border border-slate-700 px-3 py-2 text-sm text-slate-300">${state.studentName.replace(/</g, '&lt;')}</div>` : ''}
+                      <div class="rounded-2xl border border-slate-700 px-3 py-2 text-sm text-slate-300">${state.studentGroup || ''}</div>
+                    </div>
+                    <button id="menuBtnQuiz" class="rounded-2xl border border-slate-700 px-4 py-2 text-sm text-slate-200 hover:bg-slate-800 transition">Main menu</button>
                   </div>
-                  <div class="w-full sm:w-64 rounded-full bg-slate-800 h-3 overflow-hidden">
+                  <div class="w-full rounded-full bg-slate-800 h-3 overflow-hidden">
                     <div class="h-full rounded-full bg-gradient-to-r from-sky-500 to-emerald-400" style="width:${progress}%"></div>
                   </div>
                 </div>
@@ -1143,6 +1183,7 @@
         </div>
       `;
 
+      document.getElementById("menuBtnQuiz").addEventListener("click", goToMenu);
       if (task.type === "multi2") {
         document.querySelectorAll(".multi-btn").forEach(btn => {
           btn.addEventListener("click", () => toggleMulti(Number(btn.dataset.idx)));
