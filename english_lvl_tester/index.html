@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>English Level Tester A0–B0</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: #0f172a;
+      min-height: 100%;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      overscroll-behavior: none;
+    }
+
+    .safe-select {
+      -webkit-user-select: text;
+      user-select: text;
+    }
+
+    .exam-lock {
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    .option-btn {
+      transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+    }
+
+    .option-btn:active {
+      transform: scale(0.99);
+    }
+
+    .glass {
+      background: rgba(15, 23, 42, 0.88);
+      backdrop-filter: blur(12px);
+    }
+
+    .warning-fade {
+      animation: fadeInOut 2.2s ease;
+    }
+
+    @keyframes fadeInOut {
+      0% { opacity: 0; transform: translateY(8px); }
+      10% { opacity: 1; transform: translateY(0); }
+      85% { opacity: 1; transform: translateY(0); }
+      100% { opacity: 0; transform: translateY(-4px); }
+    }
+  </style>
+</head>
+<body class="text-slate-100">
+  <div id="app" class="min-h-screen"></div>
+
+  <script>
+    const STORAGE_KEY = 'english_level_tester_a0_b0_v1';
+
+    const QUESTION_BANK = [
+      {
+        id: 1,
+        story: 'Alex has a dog. The dog is big and black.',
+        question: 'What color is the dog?',
+        options: ['black', 'big', 'Alex', 'dog'],
+        answer: 'black'
+      },
+      {
+        id: 2,
+        story: 'Anna has two cats and one fish.',
+        question: 'How many cats does Anna have?',
+        options: ['one', 'two', 'three', 'four'],
+        answer: 'two'
+      },
+      {
+        id: 3,
+        story: 'Tom is in the kitchen. His brother is in the garden.',
+        question: 'Where is Tom?',
+        options: ['in the garden', 'in the kitchen', 'at school', 'in the car'],
+        answer: 'in the kitchen'
+      },
+      {
+        id: 4,
+        story: 'Mia likes tea. She does not like coffee.',
+        question: 'What does Mia like?',
+        options: ['coffee', 'tea', 'milk', 'juice'],
+        answer: 'tea'
+      },
+      {
+        id: 5,
+        story: 'Ben has a red bag and a blue book.',
+        question: 'What is blue?',
+        options: ['the bag', 'Ben', 'the book', 'the room'],
+        answer: 'the book'
+      },
+      {
+        id: 6,
+        story: 'Sara is happy today. She is smiling.',
+        question: 'Is Sara sad?',
+        options: ['yes', 'no', 'maybe', 'at home'],
+        answer: 'no'
+      },
+      {
+        id: 7,
+        story: 'It is cold outside. Max puts on a coat.',
+        question: 'Why does Max put on a coat?',
+        options: ['it is hot', 'it is cold', 'he is late', 'he is hungry'],
+        answer: 'it is cold'
+      },
+      {
+        id: 8,
+        story: 'Leo goes to school by bus every day.',
+        question: 'How does Leo go to school?',
+        options: ['by car', 'by bus', 'on foot', 'by bike'],
+        answer: 'by bus'
+      },
+      {
+        id: 9,
+        story: 'Emma has an apple and a banana. She eats the banana.',
+        question: 'What does Emma eat?',
+        options: ['the apple', 'the banana', 'bread', 'rice'],
+        answer: 'the banana'
+      },
+      {
+        id: 10,
+        story: 'The box is under the table near the window.',
+        question: 'Where is the box?',
+        options: ['on the table', 'under the table', 'in the bag', 'behind the door'],
+        answer: 'under the table'
+      },
+      {
+        id: 11,
+        story: 'Nick works in the morning. He sleeps at night.',
+        question: 'When does Nick sleep?',
+        options: ['in the morning', 'at night', 'at lunch', 'at school'],
+        answer: 'at night'
+      },
+      {
+        id: 12,
+        story: 'The shop is closed on Sunday.',
+        question: 'Can Amy go shopping there on Sunday?',
+        options: ['yes', 'no', 'only at night', 'only with friends'],
+        answer: 'no'
+      },
+      {
+        id: 13,
+        story: 'Kate has one brother and one sister.',
+        question: 'How many brothers and sisters does Kate have?',
+        options: ['one', 'two', 'three', 'four'],
+        answer: 'two'
+      },
+      {
+        id: 14,
+        story: 'The car is very slow, but the bike is fast.',
+        question: 'What is fast?',
+        options: ['the car', 'the road', 'the bike', 'the driver'],
+        answer: 'the bike'
+      },
+      {
+        id: 15,
+        story: 'Dan opens the window because the room is hot.',
+        question: 'Why does Dan open the window?',
+        options: ['the room is hot', 'the room is cold', 'it is dark', 'he is tired'],
+        answer: 'the room is hot'
+      },
+      {
+        id: 16,
+        story: 'Lucy wants water. She is very thirsty.',
+        question: 'What does Lucy want?',
+        options: ['tea', 'water', 'cake', 'coffee'],
+        answer: 'water'
+      },
+      {
+        id: 17,
+        story: 'There are 5 chairs in the room. 2 chairs are broken.',
+        question: 'How many good chairs are there?',
+        options: ['2', '3', '5', '7'],
+        answer: '3'
+      },
+      {
+        id: 18,
+        story: 'Sam has English on Monday and Tuesday.',
+        question: 'Does Sam have English on Friday?',
+        options: ['yes', 'no', 'only in summer', 'only at home'],
+        answer: 'no'
+      },
+      {
+        id: 19,
+        story: 'Jill is wearing boots and carrying an umbrella. It is raining.',
+        question: 'What is the weather like?',
+        options: ['sunny', 'windy', 'rainy', 'snowy'],
+        answer: 'rainy'
+      },
+      {
+        id: 20,
+        story: 'Peter’s phone is on the bed next to his bag.',
+        question: 'Where is Peter’s phone?',
+        options: ['in the bag', 'under the bed', 'on the bed', 'on the table'],
+        answer: 'on the bed'
+      },
+      {
+        id: 21,
+        story: 'Nora gets up at 7:00. She starts work at 8:00.',
+        question: 'What does Nora do first?',
+        options: ['she starts work', 'she gets up', 'she goes to sleep', 'she eats dinner'],
+        answer: 'she gets up'
+      },
+      {
+        id: 22,
+        story: 'The train to Berlin leaves at 10:00. It is 9:30 now.',
+        question: 'Is the train gone?',
+        options: ['yes', 'no', 'only on Friday', 'nobody knows'],
+        answer: 'no'
+      },
+      {
+        id: 23,
+        story: 'A man buys 3 eggs and 1 loaf of bread.',
+        question: 'What does he buy more of?',
+        options: ['bread', 'eggs', 'milk', 'water'],
+        answer: 'eggs'
+      },
+      {
+        id: 24,
+        story: 'The teacher says, “Open your books.”',
+        question: 'What should the students do?',
+        options: ['close the door', 'open their books', 'go home', 'write on the wall'],
+        answer: 'open their books'
+      },
+      {
+        id: 25,
+        story: 'The café is between the bank and the park.',
+        question: 'Where is the café?',
+        options: ['behind the school', 'between the bank and the park', 'inside the bank', 'near the hospital'],
+        answer: 'between the bank and the park'
+      },
+      {
+        id: 26,
+        story: 'Mike is taller than Ben. Ben is taller than Tim.',
+        question: 'Who is the tallest?',
+        options: ['Tim', 'Ben', 'Mike', 'all are the same'],
+        answer: 'Mike'
+      },
+      {
+        id: 27,
+        story: 'Lisa has 10 euros. Juice costs 4 euros. A sandwich costs 5 euros.',
+        question: 'Can Lisa buy both?',
+        options: ['yes', 'no', 'only the sandwich', 'only juice'],
+        answer: 'yes'
+      },
+      {
+        id: 28,
+        story: 'On the map, go left from the school to the museum.',
+        question: 'Where do you go from the school?',
+        options: ['right', 'left', 'up', 'back home'],
+        answer: 'left'
+      },
+      {
+        id: 29,
+        story: 'The movie starts at 6:00. Tina arrives at 6:15.',
+        question: 'Is Tina early or late?',
+        options: ['early', 'late', 'hungry', 'busy'],
+        answer: 'late'
+      },
+      {
+        id: 30,
+        story: 'John was sick yesterday, so he stayed home.',
+        question: 'Where was John yesterday?',
+        options: ['at school', 'at home', 'at the shop', 'at the station'],
+        answer: 'at home'
+      }
+    ];
+
+    let state = loadState() || createEmptyState();
+
+    function createEmptyState() {
+      return {
+        version: 1,
+        mode: 'start',
+        studentName: '',
+        startedAt: null,
+        finishedAt: null,
+        questionOrder: [],
+        currentIndex: 0,
+        answers: {},
+        score: 0,
+        leaveCount: 0,
+        warning: '',
+        seed: '',
+        attemptCode: '',
+        lastFocusLossAt: 0,
+        restored: false
+      };
+    }
+
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        parsed.restored = true;
+        return parsed;
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function clearState() {
+      localStorage.removeItem(STORAGE_KEY);
+      state = createEmptyState();
+      render();
+    }
+
+    function shuffleArray(arr) {
+      const copy = [...arr];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    function uid() {
+      return Math.random().toString(36).slice(2, 8).toUpperCase() + '-' + Date.now().toString(36).toUpperCase();
+    }
+
+    function buildSessionQuestions() {
+      const shuffled = shuffleArray(QUESTION_BANK).map(q => ({
+        ...q,
+        options: shuffleArray(q.options)
+      }));
+      return shuffled.map(q => q.id);
+    }
+
+    function getQuestionById(id) {
+      return QUESTION_BANK.find(q => q.id === id);
+    }
+
+    function getShuffledQuestion(id) {
+      const orderItem = state.questionOrderMeta?.[id];
+      const q = getQuestionById(id);
+      if (!q) return null;
+      return {
+        ...q,
+        options: orderItem ? orderItem.options : q.options
+      };
+    }
+
+    function initQuestionMeta() {
+      const meta = {};
+      for (const id of state.questionOrder) {
+        const q = getQuestionById(id);
+        meta[id] = {
+          options: shuffleArray(q.options)
+        };
+      }
+      state.questionOrderMeta = meta;
+    }
+
+    function startTest() {
+      const nameInput = document.getElementById('studentName');
+      const studentName = nameInput ? nameInput.value.trim() : '';
+      if (!studentName) {
+        alert('Введите имя или фамилию студента.');
+        return;
+      }
+
+      state = {
+        version: 1,
+        mode: 'test',
+        studentName,
+        startedAt: new Date().toISOString(),
+        finishedAt: null,
+        questionOrder: buildSessionQuestions(),
+        currentIndex: 0,
+        answers: {},
+        score: 0,
+        leaveCount: 0,
+        warning: '',
+        seed: uid(),
+        attemptCode: '',
+        lastFocusLossAt: 0,
+        restored: false
+      };
+      initQuestionMeta();
+      saveState();
+      render();
+    }
+
+    function getCurrentQuestion() {
+      const id = state.questionOrder[state.currentIndex];
+      return getShuffledQuestion(id);
+    }
+
+    function answerQuestion(option) {
+      const current = getCurrentQuestion();
+      if (!current) return;
+      const isCorrect = option === current.answer;
+      state.answers[current.id] = {
+        selected: option,
+        correct: isCorrect
+      };
+
+      if (state.currentIndex < state.questionOrder.length - 1) {
+        state.currentIndex += 1;
+        saveState();
+        render();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        finishTest();
+      }
+    }
+
+    function finishTest() {
+      const values = Object.values(state.answers);
+      state.score = values.filter(v => v.correct).length;
+      state.finishedAt = new Date().toISOString();
+      state.mode = 'result';
+      state.attemptCode = makeAttemptCode();
+      saveState();
+      render();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function makeAttemptCode() {
+      const raw = [
+        state.seed,
+        state.studentName,
+        state.score,
+        state.leaveCount,
+        Object.keys(state.answers).sort().map(id => `${id}:${state.answers[id].selected}`).join('|')
+      ].join('||');
+
+      let hash = 0;
+      for (let i = 0; i < raw.length; i++) {
+        hash = ((hash << 5) - hash) + raw.charCodeAt(i);
+        hash |= 0;
+      }
+      return `ENG-${Math.abs(hash).toString(36).toUpperCase()}-${state.score}`;
+    }
+
+    function getLevelLabel(score) {
+      if (score <= 6) return 'A0';
+      if (score <= 12) return 'A0+';
+      if (score <= 18) return 'A1';
+      if (score <= 23) return 'A1+';
+      if (score <= 27) return 'A2';
+      return 'B0';
+    }
+
+    function getLevelNote(score) {
+      if (score <= 6) return 'Понимание очень базовое. Нужны самые простые слова и короткие модели.';
+      if (score <= 12) return 'Есть начальное понимание отдельных слов и простых фраз.';
+      if (score <= 18) return 'Понимает очень простые короткие сообщения и бытовые ситуации.';
+      if (score <= 23) return 'Хорошо понимает простые тексты и вопросы на базовом уровне.';
+      if (score <= 27) return 'Уверенно работает с лёгкими короткими текстами и понятными ситуациями.';
+      return 'Очень хороший базовый уровень понимания для простых текстов.';
+    }
+
+    function formatDate(iso) {
+      if (!iso) return '—';
+      const d = new Date(iso);
+      return d.toLocaleString('ru-RU');
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    function reshuffleRemainingQuestions() {
+      const answeredIds = new Set(Object.keys(state.answers).map(Number));
+      const remainingIds = state.questionOrder.filter((id, idx) => idx >= state.currentIndex && !answeredIds.has(id));
+      const shuffledRemaining = shuffleArray(remainingIds);
+
+      const newOrder = [];
+      for (let i = 0; i < state.questionOrder.length; i++) {
+        const id = state.questionOrder[i];
+        if (i < state.currentIndex || answeredIds.has(id)) {
+          newOrder.push(id);
+        }
+      }
+
+      state.questionOrder = [...newOrder, ...shuffledRemaining];
+
+      for (const id of shuffledRemaining) {
+        const q = getQuestionById(id);
+        state.questionOrderMeta[id] = { options: shuffleArray(q.options) };
+      }
+
+      const answeredCount = Object.keys(state.answers).length;
+      state.currentIndex = answeredCount;
+    }
+
+    function registerFocusLoss() {
+      if (state.mode !== 'test') return;
+
+      const now = Date.now();
+      if (now - state.lastFocusLossAt < 2000) return;
+      state.lastFocusLossAt = now;
+      state.leaveCount += 1;
+      reshuffleRemainingQuestions();
+      state.warning = 'Выход со страницы обнаружен. Оставшиеся задания перемешаны.';
+      saveState();
+    }
+
+    function renderStart() {
+      const restoredBox = state.restored && (state.mode === 'test' || state.mode === 'result')
+        ? `
+          <div class="mb-4 rounded-2xl border border-amber-400/40 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">
+            Найдена сохранённая попытка. Можно продолжить с того же места.
+          </div>
+        `
+        : '';
+
+      const continueButton = state.restored && state.mode === 'test'
+        ? `<button onclick="renderTest()" class="w-full rounded-2xl bg-amber-400 px-4 py-3 font-bold text-slate-900 hover:bg-amber-300">Продолжить сохранённую попытку</button>`
+        : '';
+
+      const resultButton = state.restored && state.mode === 'result'
+        ? `<button onclick="renderResult()" class="w-full rounded-2xl bg-emerald-400 px-4 py-3 font-bold text-slate-900 hover:bg-emerald-300">Открыть последний результат</button>`
+        : '';
+
+      return `
+        <div class="mx-auto flex min-h-screen max-w-5xl items-center px-4 py-6 sm:px-6 lg:px-8">
+          <div class="glass w-full rounded-3xl border border-slate-700/70 p-5 shadow-2xl sm:p-8">
+            <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <div class="mb-2 inline-flex rounded-full border border-sky-400/30 bg-sky-400/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-sky-200">English Tester</div>
+                <h1 class="text-2xl font-extrabold text-white sm:text-4xl">Тест на понимание английского языка</h1>
+                <p class="mt-2 max-w-2xl text-sm text-slate-300 sm:text-base">Уровень заданий: от A0 до B0. Вопросы очень лёгкие и идут от самых простых к чуть более сложным.</p>
+              </div>
+              <div class="rounded-2xl border border-slate-700 bg-slate-900/70 px-4 py-3 text-sm text-slate-300">
+                <div><span class="text-slate-400">Вопросов:</span> 30</div>
+                <div><span class="text-slate-400">Формат:</span> 4 варианта ответа</div>
+              </div>
+            </div>
+
+            ${restoredBox}
+
+            <div class="grid gap-5 lg:grid-cols-[1.1fr_0.9fr]">
+              <div class="rounded-3xl border border-slate-700 bg-slate-900/70 p-5">
+                <label for="studentName" class="mb-2 block text-sm font-semibold text-slate-200">Имя или фамилия студента</label>
+                <input id="studentName" type="text" autocomplete="name" value="${escapeHtml(state.studentName || '')}" class="safe-select w-full rounded-2xl border border-slate-600 bg-slate-950 px-4 py-3 text-base text-white outline-none ring-0 placeholder:text-slate-500 focus:border-sky-400" placeholder="Например: Иван Петров" />
+
+                <div class="mt-5 grid gap-3">
+                  <button onclick="startTest()" class="w-full rounded-2xl bg-sky-500 px-4 py-3 font-bold text-white hover:bg-sky-400">Начать тест</button>
+                  ${continueButton}
+                  ${resultButton}
+                  <button onclick="clearState()" class="w-full rounded-2xl border border-slate-600 bg-slate-800 px-4 py-3 font-semibold text-slate-200 hover:bg-slate-700">Сбросить сохранённые данные</button>
+                </div>
+              </div>
+
+
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderTest() {
+      state.mode = 'test';
+      saveState();
+      render();
+    }
+
+    function renderTestView() {
+      const q = getCurrentQuestion();
+      const progress = Math.round((state.currentIndex / QUESTION_BANK.length) * 100);
+      const warningHtml = state.warning
+        ? `<div class="warning-fade mb-4 rounded-2xl border border-amber-400/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">${escapeHtml(state.warning)}</div>`
+        : '';
+
+      return `
+        <div class="exam-lock mx-auto max-w-4xl px-3 py-4 sm:px-5 sm:py-6">
+          <div class="glass rounded-3xl border border-slate-700/70 p-4 shadow-2xl sm:p-6">
+            <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <div class="text-xs font-semibold uppercase tracking-[0.2em] text-sky-200">English Level Test</div>
+                <h1 class="text-xl font-extrabold text-white sm:text-2xl">${escapeHtml(state.studentName)}</h1>
+              </div>
+              <div class="rounded-2xl border border-slate-700 bg-slate-900/70 px-4 py-3 text-sm text-slate-300">
+                <div>Вопрос <span class="font-bold text-white">${state.currentIndex + 1}</span> / ${QUESTION_BANK.length}</div>
+                <div>outs: <span class="font-bold text-amber-300">${state.leaveCount}</span></div>
+              </div>
+            </div>
+
+            ${warningHtml}
+
+            <div class="mb-5">
+              <div class="mb-2 flex items-center justify-between text-xs text-slate-400">
+                <span>Прогресс</span>
+                <span>${progress}%</span>
+              </div>
+              <div class="h-3 overflow-hidden rounded-full bg-slate-800">
+                <div class="h-full rounded-full bg-sky-500" style="width:${progress}%"></div>
+              </div>
+            </div>
+
+            <div class="rounded-3xl border border-slate-700 bg-slate-950/70 p-4 sm:p-6">
+              <div class="mb-4 inline-flex rounded-full border border-violet-400/30 bg-violet-400/10 px-3 py-1 text-xs font-semibold text-violet-200">Read and choose the correct answer</div>
+
+              <div class="mb-5 rounded-2xl border border-slate-700 bg-slate-900/90 p-4 text-base leading-7 text-slate-100 sm:text-lg">
+                ${escapeHtml(q.story)}
+              </div>
+
+              <div class="mb-5 text-lg font-bold leading-7 text-white sm:text-xl">
+                ${escapeHtml(q.question)}
+              </div>
+
+              <div class="grid gap-3">
+                ${q.options.map(option => `
+                  <button class="option-btn rounded-2xl border border-slate-600 bg-slate-900 px-4 py-4 text-left text-base font-semibold text-slate-100 shadow hover:border-sky-400 hover:bg-slate-800" onclick="answerQuestion(${JSON.stringify(option).replace(/"/g, '&quot;')})">
+                    ${escapeHtml(option)}
+                  </button>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderResult() {
+      state.mode = 'result';
+      saveState();
+      render();
+    }
+
+    function renderResultView() {
+      const level = getLevelLabel(state.score);
+      const note = getLevelNote(state.score);
+      const percent = Math.round((state.score / QUESTION_BANK.length) * 100);
+
+      return `
+        <div class="mx-auto max-w-4xl px-4 py-5 sm:px-6 sm:py-8">
+          <div class="glass rounded-3xl border border-slate-700/70 p-5 shadow-2xl sm:p-8">
+            <div class="mb-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <div class="mb-2 inline-flex rounded-full border border-emerald-400/30 bg-emerald-400/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-emerald-200">Result</div>
+                <h1 class="text-2xl font-extrabold text-white sm:text-4xl">Итог теста</h1>
+                <p class="mt-2 text-sm text-slate-300 sm:text-base">Сделайте скриншот этого экрана и отправьте преподавателю.</p>
+              </div>
+              <div class="rounded-3xl border border-slate-700 bg-slate-950/80 px-5 py-4 text-center">
+                <div class="text-sm text-slate-400">Уровень</div>
+                <div class="text-4xl font-extrabold text-sky-300">${level}</div>
+              </div>
+            </div>
+
+            <div class="grid gap-4 md:grid-cols-2">
+              <div class="rounded-3xl border border-slate-700 bg-slate-900/80 p-5">
+                <div class="mb-4 text-lg font-bold text-white">Данные попытки</div>
+                <div class="space-y-3 text-sm sm:text-base">
+                  <div class="flex items-start justify-between gap-4 border-b border-slate-700 pb-2"><span class="text-slate-400">Студент</span><span class="text-right font-semibold text-white">${escapeHtml(state.studentName)}</span></div>
+                  <div class="flex items-start justify-between gap-4 border-b border-slate-700 pb-2"><span class="text-slate-400">Правильных ответов</span><span class="text-right font-semibold text-white">${state.score} / ${QUESTION_BANK.length}</span></div>
+                  <div class="flex items-start justify-between gap-4 border-b border-slate-700 pb-2"><span class="text-slate-400">Процент</span><span class="text-right font-semibold text-white">${percent}%</span></div>
+                  <div class="flex items-start justify-between gap-4 border-b border-slate-700 pb-2"><span class="text-slate-400">Условный уровень</span><span class="text-right font-semibold text-sky-300">${level}</span></div>
+                  <div class="flex items-start justify-between gap-4 border-b border-slate-700 pb-2"><span class="text-slate-400">Начало</span><span class="text-right font-semibold text-white">${formatDate(state.startedAt)}</span></div>
+                  <div class="flex items-start justify-between gap-4 border-b border-slate-700 pb-2"><span class="text-slate-400">Завершение</span><span class="text-right font-semibold text-white">${formatDate(state.finishedAt)}</span></div>
+                  <div class="flex items-start justify-between gap-4 border-b border-slate-700 pb-2"><span class="text-slate-400">outs</span><span class="text-right font-semibold ${state.leaveCount > 0 ? 'text-amber-300' : 'text-emerald-300'}">${state.leaveCount}</span></div>
+                  <div class="flex items-start justify-between gap-4"><span class="text-slate-400">Код попытки</span><span class="text-right font-bold text-emerald-300">${escapeHtml(state.attemptCode)}</span></div>
+                </div>
+              </div>
+
+              <div class="rounded-3xl border border-slate-700 bg-slate-900/80 p-5">
+                <div class="mb-4 text-lg font-bold text-white">Краткая интерпретация</div>
+                <div class="rounded-2xl border border-slate-700 bg-slate-950/70 p-4 text-base leading-7 text-slate-200">
+                  ${escapeHtml(note)}
+                </div>
+
+
+
+                <div class="mt-4 grid gap-3 sm:grid-cols-2">
+                  <button onclick="window.location.reload()" class="rounded-2xl bg-sky-500 px-4 py-3 font-bold text-white hover:bg-sky-400">Открыть результат заново</button>
+                  <button onclick="clearState()" class="rounded-2xl border border-slate-600 bg-slate-800 px-4 py-3 font-semibold text-slate-200 hover:bg-slate-700">Новая попытка</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function render() {
+      const app = document.getElementById('app');
+
+      if (state.mode === 'test') {
+        app.innerHTML = renderTestView();
+      } else if (state.mode === 'result') {
+        app.innerHTML = renderResultView();
+      } else {
+        app.innerHTML = renderStart();
+      }
+
+      if (state.warning) {
+        setTimeout(() => {
+          state.warning = '';
+          saveState();
+          if (state.mode === 'test') render();
+        }, 2200);
+      }
+    }
+
+    document.addEventListener('contextmenu', (e) => e.preventDefault());
+    document.addEventListener('copy', (e) => e.preventDefault());
+    document.addEventListener('cut', (e) => e.preventDefault());
+    document.addEventListener('dragstart', (e) => e.preventDefault());
+    document.addEventListener('selectstart', (e) => {
+      const allowed = e.target.closest && e.target.closest('.safe-select');
+      if (!allowed) e.preventDefault();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      const key = e.key.toLowerCase();
+      const blocked = (
+        key === 'f12' ||
+        ((e.ctrlKey || e.metaKey) && ['c', 'x', 'u', 's', 'p', 'a'].includes(key)) ||
+        ((e.ctrlKey || e.metaKey) && e.shiftKey && ['i', 'j', 'c'].includes(key))
+      );
+      if (blocked) {
+        e.preventDefault();
+        return false;
+      }
+    });
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        registerFocusLoss();
+      }
+    });
+
+    window.addEventListener('blur', () => {
+      registerFocusLoss();
+    });
+
+    window.addEventListener('beforeunload', () => {
+      saveState();
+    });
+
+    if (state.mode === 'test' && (!state.questionOrderMeta || Object.keys(state.questionOrderMeta).length === 0)) {
+      initQuestionMeta();
+      saveState();
+    }
+
+    render();
+
+    window.startTest = startTest;
+    window.answerQuestion = answerQuestion;
+    window.clearState = clearState;
+    window.renderTest = renderTest;
+    window.renderResult = renderResult;
+  </script>
+</body>
+</html>
