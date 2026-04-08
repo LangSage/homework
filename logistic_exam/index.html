@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="google" content="notranslate" />
   <title>Logistics Vocab Quiz</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
@@ -38,10 +39,15 @@
       white-space: pre-wrap;
       word-break: break-word;
     }
+    .text-canvas {
+      display: block;
+      max-width: 100%;
+      height: auto;
+    }
   </style>
 </head>
-<body class="text-slate-100 no-select">
-  <div id="app" class="app-shell min-h-screen"></div>
+<body class="text-slate-100 no-select notranslate" translate="no">
+  <div id="app" class="app-shell min-h-screen notranslate" translate="no"></div>
 
   <script>
     const TASK_BANK = [
@@ -116,6 +122,103 @@
         [a[i], a[j]] = [a[j], a[i]];
       }
       return a;
+    }
+
+    function wrapCanvasText(ctx, text, maxWidth) {
+      const raw = String(text || "").trim();
+      if (!raw) return [""];
+      const words = raw.split(/\s+/);
+      const lines = [];
+      let line = words[0] || "";
+
+      for (let i = 1; i < words.length; i++) {
+        const testLine = line + " " + words[i];
+        if (ctx.measureText(testLine).width <= maxWidth) {
+          line = testLine;
+        } else {
+          lines.push(line);
+          line = words[i];
+        }
+      }
+
+      if (line) lines.push(line);
+      return lines;
+    }
+
+    function drawTextCanvas(canvas, text, config = {}) {
+      if (!canvas) return;
+
+      const {
+        width = null,
+        fontSize = 22,
+        fontWeight = 700,
+        color = "#f8fafc",
+        lineHeight = 1.28,
+        paddingX = 0,
+        paddingY = 0,
+        fontFamily = "Arial, sans-serif",
+        minWidth = 100
+      } = config;
+
+      const hostWidth = width || canvas.parentElement?.clientWidth || 320;
+      const innerWidth = Math.max(minWidth, Math.floor(hostWidth - paddingX * 2));
+      const ratio = window.devicePixelRatio || 1;
+
+      const probeCanvas = document.createElement("canvas");
+      const probe = probeCanvas.getContext("2d");
+      probe.font = `${fontWeight} ${fontSize}px ${fontFamily}`;
+
+      const lines = wrapCanvasText(probe, text, innerWidth);
+      const linePx = Math.max(fontSize + 6, Math.round(fontSize * lineHeight));
+      const cssWidth = innerWidth + paddingX * 2;
+      const cssHeight = Math.max(linePx, lines.length * linePx + paddingY * 2);
+
+      canvas.width = Math.max(1, Math.floor(cssWidth * ratio));
+      canvas.height = Math.max(1, Math.floor(cssHeight * ratio));
+      canvas.style.width = cssWidth + "px";
+      canvas.style.height = cssHeight + "px";
+
+      const ctx = canvas.getContext("2d");
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.scale(ratio, ratio);
+
+      ctx.font = `${fontWeight} ${fontSize}px ${fontFamily}`;
+      ctx.fillStyle = color;
+      ctx.textBaseline = "top";
+
+      lines.forEach((line, index) => {
+        ctx.fillText(line, paddingX, paddingY + index * linePx);
+      });
+    }
+
+    function renderTaskTextCanvases(task) {
+      requestAnimationFrame(() => {
+        const promptCanvas = document.getElementById("promptCanvas");
+        if (promptCanvas) {
+          const promptWidth = promptCanvas.parentElement?.clientWidth || 560;
+          drawTextCanvas(promptCanvas, task.prompt, {
+            width: promptWidth,
+            fontSize: window.innerWidth < 640 ? 24 : 32,
+            fontWeight: 700,
+            lineHeight: 1.18,
+            paddingY: 2
+          });
+        }
+
+        document.querySelectorAll(".option-canvas").forEach((canvas) => {
+          const idx = Number(canvas.dataset.idx);
+          const button = canvas.closest("button");
+          const available = Math.max(140, (button?.clientWidth || 320) - 78);
+
+          drawTextCanvas(canvas, task.options[idx].text, {
+            width: available,
+            fontSize: window.innerWidth < 640 ? 18 : 20,
+            fontWeight: 600,
+            lineHeight: 1.24
+          });
+        });
+      });
     }
 
     function now() {
@@ -542,6 +645,7 @@
       }
     }
 
+
     function renderOptions(task) {
       if (task.type === "multi2") {
         return `
@@ -550,9 +654,11 @@
             ${task.options.map((opt, idx) => {
               const active = (state.selection || []).includes(idx);
               return `
-                <button data-idx="${idx}" class="multi-btn rounded-2xl border ${active ? 'border-sky-400 bg-sky-500/20' : 'border-slate-700 bg-slate-950/70'} p-4 sm:p-5 text-left text-base sm:text-lg hover:border-sky-500/50 hover:bg-slate-900 transition">
-                  <span class="font-semibold text-slate-200">${String.fromCharCode(65 + idx)}.</span>
-                  <span class="ml-2 text-slate-100">${opt.text}</span>
+                <button data-idx="${idx}" translate="no" class="multi-btn rounded-2xl border ${active ? 'border-sky-400 bg-sky-500/20' : 'border-slate-700 bg-slate-950/70'} p-4 sm:p-5 text-left hover:border-sky-500/50 hover:bg-slate-900 transition flex items-start gap-3">
+                  <span class="mt-0.5 shrink-0 font-semibold text-slate-200">${String.fromCharCode(65 + idx)}.</span>
+                  <div class="min-w-0 flex-1">
+                    <canvas class="option-canvas text-canvas" data-idx="${idx}"></canvas>
+                  </div>
                 </button>
               `;
             }).join("")}
@@ -566,14 +672,18 @@
       return `
         <div class="mt-6 grid grid-cols-1 gap-3">
           ${task.options.map((opt, idx) => `
-            <button data-idx="${idx}" class="answer-btn rounded-2xl border border-slate-700 bg-slate-950/70 p-4 sm:p-5 text-left text-base sm:text-lg hover:border-sky-500/50 hover:bg-slate-900 transition">
-              <span class="font-semibold text-slate-200">${String.fromCharCode(65 + idx)}.</span>
-              <span class="ml-2 text-slate-100">${opt.text}</span>
+            <button data-idx="${idx}" translate="no" class="answer-btn rounded-2xl border border-slate-700 bg-slate-950/70 p-4 sm:p-5 text-left hover:border-sky-500/50 hover:bg-slate-900 transition flex items-start gap-3">
+              <span class="mt-0.5 shrink-0 font-semibold text-slate-200">${String.fromCharCode(65 + idx)}.</span>
+              <div class="min-w-0 flex-1">
+                <canvas class="option-canvas text-canvas" data-idx="${idx}"></canvas>
+              </div>
             </button>
           `).join("")}
         </div>
       `;
     }
+
+
 
     function renderQuiz() {
       const app = document.getElementById("app");
@@ -660,9 +770,13 @@
                   </div>
                 </div>
 
-                <div class="p-4 sm:p-6">
+                <div class="p-4 sm:p-6" translate="no">
                   <div class="inline-flex rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-xs text-emerald-300">${typeBadge}</div>
-                  <h2 class="mt-4 text-xl sm:text-3xl font-bold leading-tight">${task.prompt}</h2>
+
+                  <div class="mt-4">
+                    <canvas id="promptCanvas" class="text-canvas"></canvas>
+                  </div>
+
                   ${renderOptions(task)}
                 </div>
               </div>
@@ -671,7 +785,10 @@
         </div>
       `;
 
+      renderTaskTextCanvases(task);
+
       document.getElementById("menuBtnQuiz").addEventListener("click", goToMenu);
+
       if (task.type === "multi2") {
         document.querySelectorAll(".multi-btn").forEach(btn => {
           btn.addEventListener("click", () => toggleMulti(Number(btn.dataset.idx)));
@@ -684,6 +801,7 @@
         });
       }
     }
+
 
     function render() {
       const saved = loadState();
@@ -735,6 +853,17 @@
     window.addEventListener("blur", () => {
       if (document.visibilityState !== "visible") return;
       applyLeavePenalty();
+    });
+
+
+    let canvasResizeTimer = null;
+    window.addEventListener("resize", () => {
+      clearTimeout(canvasResizeTimer);
+      canvasResizeTimer = setTimeout(() => {
+        if (state && !state.done && state.presented && state.presented[state.current]) {
+          renderTaskTextCanvases(state.presented[state.current]);
+        }
+      }, 120);
     });
 
     blockActions();
