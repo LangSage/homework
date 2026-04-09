@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en" translate="no" class="notranslate">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="google" content="notranslate" />
+  <meta name="theme-color" content="#0f172a" />
+  <title>Hotel Reception Practice</title>
+  <link rel="stylesheet" href="./styles.css" />
+  <script defer src="./app.js"></script>
+</head>
+<body class="notranslate" translate="no">
+  <div class="app-shell" id="app">
+    <section class="panel start-panel" id="startScreen">
+      <div class="brand-row">
+        <div class="brand-badge">Practice</div>
+        <div class="topic-pill" id="topicPill">Hotel Reception Practice</div>
+      </div>
+
+      <div class="hero-block">
+        <h1>Student Practice</h1>
+        <p>One task at a time.</p>
+      </div>
+
+      <div class="grid-two">
+        <label class="field">
+          <span>Name</span>
+          <input id="studentName" autocomplete="off" spellcheck="false" maxlength="80" />
+        </label>
+        <label class="field">
+          <span>Group</span>
+          <input id="studentGroup" autocomplete="off" spellcheck="false" maxlength="50" />
+        </label>
+      </div>
+
+      <div class="start-actions">
+        <button class="primary-btn" id="startBtn" type="button">Start</button>
+      </div>
+    </section>
+
+    <section class="panel practice-panel hidden" id="practiceScreen">
+      <header class="practice-header">
+        <div class="header-left">
+          <div class="topic-pill" id="liveTopic">Hotel Reception Practice</div>
+          <div class="meta-chip" id="studentMeta">—</div>
+        </div>
+        <div class="header-right">
+          <div class="progress-chip" id="progressChip">1 / 35</div>
+        </div>
+      </header>
+
+      <main class="exercise-stage">
+        <div class="question-card">
+          <div class="canvas-frame question-frame" id="questionFrame">
+            <canvas id="questionCanvas"></canvas>
+            <div class="hotspot-layer" id="questionHotspots"></div>
+          </div>
+        </div>
+
+        <div class="options-list" id="optionsList"></div>
+
+        <div class="micro-bar">
+          <div class="hint-chip">Tap colored words</div>
+          <div class="status-chip" id="statusChip">Question 1</div>
+        </div>
+      </main>
+    </section>
+
+    <section class="panel result-panel hidden" id="resultScreen">
+      <div class="result-card" id="resultCard">
+        <div class="result-topline">
+          <div class="result-topic" id="resultTopic">Hotel Reception Practice</div>
+          <div class="result-badge" id="resultBadge">Completed</div>
+        </div>
+
+        <div class="result-score" id="resultScore">0 / 0</div>
+        <div class="result-percent" id="resultPercent">0%</div>
+
+        <div class="result-grid">
+          <div class="stat-box">
+            <div class="stat-label">Name</div>
+            <div class="stat-value" id="resultName">—</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">Group</div>
+            <div class="stat-value" id="resultGroup">—</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">Time</div>
+            <div class="stat-value" id="resultTime">—</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">Session</div>
+            <div class="stat-value mono" id="resultSession">—</div>
+          </div>
+        </div>
+
+        <div class="submission-row">
+          <div class="submission-label">Form status</div>
+          <div class="submission-state" id="submissionState">Waiting</div>
+        </div>
+      </div>
+
+      <div class="result-actions">
+        <button class="primary-btn" id="newSetBtn" type="button">New set</button>
+      </div>
+    </section>
+  </div>
+
+  <div class="toast hidden" id="toast"></div>
+
+  <div class="dict-popover hidden" id="dictPopover" role="dialog" aria-live="polite">
+    <div class="dict-emoji" id="dictEmoji">📘</div>
+    <div class="dict-word" id="dictWord">word</div>
+    <div class="dict-translation" id="dictTranslation">translation</div>
+    <button class="dict-close" id="dictClose" type="button" aria-label="Close">×</button>
+  </div>
+</body>
+</html>
