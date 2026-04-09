@@ -318,7 +318,7 @@
 
     function buildPresentedList(mode) {
       const ids = shuffle(TASK_BANK.map(t => t.id));
-      const count = mode === "5" ? FULL_MODE_COUNT : 15;
+      const count = FULL_MODE_COUNT;
       return ids.slice(0, count).map(id => makePresentedTask(getTaskById(id)));
     }
 
@@ -582,26 +582,9 @@
               <button id="menuBtnStart" class="rounded-2xl border border-slate-700 px-4 py-2 text-sm text-slate-200 hover:bg-slate-800 transition">Main menu</button>
             </div>
 
-            <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div class="rounded-3xl border border-slate-800 bg-slate-950/50 p-4 sm:p-5">
-                <div class="text-xs text-slate-400">Name</div>
-                <div class="mt-2 text-lg font-semibold text-slate-100">${profile.name || "—"}</div>
-              </div>
-              <div class="rounded-3xl border border-slate-800 bg-slate-950/50 p-4 sm:p-5">
-                <div class="text-xs text-slate-400">Group</div>
-                <div class="mt-2 text-lg font-semibold text-slate-100">${profile.group || "—"}</div>
-              </div>
-            </div>
-
-            <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <button id="mode4Btn" class="rounded-3xl border border-emerald-500/30 bg-emerald-500/10 p-6 text-left hover:bg-emerald-500/20 transition">
-                <div class="text-sm text-emerald-300">4</div>
-                <div class="mt-2 text-3xl font-bold">15</div>
-                <div class="mt-1 text-sm text-slate-300">questions</div>
-              </button>
-
+            <div class="mt-6 grid grid-cols-1 gap-4">
               <button id="mode5Btn" class="rounded-3xl border border-violet-500/30 bg-violet-500/10 p-6 text-left hover:bg-violet-500/20 transition">
-                <div class="text-sm text-violet-300">5</div>
+                <div class="text-sm text-violet-300">Only mode</div>
                 <div class="mt-2 text-3xl font-bold">${FULL_MODE_COUNT}</div>
                 <div class="mt-1 text-sm text-slate-300">questions</div>
               </button>
@@ -626,7 +609,6 @@
       `;
 
       document.getElementById("menuBtnStart").addEventListener("click", goToMenu);
-      document.getElementById("mode4Btn").addEventListener("click", () => startQuiz("4"));
       document.getElementById("mode5Btn").addEventListener("click", () => startQuiz("5"));
 
       const resumeBtn = document.getElementById("resumeBtn");
