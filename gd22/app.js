@@ -98,10 +98,12 @@
   });
 
   dom.startBtn.addEventListener('click', startSessionFromInputs);
-  dom.newSetBtn.addEventListener('click', () => {
-    resetInvalidation();
-    startNewSet(true);
-  });
+  if (dom.newSetBtn) {
+    dom.newSetBtn.addEventListener('click', () => {
+      resetInvalidation();
+      startNewSet(true);
+    });
+  }
   dom.dictClose.addEventListener('click', hideDictionary);
   window.addEventListener('resize', throttle(renderPractice, 60));
   document.addEventListener('visibilitychange', handleVisibilityChange, { passive: true });
@@ -126,6 +128,7 @@
     }
   }
 
+
   function decodeBase64Utf8(value) {
     const binary = atob(value);
     const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0));
@@ -134,7 +137,7 @@
 
   function repairMojibake(value) {
     const text = String(value || '');
-    if (!/[ÃÂâ][-¿]/.test(text) && !/â€|â€™|â€œ|â€|Â/.test(text)) {
+    if (!/[ÃÂâ][\x80-\xBF]/.test(text) && !/â€|â€™|â€œ|â€|Â/.test(text)) {
       return text;
     }
 
@@ -256,30 +259,58 @@
     });
   }
 
+  function rerollCurrentTask() {
+    if (!state.sessionId || state.finished || !state.questions.length) return;
+
+    const start = Math.max(0, state.currentIndex);
+    const remaining = state.questions.slice(start).map((item) => ({
+      ...item,
+      options: item.options.map((option) => ({ ...option })),
+    }));
+
+    if (!remaining.length) return;
+    if (remaining.length === 1) {
+      state.currentStartedAt = Date.now();
+      persistSnapshot();
+      renderPractice();
+      return;
+    }
+
+    const currentId = remaining[0].id;
+    let shuffledRemaining = shuffle(remaining);
+
+    if (shuffledRemaining[0].id === currentId) {
+      const swapIndex = shuffledRemaining.findIndex((item) => item.id !== currentId);
+      if (swapIndex > 0) {
+        [shuffledRemaining[0], shuffledRemaining[swapIndex]] = [shuffledRemaining[swapIndex], shuffledRemaining[0]];
+      }
+    }
+
+    state.questions.splice(start, shuffledRemaining.length, ...shuffledRemaining);
+    state.currentStartedAt = Date.now();
+    persistSnapshot();
+    renderPractice();
+  }
+
   function hydrateFromSnapshot() {
-    const navigationType = getNavigationType();
-    const invalidation = safeRead(STORAGE_KEYS.invalidate, null);
     const profile = safeRead(STORAGE_KEYS.profile, null);
     const snapshot = safeRead(STORAGE_KEYS.snapshot, null);
 
-    if ((navigationType === 'reload' || invalidation) && profile) {
-      resetInvalidation();
+    if (profile) {
       dom.studentName.value = profile.name || '';
       dom.studentGroup.value = profile.group || '';
-      return;
     }
 
-    if (snapshot && !snapshot.finished) {
+    if (snapshot) {
       Object.assign(state, snapshot);
       normalizeSnapshotText();
-      return;
-    }
-
-    if (snapshot && snapshot.finished) {
-      Object.assign(state, snapshot);
-      normalizeSnapshotText();
+      if (state.sessionId && !state.finished && !state.currentStartedAt) {
+        state.currentStartedAt = Date.now();
+      }
+      resetInvalidation();
     }
   }
+
 
   function normalizeSnapshotText() {
     if (!Array.isArray(state.questions)) return;
@@ -700,41 +731,20 @@
   }
 
   function handleVisibilityChange() {
-    if (document.visibilityState === 'hidden' && state.sessionId && !state.finished) {
-      safeWrite(STORAGE_KEYS.invalidate, {
-        reason: 'hidden',
-        at: Date.now(),
-        sessionId: state.sessionId,
-      });
-    }
-
-    if (document.visibilityState === 'visible') {
-      const invalidation = safeRead(STORAGE_KEYS.invalidate, null);
-      if (invalidation && state.sessionId && !state.finished) {
-        resetInvalidation();
-        startNewSet(true);
-        showToast('Set replaced after page leave.');
-      }
+    if (state.sessionId && !state.finished) {
+      persistSnapshot();
     }
   }
 
   function handlePageHide() {
     if (state.sessionId && !state.finished) {
-      safeWrite(STORAGE_KEYS.invalidate, {
-        reason: 'pagehide',
-        at: Date.now(),
-        sessionId: state.sessionId,
-      });
+      persistSnapshot();
     }
   }
 
   function handleBeforeUnload() {
     if (state.sessionId && !state.finished) {
-      safeWrite(STORAGE_KEYS.invalidate, {
-        reason: 'reload',
-        at: Date.now(),
-        sessionId: state.sessionId,
-      });
+      persistSnapshot();
     }
   }
 
