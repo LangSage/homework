@@ -7,76 +7,347 @@
   <meta name="robots" content="noindex,nofollow,noarchive" />
   <title>Person Description Practice</title>
   <style>
-    :root{
-      --bg:#071126;
-      --panel:#0b1730;
-      --panel2:#0e1d3a;
-      --line:rgba(148,163,184,.16);
-      --text:#eef4ff;
-      --muted:#9fb0d0;
-      --blue:#66a7ff;
-      --cyan:#2fd3ef;
-      --good:#34d399;
-      --bad:#fb7185;
-      --shadow:0 24px 70px rgba(2,8,23,.45);
-      --radius:24px;
+    :root {
+      --bg-1: #020617;
+      --bg-2: #0f172a;
+      --panel: rgba(7, 16, 36, 0.9);
+      --panel-2: rgba(12, 24, 50, 0.9);
+      --line: rgba(148, 163, 184, 0.16);
+      --text: #e5eefc;
+      --muted: #a8b7d2;
+      --accent: #60a5fa;
+      --accent-2: #22d3ee;
+      --good: #34d399;
+      --bad: #fb7185;
+      --shadow: 0 22px 60px rgba(2, 8, 23, 0.42);
+      --radius: 24px;
+      --radius-sm: 18px;
     }
-    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-    html,body{margin:0;min-height:100%;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:radial-gradient(circle at top left, rgba(47,211,239,.10), transparent 24%), radial-gradient(circle at top right, rgba(102,167,255,.11), transparent 26%), linear-gradient(180deg,#020617,#071126 30%,#0b1730 100%);color:var(--text);user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;overflow-x:hidden}
-    body *{user-select:none;-webkit-user-select:none}
-    button,input{font:inherit}
-    .app{min-height:100vh;padding:14px;display:grid;place-items:center}
-    .card{width:min(920px,100%);background:linear-gradient(180deg,rgba(8,15,32,.94),rgba(9,18,38,.88));border:1px solid var(--line);border-radius:30px;box-shadow:var(--shadow);padding:18px}
-    .screen{display:none}
-    .screen.active{display:grid;gap:16px}
-    .title{text-align:center;font-size:clamp(1.8rem,4vw,3rem);font-weight:900;letter-spacing:.01em;margin-top:4px}
-    .sub{text-align:center;color:var(--muted);font-size:1rem}
-    .fields{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:6px}
-    .label{font-size:.95rem;color:#d4e1fb}
-    .field-wrap{display:grid;gap:8px}
-    .field{width:100%;background:rgba(5,13,28,.75);border:1px solid var(--line);border-radius:18px;padding:14px 16px;color:var(--text);outline:none}
-    .field:focus{border-color:rgba(102,167,255,.7);box-shadow:0 0 0 3px rgba(102,167,255,.14)}
-    .btn{border:0;border-radius:20px;padding:16px 18px;cursor:pointer;color:white;background:linear-gradient(90deg,var(--blue),var(--cyan));font-weight:800;min-height:56px}
-    .btn.secondary{background:rgba(30,41,59,.78);border:1px solid var(--line);color:var(--text)}
-    .topline{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;color:#d8e4ff;font-size:1.02rem;font-weight:700}
-    .topline .muted{color:var(--muted);font-weight:600}
-    .progress{height:12px;border-radius:999px;background:rgba(30,41,59,.86);border:1px solid rgba(148,163,184,.12);overflow:hidden}
-    .progress>div{height:100%;width:0%;background:linear-gradient(90deg,var(--blue),var(--cyan));transition:width .22s ease}
-    .task-shell{border:1px solid rgba(148,163,184,.13);border-radius:24px;background:linear-gradient(180deg,rgba(8,15,32,.72),rgba(8,15,32,.55));padding:14px;display:grid;gap:14px}
-    .task-canvas-box{border-radius:20px;border:1px solid rgba(148,163,184,.12);overflow:hidden;background:rgba(5,13,28,.88)}
-    #taskCanvas{display:block;width:100%}
-    .options{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    .option{padding:0;border-radius:18px;border:1px solid rgba(148,163,184,.14);overflow:hidden;background:rgba(14,29,58,.9);cursor:pointer;transition:transform .14s ease,border-color .14s ease,box-shadow .14s ease;min-height:88px}
-    .option:hover,.option:focus-visible{transform:translateY(-1px);border-color:rgba(102,167,255,.55);box-shadow:0 10px 24px rgba(2,8,23,.26);outline:none}
-    .option.locked{pointer-events:none}
-    .option.correct{border-color:rgba(52,211,153,.9);box-shadow:0 0 0 2px rgba(52,211,153,.16)}
-    .option.wrong{border-color:rgba(251,113,133,.9);box-shadow:0 0 0 2px rgba(251,113,133,.14)}
-    .option canvas{display:block;width:100%}
-    .result-wrap{display:grid;gap:16px}
-    .result-canvas-box{border-radius:24px;overflow:hidden;border:1px solid rgba(148,163,184,.14);background:rgba(5,13,28,.9)}
-    #resultCanvas{display:block;width:100%}
-    .result-actions{display:flex;justify-content:center}
-    .popup{position:fixed;z-index:50;display:none;min-width:210px;max-width:min(320px,calc(100vw - 24px));padding:14px 16px;border-radius:18px;background:rgba(7,17,38,.96);border:1px solid rgba(148,163,184,.18);box-shadow:var(--shadow)}
-    .popup.visible{display:grid;gap:8px}
-    .popup strong{font-size:1.08rem}
-    .popup .tr{color:#dbeafe}
-    .popup .emoji{font-size:1.2rem}
-    .toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%) translateY(18px);background:rgba(7,17,38,.96);border:1px solid rgba(148,163,184,.18);color:var(--text);padding:12px 16px;border-radius:16px;box-shadow:var(--shadow);opacity:0;pointer-events:none;transition:opacity .22s ease,transform .22s ease;z-index:60}
-    .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-    @media (max-width:700px){
-      .card{padding:14px;border-radius:24px}
-      .fields,.options{grid-template-columns:1fr}
-      .title{font-size:2rem}
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      background:
+        radial-gradient(circle at top left, rgba(34, 211, 238, 0.08), transparent 24%),
+        radial-gradient(circle at top right, rgba(96, 165, 250, 0.08), transparent 24%),
+        linear-gradient(180deg, var(--bg-1), var(--bg-2));
+      color: var(--text);
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+      overflow-x: hidden;
+    }
+
+    body * { user-select: none; -webkit-user-select: none; }
+    body.locked-copy { -webkit-user-select: none; user-select: none; }
+
+    button, input { font: inherit; }
+
+    .app {
+      min-height: 100vh;
+      padding: 12px;
+      display: grid;
+      place-items: center;
+    }
+
+    .shell {
+      width: min(980px, 100%);
+      background: linear-gradient(180deg, rgba(8,16,36,0.95), rgba(8,16,36,0.88));
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    .start-screen,
+    .practice-screen,
+    .result-screen {
+      padding: 18px;
+      display: grid;
+      gap: 16px;
+    }
+
+    .top-simple {
+      display: grid;
+      gap: 10px;
+    }
+
+    .title {
+      font-size: clamp(1.6rem, 3vw, 2.5rem);
+      font-weight: 800;
+      text-align: center;
+      letter-spacing: -0.03em;
+    }
+
+    .mini {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .start-fields {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .field-wrap {
+      display: grid;
+      gap: 6px;
+    }
+
+    .label {
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .field {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 14px 15px;
+      background: rgba(15, 23, 42, 0.72);
+      color: var(--text);
+      outline: none;
+    }
+
+    .field:focus {
+      border-color: rgba(96, 165, 250, 0.65);
+      box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.14);
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 18px;
+      min-height: 54px;
+      padding: 14px 18px;
+      font-weight: 800;
+      cursor: pointer;
+      color: white;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    }
+
+    .btn.secondary {
+      background: rgba(15, 23, 42, 0.75);
+      border: 1px solid var(--line);
+      color: var(--text);
+    }
+
+    .header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      color: var(--muted);
+      flex-wrap: wrap;
+      font-size: 0.92rem;
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 12px;
+      background: rgba(30, 41, 59, 0.95);
+      border: 1px solid rgba(148, 163, 184, 0.14);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      transition: width 0.25s ease;
+    }
+
+    .task-wrap {
+      display: grid;
+      gap: 14px;
+    }
+
+    .canvas-box,
+    .support-box,
+    .result-box {
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      overflow: hidden;
+      background: linear-gradient(180deg, rgba(11, 21, 46, 0.96), rgba(6, 16, 36, 0.96));
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      max-width: 100%;
+      image-rendering: -webkit-optimize-contrast;
+      image-rendering: crisp-edges;
+    }
+
+    .support-grid,
+    .options-grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .support-grid.two,
+    .options-grid.two {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .option-btn {
+      padding: 0;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      overflow: hidden;
+      background: rgba(12, 24, 50, 0.88);
+      cursor: pointer;
+      transition: transform 0.14s ease, border-color 0.14s ease, box-shadow 0.14s ease;
+      min-height: 92px;
+    }
+
+    .option-btn:hover,
+    .option-btn:focus-visible {
+      transform: translateY(-1px);
+      border-color: rgba(96, 165, 250, 0.55);
+      box-shadow: 0 10px 24px rgba(15,23,42,0.2);
+      outline: none;
+    }
+
+    .option-btn.correct { border-color: rgba(52, 211, 153, 0.8); box-shadow: 0 0 0 2px rgba(52, 211, 153, 0.12); }
+    .option-btn.wrong { border-color: rgba(251, 113, 133, 0.8); box-shadow: 0 0 0 2px rgba(251, 113, 133, 0.1); }
+    .option-btn:disabled { cursor: default; transform: none; }
+
+    .task-foot {
+      min-height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      color: var(--muted);
+      flex-wrap: wrap;
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(15, 23, 42, 0.6);
+      font-size: 0.92rem;
+    }
+
+    .status.good {
+      color: #d1fae5;
+      border-color: rgba(52, 211, 153, 0.3);
+      background: rgba(6, 78, 59, 0.28);
+    }
+
+    .status.bad {
+      color: #ffe4e6;
+      border-color: rgba(251, 113, 133, 0.3);
+      background: rgba(127, 29, 29, 0.22);
+    }
+
+    .glossary-btn {
+      border: 1px solid var(--line);
+      background: rgba(15, 23, 42, 0.72);
+      color: var(--text);
+      border-radius: 14px;
+      min-height: 42px;
+      padding: 8px 12px;
+      cursor: pointer;
+    }
+
+    .glossary-popup {
+      position: fixed;
+      z-index: 40;
+      display: none;
+      width: min(320px, calc(100vw - 24px));
+      padding: 14px;
+      border-radius: 18px;
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      background: rgba(8, 15, 32, 0.96);
+      box-shadow: 0 24px 60px rgba(2, 8, 23, 0.5);
+    }
+
+    .glossary-popup.visible { display: grid; gap: 8px; }
+    .glossary-popup strong { font-size: 1.08rem; }
+    .glossary-popup .muted { color: var(--muted); }
+
+    .result-panel {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(260px, 0.85fr);
+      gap: 16px;
+    }
+
+    .stat-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      background: rgba(15, 23, 42, 0.72);
+      color: var(--muted);
+    }
+
+    .stat-row strong { color: var(--text); }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 18px;
+      transform: translateX(-50%) translateY(16px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.22s ease, transform 0.22s ease;
+      z-index: 50;
+      max-width: min(92vw, 560px);
+      padding: 12px 16px;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      background: rgba(8, 15, 32, 0.96);
+      color: var(--text);
+      box-shadow: var(--shadow);
+    }
+
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    @media (max-width: 760px) {
+      .app { padding: 8px; }
+      .start-fields,
+      .support-grid.two,
+      .options-grid.two,
+      .result-panel {
+        grid-template-columns: 1fr;
+      }
+      .start-screen,
+      .practice-screen,
+      .result-screen { padding: 12px; }
     }
   </style>
 </head>
-<body class="notranslate" translate="no">
+<body class="locked-copy notranslate" translate="no">
   <div class="app">
-    <div class="card">
-      <section id="startScreen" class="screen active">
-        <div class="title">Person description practice</div>
-        <div class="sub">45 exercises</div>
-        <div class="fields">
+    <div class="shell">
+      <section class="screen active start-screen" id="startScreen">
+        <div class="top-simple">
+          <div class="title">Person description practice</div>
+          <div class="mini">45 exercises · 35 definition · 10 true or false</div>
+        </div>
+
+        <div class="start-fields">
           <div class="field-wrap">
             <label class="label" for="studentName">Name</label>
             <input class="field" id="studentName" autocomplete="off" spellcheck="false" />
@@ -86,43 +357,57 @@
             <input class="field" id="studentGroup" autocomplete="off" spellcheck="false" />
           </div>
         </div>
+
         <button class="btn" id="startBtn" type="button">Start</button>
       </section>
 
-      <section id="practiceScreen" class="screen">
-        <div class="topline">
-          <div><span id="counter">1 / 45</span></div>
-          <div class="muted" id="score">0 correct</div>
+      <section class="screen practice-screen" id="practiceScreen">
+        <div class="header-row">
+          <span id="progressText">1 / 45</span>
+          <span id="scoreText">0 correct</span>
         </div>
-        <div class="progress" aria-hidden="true"><div id="progressFill"></div></div>
-        <div class="task-shell">
-          <div class="task-canvas-box"><canvas id="taskCanvas"></canvas></div>
-          <div class="options" id="options"></div>
+        <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+
+        <div class="task-wrap">
+          <div class="canvas-box">
+            <canvas id="promptCanvas" width="1400" height="260" aria-label="Task"></canvas>
+          </div>
+          <div class="support-grid" id="supportGrid"></div>
+          <div class="options-grid" id="optionsGrid"></div>
+        </div>
+
+        <div class="task-foot">
+          <div id="statusLine"></div>
+          <button class="glossary-btn" id="glossaryBtn" type="button">Dictionary</button>
         </div>
       </section>
 
-      <section id="resultScreen" class="screen">
-        <div class="result-wrap">
-          <div class="result-canvas-box"><canvas id="resultCanvas"></canvas></div>
-          <div class="result-actions"><button class="btn secondary" id="retryBtn" type="button">Start again</button></div>
+      <section class="screen result-screen" id="resultScreen">
+        <div class="result-panel">
+          <div class="result-box">
+            <canvas id="resultCanvas" width="1400" height="880" aria-label="Result"></canvas>
+          </div>
+          <div class="stat-list" id="resultStats"></div>
         </div>
       </section>
     </div>
   </div>
 
-  <div id="dictPopup" class="popup" role="dialog" aria-live="polite"></div>
-  <div id="toast" class="toast"></div>
+  <div class="glossary-popup" id="glossaryPopup"></div>
+  <div class="toast" id="toast"></div>
 
+  
   <script>
     const CONFIG = {
-      version: '2.0.0',
+      appVersion: '3.0.0',
       totalTasks: 45,
+      trueFalseCount: 10,
       topicValue: 'topic',
       topicDisplay: 'Description of a person',
       storage: {
-        state: 'personDescriptionPracticeStateV2',
-        invalidation: 'personDescriptionPracticeInvalidationV2',
-        submittedPrefix: 'personDescriptionPracticeSubmittedV2:'
+        state: 'personDescriptionPracticeStateV3',
+        shuffle: 'personDescriptionPracticeShuffleV3',
+        submittedPrefix: 'personDescriptionPracticeSubmittedV3:'
       },
       form: {
         actionUrl: 'https://docs.google.com/forms/d/e/1FAIpQLSeUzYUvQbbzo_1r81AacP6Kj7HlKDzEVfa93Dam39LiVjcItA/viewform?usp=pp_url',
@@ -135,72 +420,245 @@
       }
     };
 
-    const WORDS = {
-      hairLength: ['short','medium-length','long'],
-      hairColor: ['black','brown','blonde','red','gray'],
-      hairType: ['straight','wavy','curly','messy','bald'],
-      lips: ['thin','full'],
-      height: ['tall','short'],
-      body: ['slim','thin','athletic','strong','chubby','average']
+    const WORD_BANK = {
+      hairLength: ['short', 'medium-length', 'long'],
+      hairColor: ['black', 'brown', 'blonde', 'red', 'gray'],
+      hairType: ['straight', 'wavy', 'curly', 'messy', 'bald'],
+      lips: ['thin', 'full'],
+      height: ['tall', 'short'],
+      body: ['slim', 'thin', 'athletic', 'strong', 'chubby', 'average']
     };
 
-    const NAMES = ['Kate','Tom','Anna','Leo','Nina','Max','Sara','Ben','Lena','Mark','Eva','Nick','Olga','Dan','Mia','Alex','Ira','Sam','Julia','Oleg'];
+    const DEFINITION_BANK = [
+      { answer: 'short', prompt: 'Choose the word: hair that is not long.', options: ['short', 'long', 'medium-length', 'bald'] },
+      { answer: 'medium-length', prompt: 'Choose the word: hair that is not short and not long.', options: ['medium-length', 'short', 'long', 'bald'] },
+      { answer: 'long', prompt: 'Choose the word: hair that goes far down.', options: ['long', 'short', 'medium-length', 'bald'] },
+      { answer: 'straight', prompt: 'Choose the word: hair with no waves and no curls.', options: ['straight', 'wavy', 'curly', 'messy'] },
+      { answer: 'wavy', prompt: 'Choose the word: hair with soft waves.', options: ['wavy', 'straight', 'curly', 'messy'] },
+      { answer: 'curly', prompt: 'Choose the word: hair with curls.', options: ['curly', 'straight', 'wavy', 'messy'] },
+      { answer: 'messy', prompt: 'Choose the word: hair that is not neat.', options: ['messy', 'straight', 'wavy', 'curly'] },
+      { answer: 'bald', prompt: 'Choose the word: a person with no hair.', options: ['bald', 'curly', 'messy', 'long'] },
+      { answer: 'thin', prompt: 'Choose the word: lips that are not full.', options: ['thin', 'full', 'tall', 'strong'] },
+      { answer: 'full', prompt: 'Choose the word: lips that look big.', options: ['full', 'thin', 'short', 'brown'] },
+      { answer: 'tall', prompt: 'Choose the word: a person with much height.', options: ['tall', 'short', 'slim', 'strong'] },
+      { answer: 'short', prompt: 'Choose the word: a person who is not tall.', options: ['short', 'tall', 'thin', 'average'] },
+      { answer: 'slim', prompt: 'Choose the word: a body that is slim and not big.', options: ['slim', 'chubby', 'strong', 'average'] },
+      { answer: 'thin', prompt: 'Choose the word: a very slim body.', options: ['thin', 'strong', 'chubby', 'average'] },
+      { answer: 'athletic', prompt: 'Choose the word: a sports body.', options: ['athletic', 'chubby', 'average', 'thin'] },
+      { answer: 'strong', prompt: 'Choose the word: a powerful body.', options: ['strong', 'slim', 'average', 'medium-length'] },
+      { answer: 'chubby', prompt: 'Choose the word: a body that is a little fat.', options: ['chubby', 'slim', 'athletic', 'thin'] },
+      { answer: 'average', prompt: 'Choose the word: a normal body, not very thin and not very chubby.', options: ['average', 'athletic', 'strong', 'slim'] },
+      { answer: 'black', prompt: 'Choose the word: very dark hair color.', options: ['black', 'brown', 'blonde', 'gray'] },
+      { answer: 'brown', prompt: 'Choose the word: hair color like chocolate.', options: ['brown', 'black', 'blonde', 'red'] },
+      { answer: 'blonde', prompt: 'Choose the word: light yellow hair color.', options: ['blonde', 'brown', 'gray', 'red'] },
+      { answer: 'red', prompt: 'Choose the word: orange-red hair color.', options: ['red', 'brown', 'black', 'gray'] },
+      { answer: 'gray', prompt: 'Choose the word: hair color like silver.', options: ['gray', 'black', 'brown', 'red'] }
+    ];
 
-    const el = {
-      startScreen: document.getElementById('startScreen'),
-      practiceScreen: document.getElementById('practiceScreen'),
-      resultScreen: document.getElementById('resultScreen'),
+    const NAMES = ['Julia', 'Alex', 'Max', 'Ben', 'Kate', 'Mia', 'Nick', 'Emma', 'Leo', 'Sofia', 'Tom', 'Anna', 'Mark', 'Lina', 'Sam', 'Nora', 'Dan', 'Mary', 'Ira', 'Paul'];
+    const CATEGORY_LABELS = { definition: 'Definition', tf: 'True or false' };
+
+    const elements = {
       studentName: document.getElementById('studentName'),
       studentGroup: document.getElementById('studentGroup'),
       startBtn: document.getElementById('startBtn'),
-      retryBtn: document.getElementById('retryBtn'),
-      counter: document.getElementById('counter'),
-      score: document.getElementById('score'),
+      progressText: document.getElementById('progressText'),
+      scoreText: document.getElementById('scoreText'),
       progressFill: document.getElementById('progressFill'),
-      taskCanvas: document.getElementById('taskCanvas'),
+      promptCanvas: document.getElementById('promptCanvas'),
+      supportGrid: document.getElementById('supportGrid'),
+      optionsGrid: document.getElementById('optionsGrid'),
+      statusLine: document.getElementById('statusLine'),
+      glossaryBtn: document.getElementById('glossaryBtn'),
+      glossaryPopup: document.getElementById('glossaryPopup'),
+      toast: document.getElementById('toast'),
       resultCanvas: document.getElementById('resultCanvas'),
-      options: document.getElementById('options'),
-      dictPopup: document.getElementById('dictPopup'),
-      toast: document.getElementById('toast')
+      resultStats: document.getElementById('resultStats'),
+      startScreen: document.getElementById('startScreen'),
+      practiceScreen: document.getElementById('practiceScreen'),
+      resultScreen: document.getElementById('resultScreen')
     };
 
     let dictionary = {};
-    let taskHits = [];
     let toastTimer = null;
-    let answering = false;
-    let appState = emptyState();
+    let answerLocked = false;
+    let nextTimer = null;
+    const canvasHits = new WeakMap();
+    let appState = createEmptyState();
 
-    function emptyState(){
+    function createEmptyState() {
       return {
-        sessionId:'',
-        seed:0,
-        startedAt:null,
-        completedAt:null,
-        student:{name:'',group:''},
-        stage:'idle',
-        tasks:[],
-        currentIndex:0,
-        currentTaskStartedAt:null,
-        results:[],
-        score:{correct:0,total:0},
-        submission:{inFlight:false,sent:false,sentAt:null,lastMessage:'Not sent'},
-        integrity:{resets:0},
-        autosavedAt:null
+        sessionId: '',
+        seed: 0,
+        startedAt: null,
+        completedAt: null,
+        student: { name: '', group: '' },
+        tasks: [],
+        currentIndex: 0,
+        results: [],
+        score: { correct: 0 },
+        stage: 'idle',
+        currentTaskStartedAt: null,
+        lastVisibilityShuffleAt: null,
+        submission: { sent: false, inFlight: false, sentAt: null, message: '' },
+        autosavedAt: null
       };
     }
 
-    function setScreen(name){
-      el.startScreen.classList.toggle('active', name === 'start');
-      el.practiceScreen.classList.toggle('active', name === 'practice');
-      el.resultScreen.classList.toggle('active', name === 'result');
+    function nowIso() { return new Date().toISOString(); }
+    function simpleId() { return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`; }
+    function randomSeed() { return Math.floor(Math.random() * 2147483646) + 1; }
+    function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
+    function choice(list, rnd) { return list[Math.floor(rnd() * list.length)]; }
+    function shuffle(list, rnd) {
+      const arr = [...list];
+      for (let i = arr.length - 1; i > 0; i -= 1) {
+        const j = Math.floor(rnd() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+    function mulberry32(seed) {
+      let a = seed >>> 0;
+      return function () {
+        a |= 0;
+        a = (a + 0x6D2B79F5) | 0;
+        let t = Math.imul(a ^ (a >>> 15), 1 | a);
+        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+      };
     }
 
-    function saveState(){
-      appState.autosavedAt = new Date().toISOString();
+    function normalizeKey(value) {
+      return String(value || '')
+        .toLowerCase()
+        .replace(/[“”"'.,!?;:()]/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
+    function createPerson(rnd, forcedName = null) {
+      const hairType = choice(WORD_BANK.hairType, rnd);
+      const person = {
+        name: forcedName || choice(NAMES, rnd),
+        hairType,
+        hairLength: hairType === 'bald' ? null : choice(WORD_BANK.hairLength, rnd),
+        hairColor: hairType === 'bald' ? null : choice(WORD_BANK.hairColor, rnd),
+        lips: choice(WORD_BANK.lips, rnd),
+        height: choice(WORD_BANK.height, rnd),
+        body: choice(WORD_BANK.body, rnd)
+      };
+      return person;
+    }
+
+    function hairText(person) {
+      if (person.hairType === 'bald') return 'bald';
+      return `${person.hairLength} ${person.hairColor} ${person.hairType} hair`;
+    }
+
+    function personLines(person) {
+      return [
+        person.name,
+        `Hair: ${hairText(person)}`,
+        `Lips: ${person.lips}`,
+        `Height: ${person.height}`,
+        `Body: ${person.body}`
+      ];
+    }
+
+    function statementFromPerson(person, rnd) {
+      const modes = ['hair', 'lips', 'height', 'body'];
+      const mode = choice(modes, rnd);
+      const makeFalse = rnd() < 0.45;
+      let statement = '';
+      let correct = true;
+
+      if (mode === 'hair') {
+        if (person.hairType === 'bald') {
+          const value = makeFalse ? choice(['curly hair', 'wavy hair', 'long hair', 'brown hair'], rnd) : 'bald';
+          correct = value === 'bald';
+          statement = `${person.name} is ${value}.`;
+        } else {
+          const actual = `${person.hairLength} ${person.hairColor} ${person.hairType} hair`;
+          if (!makeFalse) {
+            statement = `${person.name} has ${actual}.`;
+            correct = true;
+          } else {
+            const wrongColor = choice(WORD_BANK.hairColor.filter((x) => x !== person.hairColor), rnd);
+            statement = `${person.name} has ${person.hairLength} ${wrongColor} ${person.hairType} hair.`;
+            correct = false;
+          }
+        }
+      } else if (mode === 'lips') {
+        const value = makeFalse ? (person.lips === 'thin' ? 'full' : 'thin') : person.lips;
+        statement = `${person.name} has ${value} lips.`;
+        correct = value === person.lips;
+      } else if (mode === 'height') {
+        const value = makeFalse ? (person.height === 'tall' ? 'short' : 'tall') : person.height;
+        statement = `${person.name} is ${value}.`;
+        correct = value === person.height;
+      } else {
+        const value = makeFalse ? choice(WORD_BANK.body.filter((x) => x !== person.body), rnd) : person.body;
+        statement = `${person.name} has a ${value} body.`;
+        correct = value === person.body;
+      }
+
+      return { statement, correct };
+    }
+
+    function buildDefinitionTask(rnd) {
+      const item = { ...choice(DEFINITION_BANK, rnd) };
+      const options = shuffle(item.options, rnd);
+      return {
+        id: simpleId(),
+        type: 'definition',
+        prompt: item.prompt,
+        supportCards: [],
+        options: options.map((text) => ({ kind: 'word', text })),
+        correctIndex: options.indexOf(item.answer),
+        glossaryText: `${item.prompt} ${options.join(' ')}`
+      };
+    }
+
+    function buildTrueFalseTask(rnd) {
+      const person = createPerson(rnd);
+      const details = statementFromPerson(person, rnd);
+      return {
+        id: simpleId(),
+        type: 'tf',
+        prompt: `True or false? ${details.statement}`,
+        supportCards: [{ kind: 'support', lines: personLines(person) }],
+        options: [{ kind: 'word', text: 'True' }, { kind: 'word', text: 'False' }],
+        correctIndex: details.correct ? 0 : 1,
+        glossaryText: `True or false? ${details.statement} ${personLines(person).join(' ')}`
+      };
+    }
+
+    function createTaskSet(seed) {
+      const rnd = mulberry32(seed);
+      const tasks = [];
+      const tfPositions = new Set(shuffle([...Array(CONFIG.totalTasks).keys()], rnd).slice(0, CONFIG.trueFalseCount));
+      for (let i = 0; i < CONFIG.totalTasks; i += 1) {
+        const task = tfPositions.has(i) ? buildTrueFalseTask(rnd) : buildDefinitionTask(rnd);
+        task.number = i + 1;
+        tasks.push(task);
+      }
+      return tasks;
+    }
+
+    function buildOneTask(seedValue, typeHint = null) {
+      const rnd = mulberry32(seedValue);
+      if (typeHint === 'tf') return buildTrueFalseTask(rnd);
+      if (typeHint === 'definition') return buildDefinitionTask(rnd);
+      return rnd() < 0.25 ? buildTrueFalseTask(rnd) : buildDefinitionTask(rnd);
+    }
+
+    function persistState() {
+      appState.autosavedAt = nowIso();
       localStorage.setItem(CONFIG.storage.state, JSON.stringify(appState));
     }
 
-    function loadState(){
+    function loadState() {
       try {
         const raw = localStorage.getItem(CONFIG.storage.state);
         return raw ? JSON.parse(raw) : null;
@@ -209,657 +667,684 @@
       }
     }
 
-    function markInvalid(reason){
-      localStorage.setItem(CONFIG.storage.invalidation, JSON.stringify({ reason, at: new Date().toISOString(), sessionId: appState.sessionId || null }));
+    function setShuffleFlag(reason) {
+      if (appState.stage !== 'running') return;
+      const payload = { sessionId: appState.sessionId, index: appState.currentIndex, reason, at: nowIso() };
+      localStorage.setItem(CONFIG.storage.shuffle, JSON.stringify(payload));
+      persistState();
     }
 
-    function consumeInvalid(){
+    function consumeShuffleFlag() {
       try {
-        const raw = localStorage.getItem(CONFIG.storage.invalidation);
+        const raw = localStorage.getItem(CONFIG.storage.shuffle);
         if (!raw) return null;
-        localStorage.removeItem(CONFIG.storage.invalidation);
+        localStorage.removeItem(CONFIG.storage.shuffle);
         return JSON.parse(raw);
       } catch (e) {
-        localStorage.removeItem(CONFIG.storage.invalidation);
+        localStorage.removeItem(CONFIG.storage.shuffle);
         return null;
       }
     }
 
-    function simpleId(){
-      return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2,8)}`;
+    function setScreen(name) {
+      elements.startScreen.classList.toggle('active', name === 'start');
+      elements.practiceScreen.classList.toggle('active', name === 'practice');
+      elements.resultScreen.classList.toggle('active', name === 'result');
     }
 
-    function randomSeed(){
-      return Math.floor(Math.random() * 2147483646) + 1;
+    function showToast(text) {
+      elements.toast.textContent = text;
+      elements.toast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => elements.toast.classList.remove('show'), 2200);
     }
 
-    function mulberry32(a){
-      return function(){
-        a |= 0; a = (a + 0x6D2B79F5) | 0;
-        let t = Math.imul(a ^ (a >>> 15), 1 | a);
-        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-      };
+    function setStatus(text, kind = '') {
+      elements.statusLine.innerHTML = '';
+      const span = document.createElement('span');
+      span.className = `status ${kind}`.trim();
+      span.textContent = text;
+      elements.statusLine.appendChild(span);
     }
 
-    function shuffle(arr, rnd){
-      const a = [...arr];
-      for(let i=a.length-1;i>0;i--){
-        const j = Math.floor(rnd() * (i+1));
-        [a[i], a[j]] = [a[j], a[i]];
-      }
-      return a;
+    function useRetinaCanvas(canvas, logicalWidth = null, logicalHeight = null) {
+      const ratio = Math.max(window.devicePixelRatio || 1, 1);
+      const width = logicalWidth || Number(canvas.getAttribute('width')) || canvas.clientWidth || 1000;
+      const height = logicalHeight || Number(canvas.getAttribute('height')) || 200;
+      canvas.width = Math.round(width * ratio);
+      canvas.height = Math.round(height * ratio);
+      const ctx = canvas.getContext('2d');
+      ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+      return { ctx, width, height };
     }
 
-    function choice(arr, rnd){ return arr[Math.floor(rnd() * arr.length)]; }
-    function clamp(v,min,max){ return Math.max(min, Math.min(max, v)); }
-    function article(word){ return /^[aeiou]/i.test(word) ? 'an' : 'a'; }
-
-    function normalize(word){
-      return String(word || '').toLowerCase().replace(/[“”"'.,!?;:()]/g, '').replace(/\s+/g, ' ').trim();
+    function roundedRect(ctx, x, y, w, h, r) {
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.arcTo(x + w, y, x + w, y + h, r);
+      ctx.arcTo(x + w, y + h, x, y + h, r);
+      ctx.arcTo(x, y + h, x, y, r);
+      ctx.arcTo(x, y, x + w, y, r);
+      ctx.closePath();
     }
 
-    async function loadWords(){
-      dictionary = {};
-      try {
-        const res = await fetch(`./words.json?v=${Date.now()}`, { cache: 'no-store' });
-        const list = await res.json();
-        if (Array.isArray(list)) {
-          list.forEach(item => {
-            const key = normalize(item.Word || item.word);
-            if (!key) return;
-            dictionary[key] = {
-              word: item.Word || item.word || key,
-              translation: item.Translation || item.translation || '',
-              emoji: item.Emoji || item.emoji || '📘'
-            };
-          });
+    function fillGradient(ctx, w, h, a, b) {
+      const g = ctx.createLinearGradient(0, 0, w, h);
+      g.addColorStop(0, a);
+      g.addColorStop(1, b);
+      return g;
+    }
+
+    function wrapLines(ctx, text, maxWidth) {
+      const words = String(text).split(/\s+/).filter(Boolean);
+      const lines = [];
+      let line = '';
+      for (const word of words) {
+        const test = line ? `${line} ${word}` : word;
+        if (ctx.measureText(test).width > maxWidth && line) {
+          lines.push(line);
+          line = word;
+        } else {
+          line = test;
         }
+      }
+      if (line) lines.push(line);
+      return lines;
+    }
+
+    function normalizeDictionary(raw) {
+      const out = {};
+      if (Array.isArray(raw)) {
+        raw.forEach((item) => {
+          const key = normalizeKey(item.Word || item.word || item.term);
+          if (!key) return;
+          out[key] = {
+            translation: item.Translation || item.translation || '',
+            emoji: item.Emoji || item.emoji || '',
+            category: item.Category || item.category || 'word',
+            example: item.Example || item.example || ''
+          };
+        });
+      } else if (raw && typeof raw === 'object') {
+        Object.entries(raw).forEach(([key, value]) => {
+          const clean = normalizeKey(key);
+          if (!clean) return;
+          if (typeof value === 'string') {
+            out[clean] = { translation: value, emoji: '', category: 'word', example: '' };
+          } else {
+            out[clean] = {
+              translation: value.Translation || value.translation || value.hint || '',
+              emoji: value.Emoji || value.emoji || '',
+              category: value.Category || value.category || 'word',
+              example: value.Example || value.example || ''
+            };
+          }
+        });
+      }
+      return out;
+    }
+
+    async function loadDictionary() {
+      try {
+        const response = await fetch('words.json', { cache: 'no-store' });
+        if (!response.ok) throw new Error('words.json not found');
+        dictionary = normalizeDictionary(await response.json());
       } catch (e) {
         dictionary = {};
       }
     }
 
-    function hairPhrase(p){
-      if (p.hairType === 'bald') return 'bald';
-      return `${p.hairLength} ${p.hairColor} ${p.hairType} hair`;
+    function storeHits(canvas, hits) {
+      canvasHits.set(canvas, hits || []);
     }
 
-    function fullSentence(p){
-      if (p.hairType === 'bald') return `${p.name} is bald, ${p.height}, with ${p.lips} lips and ${article(p.body)} ${p.body} body.`;
-      return `${p.name} has ${p.hairLength} ${p.hairColor} ${p.hairType} hair, is ${p.height}, has ${p.lips} lips, and has ${article(p.body)} ${p.body} body.`;
-    }
+    function renderTextBlock(canvas, text, opts = {}) {
+      const logicalHeight = opts.height || 200;
+      const { ctx, width, height } = useRetinaCanvas(canvas, opts.width || 1400, logicalHeight);
+      const hits = [];
+      ctx.clearRect(0, 0, width, height);
+      ctx.fillStyle = fillGradient(ctx, width, height, 'rgba(12,24,50,0.96)', 'rgba(6,16,36,0.96)');
+      roundedRect(ctx, 0, 0, width, height, 22);
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(148,163,184,0.14)';
+      roundedRect(ctx, 0.5, 0.5, width - 1, height - 1, 22);
+      ctx.stroke();
 
-    function createPerson(rnd, forceName){
-      const hairType = choice(WORDS.hairType, rnd);
-      return {
-        name: forceName || choice(NAMES, rnd),
-        hairLength: hairType === 'bald' ? null : choice(WORDS.hairLength, rnd),
-        hairColor: hairType === 'bald' ? null : choice(WORDS.hairColor, rnd),
-        hairType,
-        lips: choice(WORDS.lips, rnd),
-        height: choice(WORDS.height, rnd),
-        body: choice(WORDS.body, rnd)
-      };
-    }
+      const padX = opts.padX || 28;
+      let y = opts.startY || 48;
 
-    function differentOption(correct, pool, rnd, extra = []){
-      const used = new Set([correct, ...extra]);
-      const candidates = shuffle(pool.filter(x => !used.has(x)), rnd);
-      return candidates[0] || correct;
-    }
-
-    function taskChooseHairLength(rnd, idx){
-      let p = createPerson(rnd, choice(NAMES, rnd));
-      while (p.hairType === 'bald') p = createPerson(rnd, p.name);
-      const correct = p.hairLength;
-      const opts = shuffle([correct, ...shuffle(WORDS.hairLength.filter(x => x !== correct), rnd).slice(0,2), 'bald'], rnd).slice(0,4);
-      return { id:`t${idx}`, type:'hair_length', category:'hair', correctIndex:opts.indexOf(correct), prompt:`${p.name} has ${hairPhrase(p)}. Choose hair length.`, options:opts };
-    }
-
-    function taskChooseHairColor(rnd, idx){
-      let p = createPerson(rnd, choice(NAMES, rnd));
-      while (p.hairType === 'bald') p = createPerson(rnd, p.name);
-      const correct = p.hairColor;
-      const opts = shuffle([correct, ...shuffle(WORDS.hairColor.filter(x => x !== correct), rnd).slice(0,3)], rnd);
-      return { id:`t${idx}`, type:'hair_color', category:'hair', correctIndex:opts.indexOf(correct), prompt:`${p.name} has ${hairPhrase(p)}. Choose hair color.`, options:opts };
-    }
-
-    function taskChooseHairType(rnd, idx){
-      const p = createPerson(rnd, choice(NAMES, rnd));
-      const correct = p.hairType;
-      const opts = shuffle([correct, ...shuffle(WORDS.hairType.filter(x => x !== correct), rnd).slice(0,3)], rnd);
-      const text = p.hairType === 'bald' ? `${p.name} is bald. Choose hair type.` : `${p.name} has ${hairPhrase(p)}. Choose hair type.`;
-      return { id:`t${idx}`, type:'hair_type', category:'hair', correctIndex:opts.indexOf(correct), prompt:text, options:opts };
-    }
-
-    function taskChooseLips(rnd, idx){
-      const p = createPerson(rnd, choice(NAMES, rnd));
-      const correct = p.lips;
-      const opts = shuffle([correct, ...shuffle(['thin','full','tall','short'].filter(x => x !== correct), rnd).slice(0,3)], rnd);
-      return { id:`t${idx}`, type:'lips', category:'lips', correctIndex:opts.indexOf(correct), prompt:`${p.name} has ${p.lips} lips. Choose lips.`, options:opts };
-    }
-
-    function taskChooseHeight(rnd, idx){
-      const p = createPerson(rnd, choice(NAMES, rnd));
-      const correct = p.height;
-      const opts = shuffle([correct, ...shuffle(['tall','short','slim','strong','chubby'].filter(x => x !== correct), rnd).slice(0,3)], rnd);
-      return { id:`t${idx}`, type:'height', category:'height', correctIndex:opts.indexOf(correct), prompt:`${p.name} is ${p.height}. Choose height.`, options:opts };
-    }
-
-    function taskChooseBody(rnd, idx){
-      const p = createPerson(rnd, choice(NAMES, rnd));
-      const correct = p.body;
-      const opts = shuffle([correct, ...shuffle(WORDS.body.filter(x => x !== correct), rnd).slice(0,3)], rnd);
-      return { id:`t${idx}`, type:'body', category:'body', correctIndex:opts.indexOf(correct), prompt:`${p.name} has ${article(p.body)} ${p.body} body. Choose body type.`, options:opts };
-    }
-
-    function taskBestSentence(rnd, idx){
-      const p = createPerson(rnd, choice(NAMES, rnd));
-      const correct = fullSentence(p);
-      const variants = [];
-      const p1 = { ...p, height: p.height === 'tall' ? 'short' : 'tall' };
-      const p2 = { ...p, lips: p.lips === 'thin' ? 'full' : 'thin' };
-      const p3 = { ...p, body: differentOption(p.body, WORDS.body, rnd) };
-      variants.push(correct, fullSentence(p1), fullSentence(p2), fullSentence(p3));
-      const opts = shuffle(variants, rnd);
-      const prompt = p.hairType === 'bald'
-        ? `${p.name} is bald, ${p.height}, with ${p.lips} lips and ${article(p.body)} ${p.body} body. Choose the best sentence.`
-        : `${p.name} has ${hairPhrase(p)}, is ${p.height}, has ${p.lips} lips, and has ${article(p.body)} ${p.body} body. Choose the best sentence.`;
-      return { id:`t${idx}`, type:'best_sentence', category:'mixed', correctIndex:opts.indexOf(correct), prompt, options:opts };
-    }
-
-    function taskWhoIsIt(rnd, idx){
-      const people = shuffle(NAMES, rnd).slice(0,4).map(n => createPerson(rnd, n));
-      const correctPerson = choice(people, rnd);
-      const prompt = correctPerson.hairType === 'bald'
-        ? `Who is bald, ${correctPerson.height}, with ${correctPerson.lips} lips and ${article(correctPerson.body)} ${correctPerson.body} body?`
-        : `Who has ${hairPhrase(correctPerson)}, is ${correctPerson.height}, has ${correctPerson.lips} lips, and has ${article(correctPerson.body)} ${correctPerson.body} body?`;
-      const opts = shuffle(people.map(p => p.name), rnd);
-      return { id:`t${idx}`, type:'who', category:'mixed', correctIndex:opts.indexOf(correctPerson.name), prompt, options:opts };
-    }
-
-    function taskMissingWord(rnd, idx){
-      const mode = choice(['hairLength','hairColor','hairType','lips','height','body'], rnd);
-      const p = createPerson(rnd, choice(NAMES, rnd));
-      let prompt = '';
-      let correct = '';
-      let pool = [];
-      if (mode === 'hairLength') {
-        let pp = p; while (pp.hairType === 'bald') pp = createPerson(rnd, pp.name);
-        prompt = `${pp.name} has ___ ${pp.hairColor} ${pp.hairType} hair.`;
-        correct = pp.hairLength; pool = [...WORDS.hairLength, 'bald'];
-      } else if (mode === 'hairColor') {
-        let pp = p; while (pp.hairType === 'bald') pp = createPerson(rnd, pp.name);
-        prompt = `${pp.name} has ${pp.hairLength} ___ ${pp.hairType} hair.`;
-        correct = pp.hairColor; pool = WORDS.hairColor;
-      } else if (mode === 'hairType') {
-        if (p.hairType === 'bald') {
-          prompt = `${p.name} is ___.`;
-          correct = 'bald'; pool = WORDS.hairType;
-        } else {
-          prompt = `${p.name} has ${p.hairLength} ${p.hairColor} ___ hair.`;
-          correct = p.hairType; pool = WORDS.hairType;
-        }
-      } else if (mode === 'lips') {
-        prompt = `${p.name} has ___ lips.`; correct = p.lips; pool = ['thin','full','tall','short'];
-      } else if (mode === 'height') {
-        prompt = `${p.name} is ___.`; correct = p.height; pool = ['tall','short','slim','strong'];
-      } else {
-        prompt = `${p.name} has ${article(p.body)} ___ body.`; correct = p.body; pool = WORDS.body;
+      if (opts.badge) {
+        ctx.font = '700 18px Inter, system-ui, sans-serif';
+        const badgeWidth = ctx.measureText(opts.badge).width + 26;
+        ctx.fillStyle = 'rgba(34,211,238,0.14)';
+        roundedRect(ctx, padX, y - 24, badgeWidth, 34, 17);
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(34,211,238,0.24)';
+        roundedRect(ctx, padX, y - 24, badgeWidth, 34, 17);
+        ctx.stroke();
+        ctx.fillStyle = '#7dd3fc';
+        ctx.fillText(opts.badge, padX + 13, y - 1);
+        y += 26;
       }
-      const opts = shuffle([correct, ...shuffle(pool.filter(x => x !== correct), rnd).slice(0,3)], rnd);
-      return { id:`t${idx}`, type:'missing', category:'mixed', correctIndex:opts.indexOf(correct), prompt:`${prompt} Choose the missing word.`, options:opts };
-    }
 
-    function createTaskSet(seed){
-      const rnd = mulberry32(seed);
-      const makers = [taskChooseHairLength, taskChooseHairColor, taskChooseHairType, taskChooseLips, taskChooseHeight, taskChooseBody, taskBestSentence, taskWhoIsIt, taskMissingWord];
-      const tasks = [];
-      let idx = 1;
-      for (let round = 0; round < 5; round++) {
-        const order = shuffle(makers, rnd);
-        order.forEach(make => tasks.push(make(rnd, idx++)));
-      }
-      return tasks.slice(0, CONFIG.totalTasks);
-    }
-
-    function drawWrapped(ctx, text, x, y, maxWidth, lineHeight, color, hits){
-      const tokens = String(text).match(/\S+|\s+/g) || [];
-      let cx = x;
-      let cy = y;
-      for (const token of tokens) {
-        if (/^\s+$/.test(token)) {
-          const w = ctx.measureText(token).width;
-          if (cx + w > x + maxWidth) {
-            cx = x;
-            cy += lineHeight;
-          } else {
-            cx += w;
+      ctx.font = `${opts.fontWeight || 800} ${opts.fontSize || 26}px Inter, system-ui, sans-serif`;
+      const lineHeight = opts.lineHeight || 38;
+      const lines = wrapLines(ctx, text, width - padX * 2);
+      const fontSize = Number((ctx.font.match(/(\d+)px/) || [0, 26])[1]);
+      const boxHeight = Math.round(fontSize * 1.05) + 12;
+      const interactive = opts.interactive !== false;
+      lines.forEach((line) => {
+        let x = padX;
+        const words = line.split(/\s+/).filter(Boolean);
+        const space = ctx.measureText(' ').width;
+        words.forEach((word) => {
+          const normalized = normalizeKey(word);
+          const dictItem = dictionary[normalized];
+          const widthWord = ctx.measureText(word).width;
+          ctx.fillStyle = dictItem ? '#7dd3fc' : (opts.color || '#eef6ff');
+          ctx.fillText(word, x, y);
+          if (dictItem) {
+            ctx.strokeStyle = 'rgba(125,211,252,0.8)';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(x, y + 6);
+            ctx.lineTo(x + widthWord, y + 6);
+            ctx.stroke();
+            if (interactive) {
+              hits.push({ term: normalized, data: dictItem, x, y: y - boxHeight + 2, width: widthWord, height: boxHeight + 10 });
+            }
           }
-          continue;
-        }
-        const clean = normalize(token);
-        const entry = dictionary[clean];
-        const w = ctx.measureText(token).width;
-        if (cx !== x && cx + w > x + maxWidth) {
-          cx = x;
-          cy += lineHeight;
-        }
-        ctx.fillStyle = entry ? '#7dd3fc' : color;
-        ctx.fillText(token, cx, cy);
-        if (entry) {
-          ctx.strokeStyle = 'rgba(125,211,252,.78)';
-          ctx.lineWidth = 2;
-          ctx.beginPath();
-          ctx.moveTo(cx, cy + 5);
-          ctx.lineTo(cx + w, cy + 5);
-          ctx.stroke();
-          hits.push({ x: cx, y: cy - 26, width: w, height: 36, entry });
-        }
-        cx += w;
-      }
-      return cy;
+          x += widthWord + space;
+        });
+        y += lineHeight;
+      });
+      storeHits(canvas, hits);
     }
 
-    function measureTextHeight(text, width, fontSize, lineHeight){
-      const c = document.createElement('canvas');
-      const ctx = c.getContext('2d');
-      ctx.font = `700 ${fontSize}px Inter, system-ui, sans-serif`;
-      const tokens = String(text).match(/\S+|\s+/g) || [];
-      let cx = 0;
-      let lines = 1;
-      for (const token of tokens) {
-        const w = ctx.measureText(token).width;
-        if (/^\s+$/.test(token)) {
-          if (cx + w > width) { cx = 0; lines += 1; } else { cx += w; }
-        } else {
-          if (cx !== 0 && cx + w > width) { cx = 0; lines += 1; }
-          cx += w;
-        }
-      }
-      return lines * lineHeight;
+    function renderOptionCanvas(canvas, option, index, state = 'idle') {
+      const height = 96;
+      const { ctx, width, height: logicalHeight } = useRetinaCanvas(canvas, 900, height);
+      ctx.clearRect(0, 0, width, logicalHeight);
+      const bg = state === 'correct'
+        ? ['rgba(6,78,59,0.88)', 'rgba(5,60,47,0.96)']
+        : state === 'wrong'
+          ? ['rgba(127,29,29,0.84)', 'rgba(88,28,43,0.96)']
+          : ['rgba(14,27,56,0.95)', 'rgba(8,16,36,0.96)'];
+      ctx.fillStyle = fillGradient(ctx, width, logicalHeight, bg[0], bg[1]);
+      roundedRect(ctx, 0, 0, width, logicalHeight, 20);
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(148,163,184,0.14)';
+      roundedRect(ctx, 0.5, 0.5, width - 1, logicalHeight - 1, 20);
+      ctx.stroke();
+
+      ctx.fillStyle = 'rgba(125,211,252,0.18)';
+      roundedRect(ctx, 18, 18, 42, 42, 15);
+      ctx.fill();
+      ctx.fillStyle = '#bae6fd';
+      ctx.font = '800 22px Inter, system-ui, sans-serif';
+      ctx.fillText(String.fromCharCode(65 + index), 32, 47);
+
+      ctx.fillStyle = '#eef6ff';
+      ctx.font = '800 26px Inter, system-ui, sans-serif';
+      const lines = wrapLines(ctx, option.text, width - 110);
+      let y = logicalHeight / 2 - ((lines.length - 1) * 16);
+      lines.forEach((line) => {
+        ctx.fillText(line, 82, y);
+        y += 32;
+      });
+      storeHits(canvas, []);
     }
 
-    function prepCanvas(canvas, cssWidth, cssHeight){
-      const dpr = Math.max(1, window.devicePixelRatio || 1);
-      canvas.style.width = `${cssWidth}px`;
-      canvas.style.height = `${cssHeight}px`;
-      canvas.width = Math.round(cssWidth * dpr);
-      canvas.height = Math.round(cssHeight * dpr);
-      const ctx = canvas.getContext('2d');
-      ctx.setTransform(dpr,0,0,dpr,0,0);
-      return { ctx, width: cssWidth, height: cssHeight };
+    function renderSupportCanvas(canvas, lines) {
+      renderTextBlock(canvas, lines.join('  '), {
+        width: 1200,
+        height: 150,
+        fontSize: 22,
+        lineHeight: 32,
+        interactive: true,
+        color: '#dbeafe'
+      });
     }
 
-    function renderTask(){
+    function renderPrompt(task) {
+      const badge = task.type === 'tf' ? CATEGORY_LABELS.tf : CATEGORY_LABELS.definition;
+      renderTextBlock(elements.promptCanvas, task.prompt, {
+        badge,
+        height: task.type === 'tf' ? 180 : 160,
+        fontSize: 24,
+        lineHeight: 34,
+        interactive: true
+      });
+    }
+
+    function updateProgress() {
+      const done = appState.results.length;
+      elements.progressText.textContent = `${Math.min(appState.currentIndex + 1, CONFIG.totalTasks)} / ${CONFIG.totalTasks}`;
+      elements.scoreText.textContent = `${appState.score.correct} correct`;
+      const pct = CONFIG.totalTasks ? Math.round((done / CONFIG.totalTasks) * 100) : 0;
+      elements.progressFill.style.width = `${pct}%`;
+    }
+
+    function renderTask() {
       const task = appState.tasks[appState.currentIndex];
       if (!task) return;
-      const box = el.taskCanvas.parentElement.getBoundingClientRect();
-      const width = Math.max(280, Math.floor(box.width));
-      const pad = window.innerWidth < 700 ? 18 : 24;
-      const fontSize = window.innerWidth < 700 ? 25 : 30;
-      const lineHeight = Math.round(fontSize * 1.5);
-      const promptHeight = measureTextHeight(task.prompt, width - pad * 2, fontSize, lineHeight);
-      const height = Math.max(210, promptHeight + pad * 2 + 16);
-      const { ctx } = prepCanvas(el.taskCanvas, width, height);
-      taskHits = [];
-      const grad = ctx.createLinearGradient(0,0,width,height);
-      grad.addColorStop(0,'rgba(11,23,48,.98)');
-      grad.addColorStop(1,'rgba(5,13,28,.98)');
-      ctx.fillStyle = grad;
-      ctx.fillRect(0,0,width,height);
-      ctx.fillStyle = '#eef4ff';
-      ctx.font = `800 ${fontSize}px Inter, system-ui, sans-serif`;
-      drawWrapped(ctx, task.prompt, pad, pad + fontSize, width - pad * 2, lineHeight, '#eef4ff', taskHits);
+      clearTimeout(nextTimer);
+      answerLocked = false;
+      appState.currentTaskStartedAt = nowIso();
+      renderPrompt(task);
 
-      el.options.innerHTML = '';
-      task.options.forEach((opt, index) => {
+      elements.supportGrid.innerHTML = '';
+      if (task.supportCards && task.supportCards.length) {
+        elements.supportGrid.className = 'support-grid';
+        task.supportCards.forEach((card) => {
+          const wrapper = document.createElement('div');
+          wrapper.className = 'support-box';
+          const canvas = document.createElement('canvas');
+          wrapper.appendChild(canvas);
+          elements.supportGrid.appendChild(wrapper);
+          renderSupportCanvas(canvas, card.lines);
+          canvas.addEventListener('click', handleCanvasClick);
+        });
+      } else {
+        elements.supportGrid.className = 'support-grid';
+      }
+
+      elements.optionsGrid.innerHTML = '';
+      elements.optionsGrid.className = task.options.length <= 2 ? 'options-grid' : 'options-grid two';
+      task.options.forEach((option, index) => {
         const button = document.createElement('button');
         button.type = 'button';
-        button.className = 'option';
-        button.dataset.index = String(index);
+        button.className = 'option-btn';
         const canvas = document.createElement('canvas');
         button.appendChild(canvas);
-        button.addEventListener('click', () => answer(index));
-        el.options.appendChild(button);
-        renderOption(canvas, opt, 'idle');
+        button.addEventListener('click', () => answerTask(index));
+        elements.optionsGrid.appendChild(button);
+        renderOptionCanvas(canvas, option, index, 'idle');
       });
 
-      el.counter.textContent = `${appState.currentIndex + 1} / ${appState.tasks.length}`;
-      el.score.textContent = `${appState.score.correct} correct`;
-      const done = appState.currentIndex / appState.tasks.length * 100;
-      el.progressFill.style.width = `${done}%`;
-      saveState();
+      updateProgress();
+      setStatus(task.type === 'tf' ? 'Choose True or False' : 'Choose the correct word');
+      persistState();
     }
 
-    function renderOption(canvas, text, state){
-      const boxWidth = el.options.getBoundingClientRect().width;
-      const singleCol = window.innerWidth < 700;
-      const width = Math.floor(singleCol ? boxWidth : (boxWidth - 12) / 2);
-      const fontSize = window.innerWidth < 700 ? 23 : 24;
-      const lineHeight = Math.round(fontSize * 1.35);
-      const pad = 16;
-      const textHeight = measureTextHeight(text, width - pad*2, fontSize, lineHeight);
-      const height = Math.max(88, textHeight + pad * 2);
-      const { ctx } = prepCanvas(canvas, width, height);
-      let fill1 = 'rgba(14,29,58,.94)', fill2 = 'rgba(11,23,48,.98)', stroke = 'rgba(148,163,184,.14)', textColor = '#eef4ff';
-      if (state === 'correct') { fill1='rgba(6,95,70,.92)'; fill2='rgba(4,78,56,.96)'; stroke='rgba(52,211,153,.72)'; }
-      if (state === 'wrong') { fill1='rgba(127,29,29,.9)'; fill2='rgba(104,20,20,.96)'; stroke='rgba(251,113,133,.75)'; }
-      const grad = ctx.createLinearGradient(0,0,width,height);
-      grad.addColorStop(0, fill1); grad.addColorStop(1, fill2);
-      ctx.fillStyle = grad;
-      roundRect(ctx, 0, 0, width, height, 18);
-      ctx.fill();
-      ctx.strokeStyle = stroke;
-      ctx.lineWidth = 1;
-      roundRect(ctx, .5, .5, width - 1, height - 1, 18);
-      ctx.stroke();
-      ctx.fillStyle = textColor;
-      ctx.font = `800 ${fontSize}px Inter, system-ui, sans-serif`;
-      drawWrapped(ctx, text, pad, pad + fontSize, width - pad * 2, lineHeight, textColor, []);
-    }
-
-    function roundRect(ctx, x, y, w, h, r){
-      const rr = Math.min(r, w/2, h/2);
-      ctx.beginPath();
-      ctx.moveTo(x + rr, y);
-      ctx.arcTo(x + w, y, x + w, y + h, rr);
-      ctx.arcTo(x + w, y + h, x, y + h, rr);
-      ctx.arcTo(x, y + h, x, y, rr);
-      ctx.arcTo(x, y, x + w, y, rr);
-      ctx.closePath();
-    }
-
-    function showToast(text){
-      el.toast.textContent = text;
-      el.toast.classList.add('show');
-      clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => el.toast.classList.remove('show'), 1800);
-    }
-
-    function startSession(reason='manual'){
-      const name = el.studentName.value.trim();
-      const group = el.studentGroup.value.trim();
-      if (!name || !group) { showToast('Enter name and group.'); return; }
-      const resets = reason === 'focus-loss' ? ((appState.integrity?.resets || 0) + 1) : (appState.integrity?.resets || 0);
-      appState = emptyState();
-      appState.sessionId = simpleId();
-      appState.seed = randomSeed();
-      appState.startedAt = new Date().toISOString();
-      appState.student = { name, group };
-      appState.stage = 'running';
-      appState.integrity.resets = resets;
-      appState.tasks = createTaskSet(appState.seed);
-      appState.currentIndex = 0;
-      appState.currentTaskStartedAt = new Date().toISOString();
-      setScreen('practice');
-      renderTask();
-      if (reason === 'focus-loss') showToast('New set loaded.');
-    }
-
-    function answer(selectedIndex){
-      if (answering) return;
-      answering = true;
+    function answerTask(selectedIndex) {
+      if (answerLocked) return;
       const task = appState.tasks[appState.currentIndex];
-      const buttons = [...el.options.querySelectorAll('.option')];
-      buttons.forEach(btn => btn.classList.add('locked'));
+      if (!task) return;
+      answerLocked = true;
+      const buttons = [...elements.optionsGrid.querySelectorAll('.option-btn')];
+      const isCorrect = selectedIndex === task.correctIndex;
+      const latencyMs = Math.max(0, Date.now() - new Date(appState.currentTaskStartedAt || nowIso()).getTime());
+      if (isCorrect) appState.score.correct += 1;
+      appState.results.push({ taskId: task.id, type: task.type, correct: isCorrect, latencyMs });
+
       buttons.forEach((btn, idx) => {
-        if (idx === task.correctIndex) btn.classList.add('correct');
-        if (idx === selectedIndex && idx !== task.correctIndex) btn.classList.add('wrong');
-        const state = idx === task.correctIndex ? 'correct' : (idx === selectedIndex && idx !== task.correctIndex ? 'wrong' : 'idle');
+        btn.disabled = true;
+        btn.classList.toggle('correct', idx === task.correctIndex);
+        btn.classList.toggle('wrong', idx === selectedIndex && !isCorrect);
         const canvas = btn.querySelector('canvas');
-        renderOption(canvas, task.options[idx], state);
+        renderOptionCanvas(canvas, task.options[idx], idx, idx === task.correctIndex ? 'correct' : idx === selectedIndex && !isCorrect ? 'wrong' : 'idle');
       });
-      const timeMs = Math.max(0, Date.now() - new Date(appState.currentTaskStartedAt || Date.now()).getTime());
-      const correct = selectedIndex === task.correctIndex;
-      appState.results.push({
-        taskId: task.id,
-        type: task.type,
-        category: task.category,
-        correct,
-        timeMs
-      });
-      appState.score.total += 1;
-      if (correct) appState.score.correct += 1;
-      saveState();
-      setTimeout(nextTask, 650);
+
+      setStatus(isCorrect ? 'Correct' : 'Saved', isCorrect ? 'good' : 'bad');
+      if (appState.results.length >= CONFIG.totalTasks) {
+        persistState();
+        nextTimer = setTimeout(() => finishSession(), 700);
+        return;
+      }
+
+      appState.currentIndex = appState.results.length;
+      persistState();
+      updateProgress();
+      nextTimer = setTimeout(() => advanceTask(), 700);
     }
 
-    function nextTask(){
-      appState.currentIndex += 1;
-      answering = false;
-      if (appState.currentIndex >= appState.tasks.length) {
+    function advanceTask() {
+      if (appState.results.length >= CONFIG.totalTasks) {
         finishSession();
         return;
       }
-      appState.currentTaskStartedAt = new Date().toISOString();
+      appState.currentIndex = appState.results.length;
       renderTask();
     }
 
-    function buildPayload(){
+    function replaceCurrentTask() {
+      if (appState.stage !== 'running') return;
+      const oldTask = appState.tasks[appState.currentIndex];
+      const replacementSeed = randomSeed() + appState.currentIndex + appState.results.length;
+      const replacement = buildOneTask(replacementSeed, oldTask?.type === 'tf' ? 'tf' : 'definition');
+      replacement.number = appState.currentIndex + 1;
+      if (oldTask) replacement.replacedFrom = oldTask.id;
+      appState.tasks[appState.currentIndex] = replacement;
+      appState.lastVisibilityShuffleAt = nowIso();
+      persistState();
+      renderTask();
+      showToast('Current task changed after leaving the page.');
+    }
+
+    function resultPayload() {
       return {
-        version: CONFIG.version,
         sessionId: appState.sessionId,
-        student: { name: appState.student.name, group: appState.student.group },
+        version: CONFIG.appVersion,
+        student: appState.student,
         topic: CONFIG.topicValue,
         startedAt: appState.startedAt,
         completedAt: appState.completedAt,
-        total: appState.score.total,
-        correct: appState.score.correct,
-        percent: appState.score.total ? Math.round(appState.score.correct / appState.score.total * 100) : 0,
-        resetsDuringRun: appState.integrity.resets,
-        results: appState.results.map((r, i) => ({
-          n: i + 1,
-          type: r.type,
-          category: r.category,
-          correct: r.correct,
-          timeMs: r.timeMs
-        }))
+        summary: {
+          totalTasks: appState.results.length,
+          correct: appState.score.correct,
+          accuracy: appState.results.length ? Number(((appState.score.correct / appState.results.length) * 100).toFixed(2)) : 0
+        },
+        results: appState.results.map((r) => ({ taskId: r.taskId, type: r.type, correct: r.correct, latencyMs: r.latencyMs }))
       };
     }
 
-    function finishSession(){
+    function finishSession() {
       appState.stage = 'complete';
-      appState.completedAt = new Date().toISOString();
-      saveState();
+      appState.completedAt = nowIso();
+      persistState();
       setScreen('result');
-      renderResult();
-      submitResultsOnce();
+      renderResults();
+      submitResultsOnce().catch(() => null);
     }
 
-    function renderResult(){
-      const box = el.resultCanvas.parentElement.getBoundingClientRect();
-      const width = Math.max(320, Math.floor(box.width));
-      const height = Math.max(620, Math.floor(width * 1.08));
-      const { ctx } = prepCanvas(el.resultCanvas, width, height);
-      const grad = ctx.createLinearGradient(0,0,width,height);
-      grad.addColorStop(0,'rgba(11,23,48,.99)');
-      grad.addColorStop(1,'rgba(5,13,28,.99)');
-      ctx.fillStyle = grad;
-      ctx.fillRect(0,0,width,height);
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
 
-      const pct = appState.score.total ? Math.round(appState.score.correct / appState.score.total * 100) : 0;
-      const pad = Math.round(width * 0.06);
-      ctx.fillStyle = '#eef4ff';
-      ctx.font = `900 ${Math.max(28, Math.round(width * 0.045))}px Inter, system-ui, sans-serif`;
-      ctx.fillText('Practice result', pad, pad + 10);
-      ctx.fillStyle = '#a7b5cc';
-      ctx.font = `700 ${Math.max(16, Math.round(width * 0.02))}px Inter, system-ui, sans-serif`;
-      ctx.fillText(`${appState.student.name} • ${appState.student.group}`, pad, pad + 50);
-      ctx.fillText(CONFIG.topicDisplay, pad, pad + 78);
-
-      const cx = width / 2;
-      const cy = pad + 180;
-      const radius = Math.min(120, Math.round(width * 0.13));
-      ctx.lineWidth = Math.max(12, Math.round(width * 0.015));
-      ctx.strokeStyle = 'rgba(30,41,59,.92)';
-      ctx.beginPath();
-      ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+    function renderResults() {
+      const payload = resultPayload();
+      const accuracy = payload.summary.accuracy;
+      const { ctx, width, height } = useRetinaCanvas(elements.resultCanvas, 1400, 880);
+      ctx.clearRect(0, 0, width, height);
+      ctx.fillStyle = fillGradient(ctx, width, height, 'rgba(12,24,50,0.98)', 'rgba(6,16,36,0.98)');
+      roundedRect(ctx, 0, 0, width, height, 22);
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(148,163,184,0.14)';
+      roundedRect(ctx, 0.5, 0.5, width - 1, height - 1, 22);
       ctx.stroke();
-      ctx.strokeStyle = '#2fd3ef';
-      ctx.beginPath();
-      ctx.arc(cx, cy, radius, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * (pct / 100));
-      ctx.stroke();
-      ctx.fillStyle = '#eef4ff';
-      ctx.font = `900 ${Math.max(34, Math.round(width * 0.07))}px Inter, system-ui, sans-serif`;
-      const pctText = `${pct}%`;
-      ctx.fillText(pctText, cx - ctx.measureText(pctText).width / 2, cy + 12);
 
-      const cards = [
+      ctx.fillStyle = 'rgba(34,211,238,0.14)';
+      roundedRect(ctx, 42, 36, 210, 38, 18);
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(34,211,238,0.24)';
+      roundedRect(ctx, 42, 36, 210, 38, 18);
+      ctx.stroke();
+      ctx.fillStyle = '#7dd3fc';
+      ctx.font = '700 18px Inter, system-ui, sans-serif';
+      ctx.fillText('Final screenshot', 58, 61);
+
+      ctx.fillStyle = '#f8fafc';
+      ctx.font = '800 46px Inter, system-ui, sans-serif';
+      ctx.fillText('Person Description Practice', 42, 126);
+
+      ctx.fillStyle = '#a8b7d2';
+      ctx.font = '700 24px Inter, system-ui, sans-serif';
+      ctx.fillText(`Name: ${appState.student.name}`, 42, 184);
+      ctx.fillText(`Group: ${appState.student.group}`, 42, 222);
+      ctx.fillText(`Mode: 35 definition + 10 true/false`, 42, 260);
+      ctx.fillText(`Finished: ${appState.completedAt ? new Date(appState.completedAt).toLocaleString() : '—'}`, 42, 298);
+
+      const boxX = width - 360;
+      ctx.fillStyle = 'rgba(15,23,42,0.76)';
+      roundedRect(ctx, boxX, 52, 300, 190, 24);
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(148,163,184,0.14)';
+      roundedRect(ctx, boxX, 52, 300, 190, 24);
+      ctx.stroke();
+      ctx.fillStyle = '#7dd3fc';
+      ctx.font = '700 22px Inter, system-ui, sans-serif';
+      ctx.fillText('Result', boxX + 28, 98);
+      ctx.fillStyle = '#f8fafc';
+      ctx.font = '800 72px Inter, system-ui, sans-serif';
+      ctx.fillText(`${Math.round(accuracy)}%`, boxX + 24, 176);
+      ctx.fillStyle = '#a8b7d2';
+      ctx.font = '700 24px Inter, system-ui, sans-serif';
+      ctx.fillText(`${appState.score.correct} / ${appState.results.length} correct`, boxX + 28, 214);
+
+      const stats = [
+        ['Tasks', String(appState.results.length)],
         ['Correct', String(appState.score.correct)],
-        ['Total', String(appState.score.total)],
-        ['Protected resets', String(appState.integrity.resets)],
-        ['Submit', appState.submission.sent ? 'sent' : (appState.submission.inFlight ? 'sending' : 'pending')]
+        ['JSON', 'results only'],
+        ['Submit', appState.submission.sent ? 'sent once' : appState.submission.inFlight ? 'sending' : 'pending']
       ];
-      const cols = 2;
-      const gap = 16;
-      const cardW = (width - pad * 2 - gap) / 2;
-      const cardH = 110;
-      let top = cy + radius + 42;
-      cards.forEach((item, i) => {
-        const col = i % cols;
-        const row = Math.floor(i / cols);
-        const x = pad + col * (cardW + gap);
-        const y = top + row * (cardH + gap);
-        ctx.fillStyle = 'rgba(15,23,42,.78)';
-        roundRect(ctx, x, y, cardW, cardH, 22);
+
+      let y = 370;
+      stats.forEach(([label, value], idx) => {
+        const x = idx % 2 === 0 ? 42 : 440;
+        const rowY = idx < 2 ? y : y + 160;
+        ctx.fillStyle = 'rgba(15,23,42,0.76)';
+        roundedRect(ctx, x, rowY, 340, 130, 22);
         ctx.fill();
-        ctx.strokeStyle = 'rgba(148,163,184,.12)';
+        ctx.strokeStyle = 'rgba(148,163,184,0.14)';
+        roundedRect(ctx, x, rowY, 340, 130, 22);
         ctx.stroke();
-        ctx.fillStyle = '#a7b5cc';
-        ctx.font = `700 ${Math.max(16, Math.round(width * 0.02))}px Inter, system-ui, sans-serif`;
-        ctx.fillText(item[0], x + 18, y + 35);
-        ctx.fillStyle = '#eef4ff';
-        ctx.font = `900 ${Math.max(26, Math.round(width * 0.04))}px Inter, system-ui, sans-serif`;
-        ctx.fillText(item[1], x + 18, y + 74);
+        ctx.fillStyle = '#a8b7d2';
+        ctx.font = '700 22px Inter, system-ui, sans-serif';
+        ctx.fillText(label, x + 24, rowY + 42);
+        ctx.fillStyle = '#f8fafc';
+        ctx.font = '800 36px Inter, system-ui, sans-serif';
+        ctx.fillText(value, x + 24, rowY + 88);
       });
 
-      const footerY = height - 70;
-      ctx.fillStyle = '#a7b5cc';
-      ctx.font = `700 ${Math.max(15, Math.round(width * 0.018))}px Inter, system-ui, sans-serif`;
-      ctx.fillText(`Finished: ${new Date(appState.completedAt).toLocaleString()}`, pad, footerY);
-      ctx.fillText('Take a screenshot now.', pad, footerY + 28);
+      elements.resultStats.innerHTML = '';
+      const rows = [
+        ['Name', appState.student.name],
+        ['Group', appState.student.group],
+        ['Correct', `${appState.score.correct} / ${appState.results.length}`],
+        ['Accuracy', `${Math.round(accuracy)}%`],
+        ['Submission', appState.submission.sent ? 'Sent once' : appState.submission.inFlight ? 'Sending…' : 'Pending']
+      ];
+      rows.forEach(([label, value]) => {
+        const row = document.createElement('div');
+        row.className = 'stat-row';
+        row.innerHTML = `<span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong>`;
+        elements.resultStats.appendChild(row);
+      });
     }
 
-    function openPopup(entry, clientX, clientY){
-      el.dictPopup.innerHTML = `<div><span class="emoji">${entry.emoji}</span> <strong>${escapeHtml(entry.word)}</strong></div><div class="tr">${escapeHtml(entry.translation)}</div>`;
-      el.dictPopup.classList.add('visible');
-      const rect = el.dictPopup.getBoundingClientRect();
-      const left = clamp(clientX + 12, 10, window.innerWidth - rect.width - 10);
-      const top = clamp(clientY + 12, 10, window.innerHeight - rect.height - 10);
-      el.dictPopup.style.left = `${left}px`;
-      el.dictPopup.style.top = `${top}px`;
+    function openGlossary(term, data, clientX, clientY) {
+      const emoji = data.emoji ? `${data.emoji} ` : '';
+      const popup = elements.glossaryPopup;
+      popup.innerHTML = `
+        <strong>${escapeHtml(term)}</strong>
+        <div class="muted">${escapeHtml((data.category || 'word'))}</div>
+        <div>${escapeHtml(`${emoji}${data.translation || ''}`)}</div>
+        ${data.example ? `<div class="muted">${escapeHtml(data.example)}</div>` : ''}
+      `;
+      popup.classList.add('visible');
+      const rect = popup.getBoundingClientRect();
+      const left = clamp(clientX + 10, 10, window.innerWidth - rect.width - 10);
+      const top = clamp(clientY + 10, 10, window.innerHeight - rect.height - 10);
+      popup.style.left = `${left}px`;
+      popup.style.top = `${top}px`;
     }
 
-    function closePopup(){ el.dictPopup.classList.remove('visible'); }
-    function escapeHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+    function closeGlossary() { elements.glossaryPopup.classList.remove('visible'); }
 
-    function handleTaskCanvasClick(event){
-      const rect = el.taskCanvas.getBoundingClientRect();
-      const x = event.clientX - rect.left;
-      const y = event.clientY - rect.top;
-      const hit = taskHits.find(h => x >= h.x && x <= h.x + h.width && y >= h.y && y <= h.y + h.height);
-      if (hit) openPopup(hit.entry, event.clientX, event.clientY); else closePopup();
+    function handleCanvasClick(event) {
+      const canvas = event.currentTarget;
+      const hits = canvasHits.get(canvas) || [];
+      if (!hits.length) return closeGlossary();
+      const rect = canvas.getBoundingClientRect();
+      const scaleX = ((canvas.width / (window.devicePixelRatio || 1)) || rect.width) / rect.width;
+      const scaleY = ((canvas.height / (window.devicePixelRatio || 1)) || rect.height) / rect.height;
+      const x = (event.clientX - rect.left) * scaleX;
+      const y = (event.clientY - rect.top) * scaleY;
+      const hit = hits.find((item) => x >= item.x && x <= item.x + item.width && y >= item.y && y <= item.y + item.height);
+      if (!hit) return closeGlossary();
+      openGlossary(hit.term, hit.data, event.clientX, event.clientY);
     }
 
-    function alreadySubmitted(id){ return localStorage.getItem(`${CONFIG.storage.submittedPrefix}${id}`) === '1'; }
-    function normalizeFormAction(url){ return url.includes('/formResponse') ? url : url.replace('/viewform','/formResponse').split('?')[0]; }
+    function showFirstGlossary() {
+      const hits = canvasHits.get(elements.promptCanvas) || [];
+      if (!hits.length) return showToast('No dictionary word here.');
+      const rect = elements.glossaryBtn.getBoundingClientRect();
+      openGlossary(hits[0].term, hits[0].data, rect.left + rect.width / 2, rect.top - 6);
+    }
 
-    async function submitResultsOnce(){
-      if (!appState.sessionId || appState.submission.inFlight || appState.submission.sent || alreadySubmitted(appState.sessionId)) {
+    function normalizeFormAction(url) {
+      if (!url) return '';
+      if (url.includes('/formResponse')) return url;
+      return url.replace('/viewform', '/formResponse').split('?')[0];
+    }
+
+    function alreadySubmitted(sessionId) {
+      return localStorage.getItem(`${CONFIG.storage.submittedPrefix}${sessionId}`) === '1';
+    }
+
+    async function submitResultsOnce() {
+      if (!appState.sessionId || appState.submission.sent || appState.submission.inFlight || alreadySubmitted(appState.sessionId)) {
         appState.submission.sent = appState.submission.sent || alreadySubmitted(appState.sessionId);
-        saveState();
-        renderResult();
+        persistState();
+        renderResults();
         return;
       }
       const action = normalizeFormAction(CONFIG.form.actionUrl);
-      const fields = CONFIG.form.fields;
-      if (!action || action.includes('PASTE_')) return;
-      appState.submission.inFlight = true;
-      saveState();
-      renderResult();
+      const { name, group, topic, payload } = CONFIG.form.fields;
+      if (!action || !name || !group || !topic || !payload) return;
+
+      const finalPayload = JSON.stringify(resultPayload());
       const body = new URLSearchParams();
-      body.set(fields.name, appState.student.name);
-      body.set(fields.group, appState.student.group);
-      body.set(fields.topic, CONFIG.topicValue);
-      body.set(fields.payload, JSON.stringify(buildPayload()));
+      body.set(name, appState.student.name);
+      body.set(group, appState.student.group);
+      body.set(topic, CONFIG.topicValue);
+      body.set(payload, finalPayload);
+
+      appState.submission.inFlight = true;
+      persistState();
+      renderResults();
+
       try {
-        await fetch(action, { method:'POST', mode:'no-cors', headers:{'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8'}, body });
+        await fetch(action, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+          body
+        });
         localStorage.setItem(`${CONFIG.storage.submittedPrefix}${appState.sessionId}`, '1');
         appState.submission.sent = true;
-        appState.submission.sentAt = new Date().toISOString();
-        appState.submission.lastMessage = 'sent';
+        appState.submission.sentAt = nowIso();
+        appState.submission.message = 'sent once';
       } catch (e) {
-        appState.submission.lastMessage = 'failed';
+        appState.submission.message = 'failed';
       } finally {
         appState.submission.inFlight = false;
-        saveState();
-        renderResult();
+        persistState();
+        renderResults();
       }
     }
 
-    function bindAntiCopy(){
-      const stop = e => { e.preventDefault(); return false; };
-      ['contextmenu','copy','cut','dragstart','selectstart'].forEach(type => document.addEventListener(type, stop));
-      document.addEventListener('keydown', e => {
-        const key = e.key.toLowerCase();
-        if (((e.ctrlKey || e.metaKey) && ['c','x','a','s','u','p'].includes(key)) || key === 'f12') e.preventDefault();
-      });
+    function startSession() {
+      const name = elements.studentName.value.trim();
+      const group = elements.studentGroup.value.trim();
+      if (!name || !group) return showToast('Enter name and group.');
+
+      clearTimeout(nextTimer);
+      appState = createEmptyState();
+      appState.sessionId = simpleId();
+      appState.seed = randomSeed();
+      appState.startedAt = nowIso();
+      appState.student = { name, group };
+      appState.tasks = createTaskSet(appState.seed);
+      appState.stage = 'running';
+      persistState();
+      setScreen('practice');
+      renderTask();
     }
 
-    function bindIntegrity(){
-      document.addEventListener('visibilitychange', () => {
-        if (document.visibilityState === 'hidden' && appState.stage === 'running') markInvalid('hidden');
-      });
-      window.addEventListener('pagehide', () => { if (appState.stage === 'running') markInvalid('pagehide'); });
-      window.addEventListener('beforeunload', () => { if (appState.stage === 'running') markInvalid('beforeunload'); });
-    }
-
-    function restore(){
+    function restoreOrInit() {
       const saved = loadState();
-      const invalid = consumeInvalid();
-      if (saved) {
-        appState = saved;
-        el.studentName.value = saved.student?.name || '';
-        el.studentGroup.value = saved.student?.group || '';
-      }
-      const nav = performance.getEntriesByType('navigation')[0];
-      const wasReload = nav && nav.type === 'reload';
-      if ((invalid || wasReload) && saved && saved.student && saved.student.name && saved.student.group && saved.stage === 'running') {
-        startSession('focus-loss');
+      const shuffleFlag = consumeShuffleFlag();
+      if (!saved) {
+        appState = createEmptyState();
+        setScreen('start');
         return;
       }
-      if (saved && saved.stage === 'complete') {
+      appState = saved;
+      elements.studentName.value = appState.student?.name || '';
+      elements.studentGroup.value = appState.student?.group || '';
+
+      if (appState.stage === 'complete') {
         setScreen('result');
-        renderResult();
+        renderResults();
         return;
       }
+
+      if (appState.stage === 'running') {
+        setScreen('practice');
+        if (shuffleFlag && shuffleFlag.sessionId === appState.sessionId) {
+          replaceCurrentTask();
+        } else {
+          renderTask();
+        }
+        return;
+      }
+
       setScreen('start');
     }
 
-    function bindEvents(){
-      el.startBtn.addEventListener('click', () => startSession('manual'));
-      el.retryBtn.addEventListener('click', () => startSession('manual'));
-      el.taskCanvas.addEventListener('click', handleTaskCanvasClick);
-      document.addEventListener('click', e => {
-        if (!el.dictPopup.contains(e.target) && e.target !== el.taskCanvas) closePopup();
-      });
-      window.addEventListener('resize', () => {
-        if (appState.stage === 'running') renderTask();
-        if (appState.stage === 'complete') renderResult();
+    function registerServiceWorker() {
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./sw.js').catch(() => null);
+      }
+    }
+
+    function bindAntiCopy() {
+      const stop = (e) => { e.preventDefault(); return false; };
+      ['contextmenu', 'copy', 'cut', 'dragstart', 'selectstart'].forEach((type) => document.addEventListener(type, stop));
+      document.addEventListener('keydown', (e) => {
+        const key = e.key.toLowerCase();
+        if ((e.ctrlKey || e.metaKey) && ['c', 'x', 'a', 's', 'u', 'p'].includes(key)) e.preventDefault();
+        if (['f12'].includes(key)) e.preventDefault();
       });
     }
 
-    async function init(){
+    function bindGuards() {
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'hidden') {
+          setShuffleFlag('hidden');
+        } else if (document.visibilityState === 'visible' && appState.stage === 'running') {
+          const saved = loadState();
+          if (saved) appState = saved;
+          replaceCurrentTask();
+        }
+      });
+      window.addEventListener('pagehide', () => setShuffleFlag('pagehide'));
+      window.addEventListener('beforeunload', () => setShuffleFlag('beforeunload'));
+      window.addEventListener('offline', () => showToast('Offline. Progress is saved.'));
+      window.addEventListener('online', () => showToast('Online again.'));
+    }
+
+    function bindEvents() {
+      elements.startBtn.addEventListener('click', startSession);
+      elements.glossaryBtn.addEventListener('click', showFirstGlossary);
+      elements.promptCanvas.addEventListener('click', handleCanvasClick);
+      document.addEventListener('click', (e) => {
+        if (!elements.glossaryPopup.contains(e.target) && e.target !== elements.glossaryBtn && e.target !== elements.promptCanvas) closeGlossary();
+      });
+      window.addEventListener('resize', () => {
+        if (appState.stage === 'running') renderTask();
+        if (appState.stage === 'complete') renderResults();
+      });
+    }
+
+    async function init() {
       bindAntiCopy();
-      bindIntegrity();
+      bindGuards();
       bindEvents();
-      await loadWords();
-      restore();
+      registerServiceWorker();
+      await loadDictionary();
+      restoreOrInit();
     }
 
     init();
   </script>
+
 </body>
 </html>
