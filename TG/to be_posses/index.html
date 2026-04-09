@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en" class="notranslate" translate="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="google" content="notranslate">
+<title>Trainer</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{--bg1:#0f172a;--bg2:#1e1b4b;--bg3:#0f766e;--line:rgba(148,163,184,.35);--text:#0f172a;--muted:#475569;--shadow:0 20px 50px rgba(15,23,42,.18)}
+html,body{margin:0;padding:0;min-height:100%;font-family:Arial,Helvetica,sans-serif;color:var(--text);user-select:none}
+body{background:
+radial-gradient(circle at 0% 0%, rgba(56,189,248,.35), transparent 26%),
+radial-gradient(circle at 100% 0%, rgba(168,85,247,.28), transparent 24%),
+radial-gradient(circle at 100% 100%, rgba(16,185,129,.22), transparent 26%),
+linear-gradient(135deg,var(--bg1),var(--bg2),var(--bg3));padding:14px}
+.wrap{max-width:920px;margin:0 auto}
+.card{background:linear-gradient(180deg, rgba(255,255,255,.94), rgba(255,255,255,.88));border:1px solid rgba(255,255,255,.55);border-radius:24px;padding:16px;box-shadow:var(--shadow);backdrop-filter:blur(10px)}
+.hidden{display:none!important}
+.cgrid{display:grid;gap:12px}
+.fieldrow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+input[type=text]{width:100%;padding:15px 14px;border:1px solid var(--line);border-radius:18px;font-size:18px;outline:none;background:rgba(255,255,255,.92);color:var(--text)}
+input[type=text]:focus{border-color:#8b5cf6;box-shadow:0 0 0 4px rgba(139,92,246,.14)}
+.btn{border:none;border-radius:18px;padding:15px 16px;cursor:pointer;width:100%;font-size:18px;font-weight:800;color:#fff;background:linear-gradient(135deg,#7c3aed,#0ea5e9);box-shadow:0 16px 30px rgba(59,130,246,.25)}
+.btn.secondary{color:#0f172a;background:linear-gradient(135deg,#f8fafc,#e2e8f0);border:1px solid var(--line);box-shadow:none}
+.option{display:block;width:100%;border:none;border-radius:18px;padding:15px 16px;cursor:pointer;text-align:left;font-size:22px;font-weight:800;color:#0f172a;background:linear-gradient(135deg, rgba(255,255,255,.95), rgba(241,245,249,.95));border:1px solid rgba(148,163,184,.28);transition:transform .12s ease, box-shadow .18s ease, border-color .18s ease, background .18s ease}
+.option:hover{transform:translateY(-1px);background:linear-gradient(135deg,#ffffff,#eef6ff);box-shadow:0 12px 24px rgba(96,165,250,.18);border-color:rgba(59,130,246,.35)}
+.option.correct{color:#065f46;border-color:#10b981;background:linear-gradient(135deg,#ecfdf5,#d1fae5)}
+.option.wrong{color:#991b1b;border-color:#ef4444;background:linear-gradient(135deg,#fef2f2,#fee2e2)}
+.progressWrap{height:14px;border-radius:999px;background:rgba(148,163,184,.18);overflow:hidden;border:1px solid rgba(148,163,184,.18)}
+.progressBar{height:100%;width:0%;background:linear-gradient(90deg,#8b5cf6,#06b6d4,#10b981)}
+.center{text-align:center}
+#mainCanvas,#topCanvas,#resultCanvas,#progressCanvas{display:block;width:100%;height:auto;border-radius:18px}
+#screenIntro,#screenQuiz,#screenResult{display:none}
+#screenIntro.active,#screenQuiz.active,#screenResult.active{display:block}
+#notice{display:none;border-radius:16px;padding:12px 14px;font-weight:800;font-size:15px;color:#0f172a;background:linear-gradient(135deg,#fde68a,#fca5a5,#93c5fd)}
+.smallbtnrow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+iframe{display:none}
+#popup{position:fixed;display:none;z-index:99999;min-width:180px;max-width:300px;border-radius:18px;padding:12px 14px;background:linear-gradient(135deg,#111827,#1d4ed8,#7c3aed);color:#fff;box-shadow:0 20px 50px rgba(15,23,42,.35);border:1px solid rgba(255,255,255,.18)}
+#popup .pw{font-size:22px;font-weight:900;line-height:1.1}
+#popup .pt{margin-top:8px;font-size:18px;font-weight:800;line-height:1.2;color:#dbeafe}
+#popup .pe{font-size:24px;line-height:1;margin-top:8px}
+#errorBox{display:none;border-radius:16px;padding:12px 14px;font-weight:800;font-size:15px;color:#7f1d1d;background:linear-gradient(135deg,#fee2e2,#fecaca)}
+@media (max-width:700px){.fieldrow{grid-template-columns:1fr} .option{font-size:19px} body{padding:10px} .card{border-radius:20px}}
+</style>
+</head>
+<body oncontextmenu="return false" oncopy="return false" oncut="return false" onpaste="return false" ondragstart="return false" onselectstart="return false">
+<div class="wrap">
+  <div id="screenIntro" class="active">
+    <div class="card cgrid">
+      <canvas id="topCanvas" width="840" height="610"></canvas>
+      <div id="errorBox"></div>
+      <div class="fieldrow">
+        <input id="studentName" type="text" autocomplete="off" spellcheck="false" placeholder="Name">
+        <input id="studentGroup" type="text" autocomplete="off" spellcheck="false" placeholder="Group">
+      </div>
+      <button class="btn" id="startBtn">Start</button>
+    </div>
+  </div>
+
+  <div id="screenQuiz">
+    <div class="card cgrid">
+      <canvas id="progressCanvas" width="840" height="76"></canvas>
+      <div class="progressWrap"><div id="progressBar" class="progressBar"></div></div>
+      <div id="notice"></div>
+      <canvas id="mainCanvas" width="840" height="250"></canvas>
+      <div id="options" class="cgrid"></div>
+    </div>
+  </div>
+
+  <div id="screenResult">
+    <div class="card cgrid center">
+      <canvas id="resultCanvas" width="840" height="390"></canvas>
+      <div class="smallbtnrow">
+        <button class="btn secondary" id="restartBtn">Restart</button>
+        <button class="btn" id="sendBtn">Send again</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="popup">
+  <div class="pw" id="popupWord"></div>
+  <div class="pt" id="popupTranslation"></div>
+  <div class="pe" id="popupEmoji"></div>
+</div>
+
+<iframe name="hiddenSubmitFrame"></iframe>
+<form id="hiddenForm" class="hidden" method="POST" target="hiddenSubmitFrame" action="https://docs.google.com/forms/d/e/1FAIpQLSeUzYUvQbbzo_1r81AacP6Kj7HlKDzEVfa93Dam39LiVjcItA/formResponse">
+  <input type="hidden" name="entry.1582931880" id="f_name">
+  <input type="hidden" name="entry.1222434157" id="f_group">
+  <input type="hidden" name="entry.371289786" id="f_topic" value="possesive">
+  <input type="hidden" name="entry.679064514" id="f_json">
+</form>
+
+<script>
+const WORDS_FILE = 'words_fixed.json';
+
+const pool = [
+  {"q":"I ___ a student.","opts":["am","is","are","be"],"a":0},
+  {"q":"He ___ happy.","opts":["am","is","are","be"],"a":1},
+  {"q":"They ___ at school.","opts":["am","is","are","be"],"a":2},
+  {"q":"She ___ my friend.","opts":["am","is","are","be"],"a":1},
+  {"q":"We ___ ready.","opts":["am","is","are","be"],"a":2},
+  {"q":"It ___ a cat.","opts":["am","is","are","be"],"a":1},
+  {"q":"You ___ late.","opts":["am","is","are","be"],"a":2},
+  {"q":"This is Anna. ___ bag is red.","opts":["My","His","Her","Their"],"a":2},
+  {"q":"This is Tom. ___ bike is blue.","opts":["My","His","Her","Our"],"a":1},
+  {"q":"I have a pencil. It is ___ pencil.","opts":["my","his","their","our"],"a":0},
+  {"q":"We are in class. It is ___ class.","opts":["his","our","her","their"],"a":1},
+  {"q":"Kate and Lisa are sisters. ___ room is big.","opts":["Her","Their","His","My"],"a":1},
+  {"q":"You have a dog. It is ___ dog.","opts":["your","his","our","their"],"a":0},
+  {"q":"Max is 17. ___ hobby is music.","opts":["Her","My","His","Our"],"a":2},
+  {"q":"Rita is calm. ___ hobby is drawing.","opts":["Her","His","Their","Our"],"a":0},
+  {"q":"I and my friend ___ here.","opts":["am","is","are","be"],"a":2},
+  {"q":"My parents ___ at home.","opts":["am","is","are","be"],"a":2},
+  {"q":"The dog ___ small.","opts":["am","is","are","be"],"a":1},
+  {"q":"The students ___ busy.","opts":["am","is","are","be"],"a":2},
+  {"q":"This is our teacher. ___ name is Ms. Green.","opts":["My","His","Her","Their"],"a":2},
+  {"q":"Ben and I ___ in the same group.","opts":["am","is","are","be"],"a":2},
+  {"q":"My sister has a camera. ___ camera is new.","opts":["My","His","Her","Their"],"a":2},
+  {"q":"The boys are tired, but ___ project is good.","opts":["his","her","their","our"],"a":2},
+  {"q":"A tiger is an animal. ___ tail is long.","opts":["its","their","our","your"],"a":0},
+  {"q":"Anna and I like sports. ___ favorite activity is volleyball.","opts":["Our","Their","Her","His"],"a":0},
+  {"q":"My brother ___ not loud, but he ___ friendly.","opts":["is / is","are / is","is / are","am / is"],"a":0},
+  {"q":"I ___ tired today, but my friends ___ full of energy.","opts":["is / are","am / is","am / are","are / are"],"a":2},
+  {"q":"This is Leo and this is Emma. ___ hobbies are chess and music.","opts":["His","Her","Their","Our"],"a":2},
+  {"q":"The table is old, but ___ color is nice.","opts":["its","their","his","our"],"a":0},
+  {"q":"You and Tom ___ good at football.","opts":["am","is","are","be"],"a":2},
+  {"q":"My name is Alex. ___ 17.","opts":["I am","He is","They are","It is"],"a":0},
+  {"q":"These are my friends. ___ from my class.","opts":["He is","She is","They are","It is"],"a":2},
+  {"q":"This is my mother and this is ___ car.","opts":["his","her","their","our"],"a":1},
+  {"q":"We have a teacher. ___ lessons are interesting.","opts":["His","Her","Its","Their"],"a":1},
+  {"q":"My phone and my laptop ___ on the desk.","opts":["am","is","are","be"],"a":2},
+  {"q":"The girl with the skates ___ Lena. ___ hobby is skating.","opts":["is / Her","are / His","is / His","am / Her"],"a":0},
+  {"q":"Jack and I ride bikes. ___ bikes are near the school.","opts":["My","His","Our","Her"],"a":2},
+  {"q":"My cat is funny. ___ ears are very small.","opts":["its","their","our","your"],"a":0},
+  {"q":"The children are in the park. ___ teacher is with them.","opts":["Their","His","Her","My"],"a":0},
+  {"q":"My friends and I ___ not at home. We ___ at college.","opts":["is / am","are / are","am / are","are / is"],"a":1},
+  {"q":"This is a bike. ___ wheels are black.","opts":["its","their","his","her"],"a":0},
+  {"q":"My father ___ a driver and my mother ___ a teacher.","opts":["are / is","is / is","am / are","is / are"],"a":1},
+  {"q":"Kate, where ___ your books?","opts":["am","is","are","be"],"a":2},
+  {"q":"Our school ___ big, and ___ windows are large.","opts":["is / its","are / its","is / their","am / its"],"a":0},
+  {"q":"I have two sisters. ___ names are Nina and Vera.","opts":["His","Our","Their","Her"],"a":2}
+];
+
+const dict = new Map();
+let interactiveBoxes = new WeakMap();
+let sessionQuestions = [];
+let current = 0;
+let answers = [];
+let score = 0;
+let sent = false;
+let studentName = "";
+let studentGroup = "";
+let sessionId = "";
+let lastLeaveSwapAt = 0;
+let wordsLoaded = false;
+
+const intro = document.getElementById('screenIntro');
+const quiz = document.getElementById('screenQuiz');
+const result = document.getElementById('screenResult');
+const topCanvas = document.getElementById('topCanvas');
+const mainCanvas = document.getElementById('mainCanvas');
+const progressCanvas = document.getElementById('progressCanvas');
+const resultCanvas = document.getElementById('resultCanvas');
+const optionsWrap = document.getElementById('options');
+const progressBar = document.getElementById('progressBar');
+const popup = document.getElementById('popup');
+const popupWord = document.getElementById('popupWord');
+const popupTranslation = document.getElementById('popupTranslation');
+const popupEmoji = document.getElementById('popupEmoji');
+const notice = document.getElementById('notice');
+const errorBox = document.getElementById('errorBox');
+const startBtn = document.getElementById('startBtn');
+
+function setupCanvas(canvas){
+  const dpr = Math.max(1, window.devicePixelRatio || 1);
+  const cssW = parseInt(canvas.getAttribute('width'), 10);
+  const cssH = parseInt(canvas.getAttribute('height'), 10);
+  canvas.style.width = '100%';
+  canvas.style.height = 'auto';
+  canvas.width = cssW * dpr;
+  canvas.height = cssH * dpr;
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  return {ctx, w: cssW, h: cssH};
+}
+function normalizeLookup(token){
+  return String(token || '').toLowerCase().replace(/(^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$)/gu, '');
+}
+function roundRect(ctx,x,y,w,h,r){
+  const rr = Math.min(r, w/2, h/2);
+  ctx.beginPath();
+  ctx.moveTo(x+rr,y);
+  ctx.arcTo(x+w,y,x+w,y+h,rr);
+  ctx.arcTo(x+w,y+h,x,y+h,rr);
+  ctx.arcTo(x,y+h,x,y,rr);
+  ctx.arcTo(x,y,x+w,y,rr);
+  ctx.closePath();
+}
+function wrapText(ctx, text, x, y, maxWidth, lineHeight){
+  const paragraphs = String(text).split('\n');
+  let cy = y;
+  for (const para of paragraphs) {
+    if (!para.trim()) { cy += lineHeight; continue; }
+    const words = para.split(' ');
+    let line = '';
+    for (let n = 0; n < words.length; n++) {
+      const testLine = line + words[n] + ' ';
+      const width = ctx.measureText(testLine).width;
+      if (width > maxWidth && n > 0) {
+        ctx.fillText(line.trim(), x, cy);
+        line = words[n] + ' ';
+        cy += lineHeight;
+      } else {
+        line = testLine;
+      }
+    }
+    ctx.fillText(line.trim(), x, cy);
+    cy += lineHeight;
+  }
+  return cy;
+}
+function drawInteractiveBlocks(canvas, blocks, pad){
+  const obj = setupCanvas(canvas);
+  const ctx = obj.ctx, w = obj.w, h = obj.h;
+  const margin = pad || 30;
+  ctx.clearRect(0,0,w,h);
+  const bg = ctx.createLinearGradient(0,0,w,h);
+  bg.addColorStop(0,'rgba(255,255,255,.98)');
+  bg.addColorStop(1,'rgba(248,250,252,.94)');
+  ctx.fillStyle = bg;
+  roundRect(ctx, 0, 0, w, h, 18);
+  ctx.fill();
+
+  const boxes = [];
+  let y = margin;
+  for (const block of blocks) {
+    ctx.fillStyle = block.color || '#0f172a';
+    ctx.font = block.font || '700 24px Arial';
+    const lineHeight = block.lineHeight || 32;
+    const paragraphs = String(block.text).split('\n');
+    for (const para of paragraphs) {
+      if (!para.trim()) { y += lineHeight; continue; }
+      const tokens = para.split(' ');
+      let x = margin;
+      for (let i = 0; i < tokens.length; i++) {
+        const token = tokens[i];
+        const drawToken = token + (i < tokens.length - 1 ? ' ' : '');
+        const tokenWidth = ctx.measureText(drawToken).width;
+        if (x + tokenWidth > w - margin && x > margin) {
+          x = margin;
+          y += lineHeight;
+        }
+        ctx.fillText(drawToken, x, y);
+        const key = normalizeLookup(token);
+        if (key && dict.has(key)) {
+          ctx.save();
+          ctx.strokeStyle = 'rgba(59,130,246,.26)';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(x, y + 4);
+          ctx.lineTo(x + Math.max(8, ctx.measureText(token).width), y + 4);
+          ctx.stroke();
+          ctx.restore();
+          boxes.push({x:x, y:y-lineHeight+6, w:Math.max(8, ctx.measureText(token).width), h:lineHeight, key:key});
+        }
+        x += tokenWidth;
+      }
+      y += lineHeight;
+    }
+    y += block.after || 0;
+  }
+  interactiveBoxes.set(canvas, boxes);
+}
+function drawSimple(canvas, blocks, pad){
+  const obj = setupCanvas(canvas);
+  const ctx = obj.ctx, w = obj.w, h = obj.h;
+  const margin = pad || 30;
+  ctx.clearRect(0,0,w,h);
+  const bg = ctx.createLinearGradient(0,0,w,h);
+  bg.addColorStop(0,'rgba(255,255,255,.98)');
+  bg.addColorStop(1,'rgba(248,250,252,.94)');
+  ctx.fillStyle = bg;
+  roundRect(ctx, 0, 0, w, h, 18);
+  ctx.fill();
+  let y = margin;
+  for (const block of blocks) {
+    ctx.fillStyle = block.color || '#0f172a';
+    ctx.font = block.font || '700 24px Arial';
+    y = wrapText(ctx, String(block.text), margin, y, w - margin * 2, block.lineHeight || 32);
+    y += block.after || 0;
+  }
+}
+function showPopup(key, ev){
+  const item = dict.get(key);
+  if (!item) return;
+  popupWord.textContent = item.word;
+  popupTranslation.textContent = item.translation || '';
+  popupEmoji.textContent = item.emoji || '';
+  popup.style.display = 'block';
+  let left = ev.clientX + 12;
+  let top = ev.clientY + 12;
+  requestAnimationFrame(() => {
+    const rect = popup.getBoundingClientRect();
+    const pad = 12;
+    if (left + rect.width > window.innerWidth - pad) left = window.innerWidth - rect.width - pad;
+    if (top + rect.height > window.innerHeight - pad) top = ev.clientY - rect.height - 12;
+    if (top < pad) top = pad;
+    popup.style.left = left + 'px';
+    popup.style.top = top + 'px';
+  });
+}
+function hidePopup(){ popup.style.display = 'none'; }
+function bindCanvasClicks(canvas){
+  canvas.addEventListener('click', (ev) => {
+    const boxes = interactiveBoxes.get(canvas) || [];
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = parseInt(canvas.getAttribute('width'), 10) / rect.width;
+    const scaleY = parseInt(canvas.getAttribute('height'), 10) / rect.height;
+    const x = (ev.clientX - rect.left) * scaleX;
+    const y = (ev.clientY - rect.top) * scaleY;
+    for (const box of boxes) {
+      if (x >= box.x && x <= box.x + box.w && y >= box.y && y <= box.y + box.h) {
+        ev.stopPropagation();
+        showPopup(box.key, ev);
+        return;
+      }
+    }
+    hidePopup();
+  });
+}
+bindCanvasClicks(topCanvas);
+bindCanvasClicks(mainCanvas);
+document.addEventListener('click', (ev) => {
+  if (!popup.contains(ev.target) && ev.target !== topCanvas && ev.target !== mainCanvas) hidePopup();
+});
+
+function shuffle(arr){
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+function prepareQuestions(){
+  const easy = pool.slice(0,20).map((q, i) => Object.assign({id:'e'+i, level:'easy'}, q));
+  const hardPool = pool.slice(20).map((q, i) => Object.assign({id:'h'+i, level:'hard'}, q));
+  const hard = shuffle(hardPool).slice(0,25);
+  sessionQuestions = easy.concat(hard).map(q => {
+    const optionObjects = q.opts.map((opt, i) => ({text: opt, originalIndex: i}));
+    const shuffled = shuffle(optionObjects);
+    return {id:q.id, level:q.level, q:q.q, opts:shuffled.map(x => x.text), correctIndex:shuffled.findIndex(x => x.originalIndex === q.a)};
+  });
+}
+function setScreen(name){
+  intro.classList.remove('active');
+  quiz.classList.remove('active');
+  result.classList.remove('active');
+  if (name === 'intro') intro.classList.add('active');
+  if (name === 'quiz') quiz.classList.add('active');
+  if (name === 'result') result.classList.add('active');
+}
+function setNotice(text){
+  if (text) {
+    notice.textContent = text;
+    notice.style.display = 'block';
+    clearTimeout(setNotice._timer);
+    setNotice._timer = setTimeout(() => { notice.style.display = 'none'; }, 1800);
+  } else {
+    notice.style.display = 'none';
+  }
+}
+function showError(text){
+  errorBox.textContent = text;
+  errorBox.style.display = 'block';
+}
+function hideError(){
+  errorBox.style.display = 'none';
+}
+function renderIntro(){
+  drawInteractiveBlocks(topCanvas, [
+    {text:'to be', font:'700 36px Arial', lineHeight:44, after:10},
+    {text:'I am. He / She / It is. You / We / They are.', font:'500 24px Arial', lineHeight:34, after:12},
+    {text:'I am a student. He is happy. They are busy.', font:'500 24px Arial', lineHeight:34, after:22},
+    {text:'Possessives', font:'700 36px Arial', lineHeight:44, after:10},
+    {text:'my, your, his, her, its, our, their', font:'500 24px Arial', lineHeight:34, after:12},
+    {text:'My book. His bike. Her bag. Our class. Their teacher.', font:'500 24px Arial', lineHeight:34, after:20},
+    {text:'Use is / are to say what someone is or what something is like.', font:'500 22px Arial', lineHeight:32, after:10},
+    {text:'Use my / your / his / her / its / our / their to show who has the thing.', font:'500 22px Arial', lineHeight:32, after:16},
+    {text:'Click words for translation. 45 questions.', font:'700 24px Arial', lineHeight:34, color:'#1d4ed8', after:0}
+  ], 30);
+}
+function renderProgress(){
+  const pct = Math.round(current / sessionQuestions.length * 100);
+  drawSimple(progressCanvas, [{text:(current + 1) + ' / ' + sessionQuestions.length + '   •   ' + pct + '%', font:'700 28px Arial', lineHeight:34, color:'#1e1b4b', after:0}], 20);
+  progressBar.style.width = (current / sessionQuestions.length * 100) + '%';
+}
+function renderQuestion(){
+  const item = sessionQuestions[current];
+  renderProgress();
+  drawInteractiveBlocks(mainCanvas, [
+    {text:item.q, font:'700 30px Arial', lineHeight:38, after:10},
+    {text:'Click words for translation.', font:'700 18px Arial', lineHeight:26, color:'#2563eb', after:0}
+  ], 26);
+  optionsWrap.innerHTML = '';
+  item.opts.forEach((opt, idx) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'option';
+    btn.textContent = opt;
+    btn.addEventListener('click', () => chooseAnswer(idx));
+    optionsWrap.appendChild(btn);
+  });
+}
+function chooseAnswer(idx){
+  const item = sessionQuestions[current];
+  answers[current] = {qid:item.id, question:item.q, chosenIndex:idx, chosenText:item.opts[idx], correctIndex:item.correctIndex, correctText:item.opts[item.correctIndex], ok:idx === item.correctIndex};
+  if (idx === item.correctIndex) score++;
+  const buttons = Array.from(document.querySelectorAll('.option'));
+  buttons.forEach((btn, i) => {
+    btn.disabled = true;
+    if (i === idx && idx !== item.correctIndex) btn.classList.add('wrong');
+    if (i === item.correctIndex) btn.classList.add('correct');
+  });
+  setTimeout(() => {
+    current++;
+    if (current < sessionQuestions.length) renderQuestion();
+    else finishQuiz();
+  }, 340);
+}
+function changeCurrentTaskOnLeave(){
+  const now = Date.now();
+  if (!quiz.classList.contains('active')) return;
+  if (now - lastLeaveSwapAt < 1200) return;
+  lastLeaveSwapAt = now;
+  let swapIdx = -1;
+  for (let i = current + 1; i < sessionQuestions.length; i++) {
+    if (sessionQuestions[i].level === sessionQuestions[current].level) { swapIdx = i; break; }
+  }
+  if (swapIdx === -1) {
+    for (let i = current + 1; i < sessionQuestions.length; i++) { swapIdx = i; break; }
+  }
+  if (swapIdx !== -1) {
+    const temp = sessionQuestions[current];
+    sessionQuestions[current] = sessionQuestions[swapIdx];
+    sessionQuestions[swapIdx] = temp;
+  } else {
+    const optionObjects = sessionQuestions[current].opts.map((text, i) => ({text:text, old:i}));
+    const shuffled = shuffle(optionObjects);
+    const oldCorrect = sessionQuestions[current].correctIndex;
+    sessionQuestions[current].opts = shuffled.map(x => x.text);
+    sessionQuestions[current].correctIndex = shuffled.findIndex(x => x.old === oldCorrect);
+  }
+  setNotice('Task changed');
+  renderQuestion();
+}
+function finishQuiz(){
+  progressBar.style.width = '100%';
+  setScreen('result');
+  drawSimple(resultCanvas, [
+    {text: score + ' / ' + sessionQuestions.length, font:'700 56px Arial', lineHeight:64, color:'#1e1b4b', after:18},
+    {text: Math.round(score / sessionQuestions.length * 100) + '%', font:'700 40px Arial', lineHeight:48, color:'#0891b2', after:22},
+    {text:'Screenshot and send', font:'700 28px Arial', lineHeight:36, color:'#0f172a', after:10},
+    {text:'Results are sent automatically', font:'500 24px Arial', lineHeight:32, color:'#475569', after:0}
+  ], 40);
+  autoSend();
+}
+function autoSend(){
+  const payload = {sessionId:sessionId, name:studentName, group:studentGroup, score:score, total:sessionQuestions.length, percent:Math.round(score / sessionQuestions.length * 100), answers:answers, timestamp:new Date().toISOString()};
+  document.getElementById('f_name').value = studentName || 'no_name';
+  document.getElementById('f_group').value = studentGroup || '';
+  document.getElementById('f_json').value = JSON.stringify(payload);
+  try {
+    document.getElementById('hiddenForm').submit();
+    sent = true;
+    document.getElementById('sendBtn').textContent = 'Sent';
+  } catch (e) {
+    sent = false;
+    document.getElementById('sendBtn').textContent = 'Send again';
+  }
+}
+function restartAll(){
+  sent = false;
+  studentName = '';
+  studentGroup = '';
+  sessionId = Math.random().toString(36).slice(2) + Date.now().toString(36);
+  document.getElementById('studentName').value = '';
+  document.getElementById('studentGroup').value = '';
+  current = 0;
+  score = 0;
+  answers = [];
+  prepareQuestions();
+  setScreen('intro');
+  hidePopup();
+  setNotice('');
+  renderIntro();
+}
+async function loadWords(){
+  const res = await fetch(WORDS_FILE, {cache:'no-store'});
+  if (!res.ok) throw new Error('Failed to load ' + WORDS_FILE);
+  const rows = await res.json();
+  dict.clear();
+  for (const row of rows) {
+    const key = String(row.Word || '').trim().toLowerCase();
+    if (!key) continue;
+    dict.set(key, {
+      word: String(row.Word || '').trim(),
+      translation: String(row.Translation || '').trim(),
+      emoji: String(row.Emoji || '').trim()
+    });
+  }
+  wordsLoaded = true;
+}
+async function init(){
+  try {
+    await loadWords();
+    hideError();
+    startBtn.disabled = false;
+    startBtn.style.opacity = '1';
+  } catch (err) {
+    wordsLoaded = false;
+    startBtn.disabled = true;
+    startBtn.style.opacity = '.55';
+    showError('words_fixed.json not loaded');
+  }
+  restartAll();
+}
+function startQuiz(){
+  if (!wordsLoaded) return;
+  studentName = document.getElementById('studentName').value.trim();
+  studentGroup = document.getElementById('studentGroup').value.trim();
+  current = 0;
+  score = 0;
+  answers = [];
+  prepareQuestions();
+  setScreen('quiz');
+  setNotice('');
+  renderQuestion();
+}
+document.getElementById('startBtn').addEventListener('click', startQuiz);
+document.getElementById('restartBtn').addEventListener('click', restartAll);
+document.getElementById('sendBtn').addEventListener('click', autoSend);
+document.addEventListener('keydown', (e) => {
+  if ((e.ctrlKey || e.metaKey) && ['c','x','a','s','u','p'].includes(e.key.toLowerCase())) e.preventDefault();
+  if (e.key === 'PrintScreen') e.preventDefault();
+});
+window.addEventListener('blur', () => changeCurrentTaskOnLeave());
+document.addEventListener('visibilitychange', () => { if (document.hidden) changeCurrentTaskOnLeave(); });
+window.addEventListener('resize', () => {
+  renderIntro();
+  if (quiz.classList.contains('active')) renderQuestion();
+  if (result.classList.contains('active')) finishQuiz();
+});
+init();
+</script>
+</body>
+</html>
