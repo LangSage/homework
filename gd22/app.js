@@ -111,10 +111,45 @@
 
   function decodeBank() {
     try {
-      return JSON.parse(atob(QUESTION_BANK_B64));
+      const decoded = decodeBase64Utf8(QUESTION_BANK_B64);
+      const parsed = JSON.parse(decoded);
+      return Array.isArray(parsed)
+        ? parsed.map((item) => ({
+            ...item,
+            question: repairMojibake(item.question),
+            options: Array.isArray(item.options) ? item.options.map(repairMojibake) : [],
+          }))
+        : [];
     } catch (error) {
       console.error('Question bank decode failed', error);
       return [];
+    }
+  }
+
+  function decodeBase64Utf8(value) {
+    const binary = atob(value);
+    const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0));
+    return new TextDecoder('utf-8').decode(bytes);
+  }
+
+  function repairMojibake(value) {
+    const text = String(value || '');
+    if (!/[ÃÂâ][-¿]/.test(text) && !/â€|â€™|â€œ|â€|Â/.test(text)) {
+      return text;
+    }
+
+    try {
+      const repaired = new TextDecoder('utf-8').decode(Uint8Array.from(text, (char) => char.charCodeAt(0)));
+      return repaired.includes('�') ? text : repaired;
+    } catch {
+      return text
+        .replace(/â€™/g, '’')
+        .replace(/â€˜/g, '‘')
+        .replace(/â€œ/g, '“')
+        .replace(/â€/g, '”')
+        .replace(/â€”/g, '—')
+        .replace(/â€“/g, '–')
+        .replace(/Â/g, '');
     }
   }
 
@@ -221,62 +256,40 @@
     });
   }
 
-  function rerollCurrentTask() {
-    if (!state.sessionId || state.finished || !state.questions.length) return;
-
-    const start = Math.max(0, state.currentIndex);
-    const remaining = state.questions.slice(start).map((item) => ({
-      ...item,
-      options: item.options.map((option) => ({ ...option })),
-    }));
-
-    if (!remaining.length) return;
-    if (remaining.length === 1) {
-      state.currentStartedAt = Date.now();
-      persistSnapshot();
-      renderPractice();
-      return;
-    }
-
-    const currentId = remaining[0].id;
-    let shuffledRemaining = shuffle(remaining);
-
-    if (shuffledRemaining[0].id === currentId) {
-      const swapIndex = shuffledRemaining.findIndex((item) => item.id !== currentId);
-      if (swapIndex > 0) {
-        [shuffledRemaining[0], shuffledRemaining[swapIndex]] = [shuffledRemaining[swapIndex], shuffledRemaining[0]];
-      }
-    }
-
-    state.questions.splice(start, shuffledRemaining.length, ...shuffledRemaining);
-    state.currentStartedAt = Date.now();
-    persistSnapshot();
-    renderPractice();
-  }
-
   function hydrateFromSnapshot() {
     const navigationType = getNavigationType();
     const invalidation = safeRead(STORAGE_KEYS.invalidate, null);
     const profile = safeRead(STORAGE_KEYS.profile, null);
     const snapshot = safeRead(STORAGE_KEYS.snapshot, null);
 
-    if (profile) {
+    if ((navigationType === 'reload' || invalidation) && profile) {
+      resetInvalidation();
       dom.studentName.value = profile.name || '';
       dom.studentGroup.value = profile.group || '';
-    }
-
-    if (snapshot) {
-      Object.assign(state, snapshot);
-      if ((navigationType === 'reload' || invalidation) && !state.finished) {
-        rerollCurrentTask();
-        resetInvalidation();
-      }
       return;
     }
 
-    if (invalidation) {
-      resetInvalidation();
+    if (snapshot && !snapshot.finished) {
+      Object.assign(state, snapshot);
+      normalizeSnapshotText();
+      return;
     }
+
+    if (snapshot && snapshot.finished) {
+      Object.assign(state, snapshot);
+      normalizeSnapshotText();
+    }
+  }
+
+  function normalizeSnapshotText() {
+    if (!Array.isArray(state.questions)) return;
+    state.questions = state.questions.map((item) => ({
+      ...item,
+      question: repairMojibake(item.question),
+      options: Array.isArray(item.options)
+        ? item.options.map((option) => ({ ...option, text: repairMojibake(option.text) }))
+        : [],
+    }));
   }
 
   function render() {
@@ -699,7 +712,8 @@
       const invalidation = safeRead(STORAGE_KEYS.invalidate, null);
       if (invalidation && state.sessionId && !state.finished) {
         resetInvalidation();
-        rerollCurrentTask();
+        startNewSet(true);
+        showToast('Set replaced after page leave.');
       }
     }
   }
