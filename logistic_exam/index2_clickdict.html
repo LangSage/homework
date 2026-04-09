@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="google" content="notranslate" />
-  <title>Logistics Vocab Quiz</title>
+  <title>Logistics Vocab Quiz Page 2</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     html, body {
@@ -77,59 +77,570 @@
 
   <script>
     const TASK_BANK = [
-      { id: 1, type: "mcq", prompt: "What is it?", image: "pallet.jpg", options: ["pallet", "dock", "report", "battery"], answer: 0 },
-      { id: 2, type: "mcq", prompt: "What is it?", image: "box.jpg", options: ["box", "scanner", "truck", "label"], answer: 0 },
-      { id: 3, type: "mcq", prompt: "What is it?", image: "carton.jpg", options: ["carton", "shelf", "barcode", "drum"], answer: 0 },
-      { id: 4, type: "mcq", prompt: "What is it?", image: "wrap.jpg", options: ["wrap", "dock", "report", "scanner"], answer: 0 },
-      { id: 5, type: "mcq", prompt: "What is it?", image: "label.jpg", options: ["label", "battery", "truck", "spill kit"], answer: 0 },
-      { id: 6, type: "mcq", prompt: "What is it?", image: "barcode.jpg", options: ["barcode", "shelf", "report", "box"], answer: 0 },
-      { id: 7, type: "mcq", prompt: "What is it?", image: "scanner.jpg", options: ["scanner", "pallet", "drum", "seal"], answer: 0 },
-      { id: 8, type: "mcq", prompt: "Where does the truck stop?", image: "dock.jpg", options: ["dock", "shelf", "quarantine zone", "report"], answer: 0 },
-      { id: 9, type: "mcq", prompt: "What is it?", image: "truck.jpg", options: ["truck", "scanner", "label", "clean"], answer: 0 },
-      { id: 10, type: "mcq", prompt: "Where do boxes stay?", image: "shelf.jpg", options: ["shelf", "dock", "battery", "spill kit"], answer: 0 },
-      { id: 11, type: "mcq", prompt: "Cold goods need a ...", image: "temperature_sticker.jpg", options: ["temperature sticker", "barcode", "battery", "drum"], answer: 0 },
-      { id: 12, type: "mcq", prompt: "Scanner needs a ...", image: "battery.jpg", options: ["battery", "label", "dock", "report"], answer: 0 },
-      { id: 13, type: "mcq", prompt: "What is it?", image: "drum.jpg", options: ["drum", "carton", "shelf", "scanner"], answer: 0 },
-      { id: 14, type: "mcq", prompt: "Use this for a liquid spill.", image: "spill_kit.jpg", options: ["spill kit", "label", "truck", "shelf"], answer: 0 },
-      { id: 15, type: "mcq", prompt: "Bad goods go here.", image: "quarantine_zone.jpg", options: ["quarantine zone", "dock", "pallet", "box"], answer: 0 },
-      { id: 16, type: "mcq", prompt: "Use the scanner to ___ the barcode.", image: "scan_action.jpg", options: ["scan", "store", "seal", "separate"], answer: 0 },
-      { id: 17, type: "mcq", prompt: "Put a new ___ on the box.", image: "label_action.jpg", options: ["label", "battery", "dock", "report"], answer: 0 },
-      { id: 18, type: "mcq", prompt: "Look carefully at the carton. ___ it.", image: "inspect_action.jpg", options: ["inspect", "load", "clean", "wrap"], answer: 0 },
-      { id: 19, type: "mcq", prompt: "The box is open. ___ it.", image: "seal_action.jpg", options: ["seal", "scan", "unload", "separate"], answer: 0 },
-      { id: 20, type: "mcq", prompt: "Two small boxes into one carton. ___ it.", image: "repack_action.jpg", options: ["repack", "stop", "store", "report"], answer: 0 },
-      { id: 21, type: "mcq", prompt: "Put the pallet on the shelf. ___ it there.", image: "store_action.jpg", options: ["store", "scan", "load", "seal"], answer: 0 },
-      { id: 22, type: "mcq", prompt: "Move goods into the truck. ___ it.", image: "load_action.jpg", options: ["load", "clean", "inspect", "stop"], answer: 0 },
-      { id: 23, type: "mcq", prompt: "Move goods out of the truck. ___ it.", image: "unload_action.jpg", options: ["unload", "wrap", "label", "store"], answer: 0 },
-      { id: 24, type: "mcq", prompt: "Bad battery away from good battery. ___ them.", image: "separate_action.jpg", options: ["separate", "seal", "scan", "load"], answer: 0 },
-      { id: 25, type: "mcq", prompt: "Wet and damaged goods go to the ___ .", image: "damaged_goods.jpg", options: ["quarantine zone", "dock", "shelf", "truck"], answer: 0 },
-      { id: 26, type: "mcq", prompt: "There is liquid on the floor. Use the ___ .", image: "spill_floor.jpg", options: ["spill kit", "scanner", "label", "pallet"], answer: 0 },
-      { id: 27, type: "mcq", prompt: "There is liquid on the floor. ___ it.", image: "clean_action.jpg", options: ["clean", "load", "seal", "scan"], answer: 0 },
-      { id: 28, type: "mcq", prompt: "There is a dangerous spill. ___ work.", image: "stop_action.jpg", options: ["stop", "store", "label", "repack"], answer: 0 },
-      { id: 29, type: "mcq", prompt: "After the problem, write a ___.", image: "report_action.jpg", options: ["report", "battery", "dock", "carton"], answer: 0 },
-      { id: 30, type: "mcq", prompt: "Put plastic around the carton. ___ it.", image: "wrap_action.jpg", options: ["wrap", "inspect", "unload", "report"], answer: 0 },
+      {
+            "id": 1,
+            "type": "mcq",
+            "prompt": "What is it?",
+            "image": "order.jpg",
+            "options": [
+                  "order",
+                  "shortage",
+                  "supervisor",
+                  "count"
+            ],
+            "answer": 0
+      },
+      {
+            "id": 2,
+            "type": "mcq",
+            "prompt": "What is it?",
+            "image": "item.jpg",
+            "options": [
+                  "item",
+                  "packing list",
+                  "report",
+                  "pick"
+            ],
+            "answer": 0
+      },
+      {
+            "id": 3,
+            "type": "mcq",
+            "prompt": "What is it?",
+            "image": "quantity.jpg",
+            "options": [
+                  "quantity",
+                  "order",
+                  "supervisor",
+                  "confirm"
+            ],
+            "answer": 0
+      },
+      {
+            "id": 4,
+            "type": "mcq",
+            "prompt": "What is it?",
+            "image": "packing_list.jpg",
+            "options": [
+                  "packing list",
+                  "item",
+                  "shortage",
+                  "check"
+            ],
+            "answer": 0
+      },
+      {
+            "id": 5,
+            "type": "mcq",
+            "prompt": "What is it?",
+            "image": "shortage.jpg",
+            "options": [
+                  "shortage",
+                  "quantity",
+                  "order",
+                  "compare"
+            ],
+            "answer": 0
+      },
+      {
+            "id": 6,
+            "type": "mcq",
+            "prompt": "Who is this?",
+            "image": "supervisor.jpg",
+            "options": [
+                  "supervisor",
+                  "item",
+                  "report",
+                  "pick"
+            ],
+            "answer": 0
+      },
+      {
+            "id": 7,
+            "type": "mcq",
+            "prompt": "Take the right item from the shelf. ___ it.",
+            "image": "pick_action.jpg",
+            "options": [
+                  "pick",
+                  "count",
+                  "report",
+                  "confirm"
+            ],
+            "answer": 0
+      },
+      {
+            "id": 8,
+            "type": "mcq",
+            "prompt": "1, 2, 3, 4. ___ the items.",
+            "image": "count_action.jpg",
+            "options": [
+                  "count",
+                  "compare",
+                  "pick",
+                  "check"
+            ],
+            "answer": 0
+      },
+      {
+            "id": 9,
+            "type": "mcq",
+            "prompt": "Look at the box carefully. ___ it.",
+            "image": "check_action.jpg",
+            "options": [
+                  "check",
+                  "report",
+                  "count",
+                  "pick"
+            ],
+            "answer": 0
+      },
+      {
+            "id": 10,
+            "type": "mcq",
+            "prompt": "Look at two lists. ___ them.",
+            "image": "compare_action.jpg",
+            "options": [
+                  "compare",
+                  "confirm",
+                  "pick",
+                  "shortage"
+            ],
+            "answer": 0
+      },
+      {
+            "id": 11,
+            "type": "mcq",
+            "prompt": "Tell the problem to your boss. ___ it.",
+            "image": "report_action.jpg",
+            "options": [
+                  "report",
+                  "count",
+                  "order",
+                  "item"
+            ],
+            "answer": 0
+      },
+      {
+            "id": 12,
+            "type": "mcq",
+            "prompt": "Yes, it is correct. ___ it.",
+            "image": "confirm_action.jpg",
+            "options": [
+                  "confirm",
+                  "pick",
+                  "shortage",
+                  "packing list"
+            ],
+            "answer": 0
+      },
+      {
+            "id": 13,
+            "type": "mcq",
+            "prompt": "A customer sends an ___.",
+            "image": "order_scene.jpg",
+            "options": [
+                  "order",
+                  "supervisor",
+                  "quantity",
+                  "check"
+            ],
+            "answer": 0
+      },
+      {
+            "id": 14,
+            "type": "mcq",
+            "prompt": "One box is one ___.",
+            "image": "single_item_scene.jpg",
+            "options": [
+                  "item",
+                  "shortage",
+                  "packing list",
+                  "report"
+            ],
+            "answer": 0
+      },
+      {
+            "id": 15,
+            "type": "mcq",
+            "prompt": "The number of pieces is the ___.",
+            "image": "quantity_scene.jpg",
+            "options": [
+                  "quantity",
+                  "order",
+                  "supervisor",
+                  "pick"
+            ],
+            "answer": 0
+      },
+      {
+            "id": 16,
+            "type": "mcq",
+            "prompt": "This paper shows all items in the box.",
+            "image": "packing_list_scene.jpg",
+            "options": [
+                  "packing list",
+                  "shortage",
+                  "order",
+                  "confirm"
+            ],
+            "answer": 0
+      },
+      {
+            "id": 17,
+            "type": "mcq",
+            "prompt": "Two items are missing. It is a ___.",
+            "image": "missing_items_scene.jpg",
+            "options": [
+                  "shortage",
+                  "quantity",
+                  "check",
+                  "report"
+            ],
+            "answer": 0
+      },
+      {
+            "id": 18,
+            "type": "mcq",
+            "prompt": "The worker tells the ___ about the problem.",
+            "image": "supervisor_scene.jpg",
+            "options": [
+                  "supervisor",
+                  "item",
+                  "order",
+                  "count"
+            ],
+            "answer": 0
+      },
+      {
+            "id": 19,
+            "type": "mcq",
+            "prompt": "Take item 4 from the shelf. ___ item 4.",
+            "image": "pick_shelf_scene.jpg",
+            "options": [
+                  "pick",
+                  "compare",
+                  "confirm",
+                  "shortage"
+            ],
+            "answer": 0
+      },
+      {
+            "id": 20,
+            "type": "mcq",
+            "prompt": "How many boxes are here? ___ them.",
+            "image": "count_boxes_scene.jpg",
+            "options": [
+                  "count",
+                  "pick",
+                  "report",
+                  "order"
+            ],
+            "answer": 0
+      },
+      {
+            "id": 21,
+            "type": "mcq",
+            "prompt": "Look at the label and the list. ___ them.",
+            "image": "check_label_scene.jpg",
+            "options": [
+                  "check",
+                  "confirm",
+                  "pick",
+                  "item"
+            ],
+            "answer": 0
+      },
+      {
+            "id": 22,
+            "type": "mcq",
+            "prompt": "Look at the box and the packing list. ___ them.",
+            "image": "compare_list_box_scene.jpg",
+            "options": [
+                  "compare",
+                  "count",
+                  "order",
+                  "supervisor"
+            ],
+            "answer": 0
+      },
+      {
+            "id": 23,
+            "type": "mcq",
+            "prompt": "There is a shortage. ___ it now.",
+            "image": "report_shortage_scene.jpg",
+            "options": [
+                  "report",
+                  "pick",
+                  "confirm",
+                  "quantity"
+            ],
+            "answer": 0
+      },
+      {
+            "id": 24,
+            "type": "mcq",
+            "prompt": "The quantity is correct. ___ it.",
+            "image": "confirm_quantity_scene.jpg",
+            "options": [
+                  "confirm",
+                  "check",
+                  "item",
+                  "shortage"
+            ],
+            "answer": 0
+      },
+      {
+            "id": 25,
+            "type": "mcq",
+            "prompt": "The worker reads the ___ before packing.",
+            "image": "reading_packing_list_scene.jpg",
+            "options": [
+                  "packing list",
+                  "supervisor",
+                  "order",
+                  "pick"
+            ],
+            "answer": 0
+      },
+      {
+            "id": 26,
+            "type": "mcq",
+            "prompt": "The customer wants 10 pieces. That is the ___.",
+            "image": "quantity_request_scene.jpg",
+            "options": [
+                  "quantity",
+                  "shortage",
+                  "item",
+                  "report"
+            ],
+            "answer": 0
+      },
+      {
+            "id": 27,
+            "type": "mcq",
+            "prompt": "There are 8 pieces, not 10. That is a ___.",
+            "image": "shortage_count_scene.jpg",
+            "options": [
+                  "shortage",
+                  "packing list",
+                  "compare",
+                  "confirm"
+            ],
+            "answer": 0
+      },
+      {
+            "id": 28,
+            "type": "mcq",
+            "prompt": "The boss in the warehouse is the ___.",
+            "image": "warehouse_supervisor_scene.jpg",
+            "options": [
+                  "supervisor",
+                  "item",
+                  "order",
+                  "count"
+            ],
+            "answer": 0
+      },
+      {
+            "id": 29,
+            "type": "mcq",
+            "prompt": "First ___ the items, then write the number.",
+            "image": "count_table_scene.jpg",
+            "options": [
+                  "count",
+                  "pick",
+                  "confirm",
+                  "shortage"
+            ],
+            "answer": 0
+      },
+      {
+            "id": 30,
+            "type": "mcq",
+            "prompt": "Read the order and ___ the right items.",
+            "image": "pick_order_scene.jpg",
+            "options": [
+                  "pick",
+                  "report",
+                  "compare",
+                  "supervisor"
+            ],
+            "answer": 0
+      },
+      {
+            "id": 31,
+            "type": "true_false",
+            "prompt": "An order tells what the customer wants.",
+            "image": "warehouse_order_scene_1.jpg",
+            "statement": true
+      },
+      {
+            "id": 32,
+            "type": "true_false",
+            "prompt": "A shortage means there are extra items.",
+            "image": "warehouse_order_scene_2.jpg",
+            "statement": false
+      },
+      {
+            "id": 33,
+            "type": "true_false",
+            "prompt": "A packing list can show items and quantity.",
+            "image": "packing_table_scene.jpg",
+            "statement": true
+      },
+      {
+            "id": 34,
+            "type": "true_false",
+            "prompt": "A supervisor is a kind of box.",
+            "image": "supervisor_desk_scene.jpg",
+            "statement": false
+      },
+      {
+            "id": 35,
+            "type": "true_false",
+            "prompt": "To pick means to take the needed item.",
+            "image": "order_picking_scene.jpg",
+            "statement": true
+      },
+      {
+            "id": 36,
+            "type": "true_false",
+            "prompt": "To count means to sleep in the warehouse.",
+            "image": "count_items_scene.jpg",
+            "statement": false
+      },
+      {
+            "id": 37,
+            "type": "true_false",
+            "prompt": "To compare means to look at two things and check them together.",
+            "image": "compare_boxes_scene.jpg",
+            "statement": true
+      },
+      {
+            "id": 38,
+            "type": "true_false",
+            "prompt": "To confirm means to say it is wrong.",
+            "image": "confirm_screen_scene.jpg",
+            "statement": false
+      },
+      {
+            "id": 39,
+            "type": "multi2",
+            "prompt": "Choose 2 noun words.",
+            "image": "warehouse_scene_1.jpg",
+            "options": [
+                  "order",
+                  "item",
+                  "pick",
+                  "check"
+            ],
+            "answers": [
+                  0,
+                  1
+            ]
+      },
+      {
+            "id": 40,
+            "type": "multi2",
+            "prompt": "Choose 2 action words.",
+            "image": "warehouse_scene_2.jpg",
+            "options": [
+                  "count",
+                  "report",
+                  "shortage",
+                  "quantity"
+            ],
+            "answers": [
+                  0,
+                  1
+            ]
+      },
+      {
+            "id": 41,
+            "type": "multi2",
+            "prompt": "Choose 2 words for papers or numbers.",
+            "image": "warehouse_scene_3.jpg",
+            "options": [
+                  "quantity",
+                  "packing list",
+                  "pick",
+                  "supervisor"
+            ],
+            "answers": [
+                  0,
+                  1
+            ]
+      },
+      {
+            "id": 42,
+            "type": "multi2",
+            "prompt": "Choose 2 words for checking work.",
+            "image": "check_compare_scene.jpg",
+            "options": [
+                  "check",
+                  "compare",
+                  "item",
+                  "order"
+            ],
+            "answers": [
+                  0,
+                  1
+            ]
+      },
+      {
+            "id": 43,
+            "type": "multi2",
+            "prompt": "Choose 2 words for problem and boss.",
+            "image": "shortage_supervisor_scene.jpg",
+            "options": [
+                  "shortage",
+                  "supervisor",
+                  "pick",
+                  "confirm"
+            ],
+            "answers": [
+                  0,
+                  1
+            ]
+      },
+      {
+            "id": 44,
+            "type": "multi2",
+            "prompt": "Choose 2 words for finishing the check.",
+            "image": "report_confirm_scene.jpg",
+            "options": [
+                  "report",
+                  "confirm",
+                  "item",
+                  "quantity"
+            ],
+            "answers": [
+                  0,
+                  1
+            ]
+      },
+      {
+            "id": 45,
+            "type": "multi2",
+            "prompt": "Choose 2 words used when taking and counting items.",
+            "image": "pick_count_scene.jpg",
+            "options": [
+                  "pick",
+                  "count",
+                  "packing list",
+                  "shortage"
+            ],
+            "answers": [
+                  0,
+                  1
+            ]
+      }
+];
 
-      { id: 31, type: "true_false", prompt: "A pallet can hold boxes.", image: "warehouse_scene_1.jpg", statement: true },
-      { id: 32, type: "true_false", prompt: "A barcode is used for sleeping.", image: "warehouse_scene_2.jpg", statement: false },
-      { id: 33, type: "true_false", prompt: "A scanner can read a barcode.", image: "scanner_barcode_scene.jpg", statement: true },
-      { id: 34, type: "true_false", prompt: "A dock is a place inside a pencil case.", image: "dock_scene.jpg", statement: false },
-      { id: 35, type: "true_false", prompt: "A spill kit helps with a liquid spill.", image: "spill_scene.jpg", statement: true },
-      { id: 36, type: "true_false", prompt: "A quarantine zone is for good goods ready to go.", image: "quarantine_scene.jpg", statement: false },
-      { id: 37, type: "true_false", prompt: "To load means to move goods into a truck.", image: "loading_scene.jpg", statement: true },
-      { id: 38, type: "true_false", prompt: "To unload means to put plastic around a box.", image: "unloading_scene.jpg", statement: false },
-
-      { id: 39, type: "multi2", prompt: "Choose 2 things you can see in logistics.", image: "warehouse_scene_3.jpg", options: ["pallet", "scanner", "banana", "sofa"], answers: [0, 1] },
-      { id: 40, type: "multi2", prompt: "Choose 2 action words.", image: "warehouse_scene_4.jpg", options: ["scan", "label", "shelf", "truck"], answers: [0, 1] },
-      { id: 41, type: "multi2", prompt: "Choose 2 places for warehouse goods.", image: "warehouse_scene_5.jpg", options: ["shelf", "dock", "cloud", "window"], answers: [0, 1] },
-      { id: 42, type: "multi2", prompt: "Choose 2 things used for checking goods.", image: "inspection_scene.jpg", options: ["scanner", "label", "pillow", "drum"], answers: [0, 1] },
-      { id: 43, type: "multi2", prompt: "Choose 2 words for problem goods.", image: "damaged_goods_scene.jpg", options: ["spill kit", "quarantine zone", "flower", "biscuit"], answers: [0, 1] },
-      { id: 44, type: "multi2", prompt: "Choose 2 loading words.", image: "truck_loading_scene.jpg", options: ["load", "unload", "sing", "jump"], answers: [0, 1] },
-      { id: 45, type: "multi2", prompt: "Choose 2 things for box work.", image: "packing_station_scene.jpg", options: ["wrap", "seal", "river", "lamp"], answers: [0, 1] }
-    ];
-
-    const PAGE_ID = 1;
-    const STORAGE_KEY = "logistics_vocab_quiz_v6";
-    const COOKIE_KEY = "lgzq6";
-    const IMG_BASE = "images/logistics/";
+    const PAGE_ID = 2;
+    const STORAGE_KEY = "logistics_vocab_quiz_page2_v1";
+    const COOKIE_KEY = "lgzq_page2_v1";
+    const IMG_BASE = "images/logistics_page2/";
     const FORM_ACTION = "https://docs.google.com/forms/d/e/1FAIpQLSfhgAxbZiFv1vwfYGZR-kwwVplw7oPaavMKb_B_K4w4yJBiVA/formResponse";
     const ENTRY_NAME = "entry.1921741824";
     const ENTRY_GROUP = "entry.1886481554";
@@ -880,7 +1391,7 @@
 
     function buildPresentedList(mode) {
       const ids = shuffle(TASK_BANK.map(t => t.id));
-      const count = mode === "5" ? FULL_MODE_COUNT : 15;
+      const count = FULL_MODE_COUNT;
       return ids.slice(0, count).map(id => makePresentedTask(getTaskById(id)));
     }
 
@@ -922,7 +1433,7 @@
       const studentGroup = profile.group;
 
       state = {
-        version: 6,
+        version: 1,
         pageId: PAGE_ID,
         mode,
         active: true,
@@ -1137,9 +1648,9 @@
           <div class="w-full max-w-2xl rounded-3xl border border-slate-800 bg-slate-900/70 backdrop-blur shadow-2xl p-5 sm:p-8">
             <div class="flex items-start justify-between gap-3">
               <div>
-                <div class="inline-flex items-center gap-2 rounded-full border border-sky-500/30 bg-sky-500/10 px-3 py-1 text-xs sm:text-sm text-sky-300">Logistics Words</div>
-                <h1 class="mt-4 text-2xl sm:text-4xl font-bold tracking-tight">Topic 1</h1>
-                <div class="mt-2 text-sm sm:text-base text-slate-400">Cold storage and warehouse basics</div>
+                <div class="inline-flex items-center gap-2 rounded-full border border-sky-500/30 bg-sky-500/10 px-3 py-1 text-xs sm:text-sm text-sky-300">Warehouse Words</div>
+                <h1 class="mt-4 text-2xl sm:text-4xl font-bold tracking-tight">Topic 2</h1>
+                <div class="mt-2 text-sm sm:text-base text-slate-400">Orders, packing list and shortage</div>
               </div>
               <button id="menuBtnStart" class="rounded-2xl border border-slate-700 px-4 py-2 text-sm text-slate-200 hover:bg-slate-800 transition">Main menu</button>
             </div>
@@ -1155,15 +1666,9 @@
               </div>
             </div>
 
-            <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <button id="mode4Btn" class="rounded-3xl border border-emerald-500/30 bg-emerald-500/10 p-6 text-left hover:bg-emerald-500/20 transition">
-                <div class="text-sm text-emerald-300">4</div>
-                <div class="mt-2 text-3xl font-bold">15</div>
-                <div class="mt-1 text-sm text-slate-300">questions</div>
-              </button>
-
-              <button id="mode5Btn" class="rounded-3xl border border-violet-500/30 bg-violet-500/10 p-6 text-left hover:bg-violet-500/20 transition">
-                <div class="text-sm text-violet-300">5</div>
+            <div class="mt-6">
+              <button id="mode5Btn" class="w-full rounded-3xl border border-violet-500/30 bg-violet-500/10 p-6 text-left hover:bg-violet-500/20 transition">
+                <div class="text-sm text-violet-300">Full mode</div>
                 <div class="mt-2 text-3xl font-bold">${FULL_MODE_COUNT}</div>
                 <div class="mt-1 text-sm text-slate-300">questions</div>
               </button>
@@ -1188,7 +1693,6 @@
       `;
 
       document.getElementById("menuBtnStart").addEventListener("click", goToMenu);
-      document.getElementById("mode4Btn").addEventListener("click", () => startQuiz("4"));
       document.getElementById("mode5Btn").addEventListener("click", () => startQuiz("5"));
 
       const resumeBtn = document.getElementById("resumeBtn");

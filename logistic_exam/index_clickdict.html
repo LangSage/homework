@@ -1,11 +1,10 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="google" content="notranslate" />
-  <title>Logistics Vocab Quiz Page 3</title>
+  <title>Logistics Vocab Quiz</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     html, body {
@@ -78,570 +77,59 @@
 
   <script>
     const TASK_BANK = [
-  {
-    "id": 1,
-    "type": "mcq",
-    "prompt": "What is it?",
-    "image": "return.jpg",
-    "options": [
-      "return",
-      "claim",
-      "refund",
-      "package"
-    ],
-    "answer": 0
-  },
-  {
-    "id": 2,
-    "type": "mcq",
-    "prompt": "What is it?",
-    "image": "claim.jpg",
-    "options": [
-      "claim",
-      "customer",
-      "warehouse",
-      "check"
-    ],
-    "answer": 0
-  },
-  {
-    "id": 3,
-    "type": "mcq",
-    "prompt": "Who is this?",
-    "image": "customer.jpg",
-    "options": [
-      "customer",
-      "supervisor",
-      "receipt",
-      "refund"
-    ],
-    "answer": 0
-  },
-  {
-    "id": 4,
-    "type": "mcq",
-    "prompt": "What is it?",
-    "image": "receipt.jpg",
-    "options": [
-      "receipt",
-      "reason",
-      "package",
-      "replace"
-    ],
-    "answer": 0
-  },
-  {
-    "id": 5,
-    "type": "mcq",
-    "prompt": "Why does the customer return it? This is the ___.",
-    "image": "reason.jpg",
-    "options": [
-      "reason",
-      "claim",
-      "warehouse",
-      "pack"
-    ],
-    "answer": 0
-  },
-  {
-    "id": 6,
-    "type": "mcq",
-    "prompt": "What is it?",
-    "image": "package.jpg",
-    "options": [
-      "package",
-      "receipt",
-      "customer",
-      "confirm"
-    ],
-    "answer": 0
-  },
-  {
-    "id": 7,
-    "type": "mcq",
-    "prompt": "Money back is a ___.",
-    "image": "refund.jpg",
-    "options": [
-      "refund",
-      "replacement",
-      "return",
-      "report"
-    ],
-    "answer": 0
-  },
-  {
-    "id": 8,
-    "type": "mcq",
-    "prompt": "A new item instead of the old one is a ___.",
-    "image": "replacement.jpg",
-    "options": [
-      "replacement",
-      "claim",
-      "reason",
-      "open"
-    ],
-    "answer": 0
-  },
-  {
-    "id": 9,
-    "type": "mcq",
-    "prompt": "What is it?",
-    "image": "warehouse.jpg",
-    "options": [
-      "warehouse",
-      "package",
-      "receipt",
-      "accept"
-    ],
-    "answer": 0
-  },
-  {
-    "id": 10,
-    "type": "mcq",
-    "prompt": "Who is this?",
-    "image": "supervisor.jpg",
-    "options": [
-      "supervisor",
-      "customer",
-      "refund",
-      "replace"
-    ],
-    "answer": 0
-  },
-  {
-    "id": 11,
-    "type": "mcq",
-    "prompt": "The customer wants to send it back. ___ it.",
-    "image": "return_action.jpg",
-    "options": [
-      "return",
-      "accept",
-      "check",
-      "open"
-    ],
-    "answer": 0
-  },
-  {
-    "id": 12,
-    "type": "mcq",
-    "prompt": "Look at the item carefully. ___ it.",
-    "image": "check_action.jpg",
-    "options": [
-      "check",
-      "report",
-      "pack",
-      "replace"
-    ],
-    "answer": 0
-  },
-  {
-    "id": 13,
-    "type": "mcq",
-    "prompt": "First ___ the package.",
-    "image": "open_action.jpg",
-    "options": [
-      "open",
-      "confirm",
-      "refuse",
-      "warehouse"
-    ],
-    "answer": 0
-  },
-  {
-    "id": 14,
-    "type": "mcq",
-    "prompt": "Look at the item and the receipt. ___ them.",
-    "image": "compare_action.jpg",
-    "options": [
-      "compare",
-      "return",
-      "accept",
-      "reason"
-    ],
-    "answer": 0
-  },
-  {
-    "id": 15,
-    "type": "mcq",
-    "prompt": "Yes, the claim is correct. ___ it.",
-    "image": "confirm_action.jpg",
-    "options": [
-      "confirm",
-      "replace",
-      "report",
-      "pack"
-    ],
-    "answer": 0
-  },
-  {
-    "id": 16,
-    "type": "mcq",
-    "prompt": "Tell the supervisor about the problem. ___ it.",
-    "image": "report_action.jpg",
-    "options": [
-      "report",
-      "open",
-      "customer",
-      "refund"
-    ],
-    "answer": 0
-  },
-  {
-    "id": 17,
-    "type": "mcq",
-    "prompt": "The warehouse says yes. ___ the return.",
-    "image": "accept_action.jpg",
-    "options": [
-      "accept",
-      "refuse",
-      "replace",
-      "check"
-    ],
-    "answer": 0
-  },
-  {
-    "id": 18,
-    "type": "mcq",
-    "prompt": "The item is not from this shop. ___ the claim.",
-    "image": "refuse_action.jpg",
-    "options": [
-      "refuse",
-      "confirm",
-      "pack",
-      "return"
-    ],
-    "answer": 0
-  },
-  {
-    "id": 19,
-    "type": "mcq",
-    "prompt": "Give the customer a new item. ___ it.",
-    "image": "replace_action.jpg",
-    "options": [
-      "replace",
-      "open",
-      "report",
-      "receipt"
-    ],
-    "answer": 0
-  },
-  {
-    "id": 20,
-    "type": "mcq",
-    "prompt": "Put the item in a box. ___ it.",
-    "image": "pack_action.jpg",
-    "options": [
-      "pack",
-      "compare",
-      "accept",
-      "reason"
-    ],
-    "answer": 0
-  },
-  {
-    "id": 21,
-    "type": "mcq",
-    "prompt": "The customer brings a ___ to the desk.",
-    "image": "customer_package_scene.jpg",
-    "options": [
-      "package",
-      "refund",
-      "supervisor",
-      "open"
-    ],
-    "answer": 0
-  },
-  {
-    "id": 22,
-    "type": "mcq",
-    "prompt": "This paper shows the purchase. It is a ___.",
-    "image": "customer_receipt_scene.jpg",
-    "options": [
-      "receipt",
-      "claim",
-      "warehouse",
-      "check"
-    ],
-    "answer": 0
-  },
-  {
-    "id": 23,
-    "type": "mcq",
-    "prompt": "The broken item is the ___ for the claim.",
-    "image": "claim_reason_scene.jpg",
-    "options": [
-      "reason",
-      "replacement",
-      "return",
-      "pack"
-    ],
-    "answer": 0
-  },
-  {
-    "id": 24,
-    "type": "mcq",
-    "prompt": "The worker reads the ___ before decision.",
-    "image": "claim_form_scene.jpg",
-    "options": [
-      "claim",
-      "receipt",
-      "warehouse",
-      "confirm"
-    ],
-    "answer": 0
-  },
-  {
-    "id": 25,
-    "type": "mcq",
-    "prompt": "The money goes back to the customer. This is a ___.",
-    "image": "refund_scene.jpg",
-    "options": [
-      "refund",
-      "package",
-      "customer",
-      "report"
-    ],
-    "answer": 0
-  },
-  {
-    "id": 26,
-    "type": "mcq",
-    "prompt": "A new box is ready for the customer. It is a ___.",
-    "image": "replacement_scene.jpg",
-    "options": [
-      "replacement",
-      "reason",
-      "claim",
-      "open"
-    ],
-    "answer": 0
-  },
-  {
-    "id": 27,
-    "type": "mcq",
-    "prompt": "Returned goods go to the ___.",
-    "image": "returns_warehouse_scene.jpg",
-    "options": [
-      "warehouse",
-      "receipt",
-      "refund",
-      "replace"
-    ],
-    "answer": 0
-  },
-  {
-    "id": 28,
-    "type": "mcq",
-    "prompt": "The worker asks the ___ for help.",
-    "image": "supervisor_help_scene.jpg",
-    "options": [
-      "supervisor",
-      "package",
-      "customer",
-      "confirm"
-    ],
-    "answer": 0
-  },
-  {
-    "id": 29,
-    "type": "mcq",
-    "prompt": "First ___ the box, then look inside.",
-    "image": "open_box_scene.jpg",
-    "options": [
-      "open",
-      "accept",
-      "return",
-      "warehouse"
-    ],
-    "answer": 0
-  },
-  {
-    "id": 30,
-    "type": "mcq",
-    "prompt": "After the check, ___ the item for shipping.",
-    "image": "pack_shipping_scene.jpg",
-    "options": [
-      "pack",
-      "report",
-      "compare",
-      "refuse"
-    ],
-    "answer": 0
-  },
-  {
-    "id": 31,
-    "type": "true_false",
-    "prompt": "A receipt shows that a customer bought something.",
-    "image": "receipt_tf_scene.jpg",
-    "statement": true
-  },
-  {
-    "id": 32,
-    "type": "true_false",
-    "prompt": "A refund means the customer gets a new warehouse.",
-    "image": "refund_tf_scene.jpg",
-    "statement": false
-  },
-  {
-    "id": 33,
-    "type": "true_false",
-    "prompt": "A replacement is a new item instead of the old one.",
-    "image": "replacement_tf_scene.jpg",
-    "statement": true
-  },
-  {
-    "id": 34,
-    "type": "true_false",
-    "prompt": "A warehouse is a kind of customer.",
-    "image": "warehouse_tf_scene.jpg",
-    "statement": false
-  },
-  {
-    "id": 35,
-    "type": "true_false",
-    "prompt": "To compare means to look at two things together.",
-    "image": "compare_tf_scene.jpg",
-    "statement": true
-  },
-  {
-    "id": 36,
-    "type": "true_false",
-    "prompt": "To refuse means to say yes.",
-    "image": "refuse_tf_scene.jpg",
-    "statement": false
-  },
-  {
-    "id": 37,
-    "type": "true_false",
-    "prompt": "To accept a return means the shop says yes to it.",
-    "image": "accept_tf_scene.jpg",
-    "statement": true
-  },
-  {
-    "id": 38,
-    "type": "true_false",
-    "prompt": "To pack means to leave the box open.",
-    "image": "pack_tf_scene.jpg",
-    "statement": false
-  },
-  {
-    "id": 39,
-    "type": "multi2",
-    "prompt": "Choose 2 words for people.",
-    "image": "people_scene.jpg",
-    "options": [
-      "customer",
-      "supervisor",
-      "refund",
-      "receipt"
-    ],
-    "answers": [
-      0,
-      1
-    ]
-  },
-  {
-    "id": 40,
-    "type": "multi2",
-    "prompt": "Choose 2 words for papers or cases.",
-    "image": "desk_papers_scene.jpg",
-    "options": [
-      "claim",
-      "receipt",
-      "warehouse",
-      "replace"
-    ],
-    "answers": [
-      0,
-      1
-    ]
-  },
-  {
-    "id": 41,
-    "type": "multi2",
-    "prompt": "Choose 2 words for return results.",
-    "image": "return_results_scene.jpg",
-    "options": [
-      "refund",
-      "replacement",
-      "reason",
-      "customer"
-    ],
-    "answers": [
-      0,
-      1
-    ]
-  },
-  {
-    "id": 42,
-    "type": "multi2",
-    "prompt": "Choose 2 action words for checking.",
-    "image": "check_compare_scene.jpg",
-    "options": [
-      "check",
-      "compare",
-      "warehouse",
-      "package"
-    ],
-    "answers": [
-      0,
-      1
-    ]
-  },
-  {
-    "id": 43,
-    "type": "multi2",
-    "prompt": "Choose 2 action words for decision.",
-    "image": "decision_scene.jpg",
-    "options": [
-      "accept",
-      "refuse",
-      "receipt",
-      "claim"
-    ],
-    "answers": [
-      0,
-      1
-    ]
-  },
-  {
-    "id": 44,
-    "type": "multi2",
-    "prompt": "Choose 2 action words for problem work.",
-    "image": "problem_work_scene.jpg",
-    "options": [
-      "report",
-      "confirm",
-      "customer",
-      "reason"
-    ],
-    "answers": [
-      0,
-      1
-    ]
-  },
-  {
-    "id": 45,
-    "type": "multi2",
-    "prompt": "Choose 2 words for box work.",
-    "image": "box_work_scene.jpg",
-    "options": [
-      "open",
-      "pack",
-      "refund",
-      "supervisor"
-    ],
-    "answers": [
-      0,
-      1
-    ]
-  }
-];
+      { id: 1, type: "mcq", prompt: "What is it?", image: "pallet.jpg", options: ["pallet", "dock", "report", "battery"], answer: 0 },
+      { id: 2, type: "mcq", prompt: "What is it?", image: "box.jpg", options: ["box", "scanner", "truck", "label"], answer: 0 },
+      { id: 3, type: "mcq", prompt: "What is it?", image: "carton.jpg", options: ["carton", "shelf", "barcode", "drum"], answer: 0 },
+      { id: 4, type: "mcq", prompt: "What is it?", image: "wrap.jpg", options: ["wrap", "dock", "report", "scanner"], answer: 0 },
+      { id: 5, type: "mcq", prompt: "What is it?", image: "label.jpg", options: ["label", "battery", "truck", "spill kit"], answer: 0 },
+      { id: 6, type: "mcq", prompt: "What is it?", image: "barcode.jpg", options: ["barcode", "shelf", "report", "box"], answer: 0 },
+      { id: 7, type: "mcq", prompt: "What is it?", image: "scanner.jpg", options: ["scanner", "pallet", "drum", "seal"], answer: 0 },
+      { id: 8, type: "mcq", prompt: "Where does the truck stop?", image: "dock.jpg", options: ["dock", "shelf", "quarantine zone", "report"], answer: 0 },
+      { id: 9, type: "mcq", prompt: "What is it?", image: "truck.jpg", options: ["truck", "scanner", "label", "clean"], answer: 0 },
+      { id: 10, type: "mcq", prompt: "Where do boxes stay?", image: "shelf.jpg", options: ["shelf", "dock", "battery", "spill kit"], answer: 0 },
+      { id: 11, type: "mcq", prompt: "Cold goods need a ...", image: "temperature_sticker.jpg", options: ["temperature sticker", "barcode", "battery", "drum"], answer: 0 },
+      { id: 12, type: "mcq", prompt: "Scanner needs a ...", image: "battery.jpg", options: ["battery", "label", "dock", "report"], answer: 0 },
+      { id: 13, type: "mcq", prompt: "What is it?", image: "drum.jpg", options: ["drum", "carton", "shelf", "scanner"], answer: 0 },
+      { id: 14, type: "mcq", prompt: "Use this for a liquid spill.", image: "spill_kit.jpg", options: ["spill kit", "label", "truck", "shelf"], answer: 0 },
+      { id: 15, type: "mcq", prompt: "Bad goods go here.", image: "quarantine_zone.jpg", options: ["quarantine zone", "dock", "pallet", "box"], answer: 0 },
+      { id: 16, type: "mcq", prompt: "Use the scanner to ___ the barcode.", image: "scan_action.jpg", options: ["scan", "store", "seal", "separate"], answer: 0 },
+      { id: 17, type: "mcq", prompt: "Put a new ___ on the box.", image: "label_action.jpg", options: ["label", "battery", "dock", "report"], answer: 0 },
+      { id: 18, type: "mcq", prompt: "Look carefully at the carton. ___ it.", image: "inspect_action.jpg", options: ["inspect", "load", "clean", "wrap"], answer: 0 },
+      { id: 19, type: "mcq", prompt: "The box is open. ___ it.", image: "seal_action.jpg", options: ["seal", "scan", "unload", "separate"], answer: 0 },
+      { id: 20, type: "mcq", prompt: "Two small boxes into one carton. ___ it.", image: "repack_action.jpg", options: ["repack", "stop", "store", "report"], answer: 0 },
+      { id: 21, type: "mcq", prompt: "Put the pallet on the shelf. ___ it there.", image: "store_action.jpg", options: ["store", "scan", "load", "seal"], answer: 0 },
+      { id: 22, type: "mcq", prompt: "Move goods into the truck. ___ it.", image: "load_action.jpg", options: ["load", "clean", "inspect", "stop"], answer: 0 },
+      { id: 23, type: "mcq", prompt: "Move goods out of the truck. ___ it.", image: "unload_action.jpg", options: ["unload", "wrap", "label", "store"], answer: 0 },
+      { id: 24, type: "mcq", prompt: "Bad battery away from good battery. ___ them.", image: "separate_action.jpg", options: ["separate", "seal", "scan", "load"], answer: 0 },
+      { id: 25, type: "mcq", prompt: "Wet and damaged goods go to the ___ .", image: "damaged_goods.jpg", options: ["quarantine zone", "dock", "shelf", "truck"], answer: 0 },
+      { id: 26, type: "mcq", prompt: "There is liquid on the floor. Use the ___ .", image: "spill_floor.jpg", options: ["spill kit", "scanner", "label", "pallet"], answer: 0 },
+      { id: 27, type: "mcq", prompt: "There is liquid on the floor. ___ it.", image: "clean_action.jpg", options: ["clean", "load", "seal", "scan"], answer: 0 },
+      { id: 28, type: "mcq", prompt: "There is a dangerous spill. ___ work.", image: "stop_action.jpg", options: ["stop", "store", "label", "repack"], answer: 0 },
+      { id: 29, type: "mcq", prompt: "After the problem, write a ___.", image: "report_action.jpg", options: ["report", "battery", "dock", "carton"], answer: 0 },
+      { id: 30, type: "mcq", prompt: "Put plastic around the carton. ___ it.", image: "wrap_action.jpg", options: ["wrap", "inspect", "unload", "report"], answer: 0 },
 
-    const PAGE_ID = 3;
-    const STORAGE_KEY = "logistics_vocab_quiz_page3_v1";
-    const COOKIE_KEY = "lgzq_page3_v1";
-    const IMG_BASE = "images/logistics_page3/";
+      { id: 31, type: "true_false", prompt: "A pallet can hold boxes.", image: "warehouse_scene_1.jpg", statement: true },
+      { id: 32, type: "true_false", prompt: "A barcode is used for sleeping.", image: "warehouse_scene_2.jpg", statement: false },
+      { id: 33, type: "true_false", prompt: "A scanner can read a barcode.", image: "scanner_barcode_scene.jpg", statement: true },
+      { id: 34, type: "true_false", prompt: "A dock is a place inside a pencil case.", image: "dock_scene.jpg", statement: false },
+      { id: 35, type: "true_false", prompt: "A spill kit helps with a liquid spill.", image: "spill_scene.jpg", statement: true },
+      { id: 36, type: "true_false", prompt: "A quarantine zone is for good goods ready to go.", image: "quarantine_scene.jpg", statement: false },
+      { id: 37, type: "true_false", prompt: "To load means to move goods into a truck.", image: "loading_scene.jpg", statement: true },
+      { id: 38, type: "true_false", prompt: "To unload means to put plastic around a box.", image: "unloading_scene.jpg", statement: false },
+
+      { id: 39, type: "multi2", prompt: "Choose 2 things you can see in logistics.", image: "warehouse_scene_3.jpg", options: ["pallet", "scanner", "banana", "sofa"], answers: [0, 1] },
+      { id: 40, type: "multi2", prompt: "Choose 2 action words.", image: "warehouse_scene_4.jpg", options: ["scan", "label", "shelf", "truck"], answers: [0, 1] },
+      { id: 41, type: "multi2", prompt: "Choose 2 places for warehouse goods.", image: "warehouse_scene_5.jpg", options: ["shelf", "dock", "cloud", "window"], answers: [0, 1] },
+      { id: 42, type: "multi2", prompt: "Choose 2 things used for checking goods.", image: "inspection_scene.jpg", options: ["scanner", "label", "pillow", "drum"], answers: [0, 1] },
+      { id: 43, type: "multi2", prompt: "Choose 2 words for problem goods.", image: "damaged_goods_scene.jpg", options: ["spill kit", "quarantine zone", "flower", "biscuit"], answers: [0, 1] },
+      { id: 44, type: "multi2", prompt: "Choose 2 loading words.", image: "truck_loading_scene.jpg", options: ["load", "unload", "sing", "jump"], answers: [0, 1] },
+      { id: 45, type: "multi2", prompt: "Choose 2 things for box work.", image: "packing_station_scene.jpg", options: ["wrap", "seal", "river", "lamp"], answers: [0, 1] }
+    ];
+
+    const PAGE_ID = 1;
+    const STORAGE_KEY = "logistics_vocab_quiz_v6";
+    const COOKIE_KEY = "lgzq6";
+    const IMG_BASE = "images/logistics/";
     const FORM_ACTION = "https://docs.google.com/forms/d/e/1FAIpQLSfhgAxbZiFv1vwfYGZR-kwwVplw7oPaavMKb_B_K4w4yJBiVA/formResponse";
     const ENTRY_NAME = "entry.1921741824";
     const ENTRY_GROUP = "entry.1886481554";
@@ -1392,7 +880,7 @@
 
     function buildPresentedList(mode) {
       const ids = shuffle(TASK_BANK.map(t => t.id));
-      const count = mode === "5" ? FULL_MODE_COUNT : 15;
+      const count = FULL_MODE_COUNT;
       return ids.slice(0, count).map(id => makePresentedTask(getTaskById(id)));
     }
 
@@ -1434,7 +922,7 @@
       const studentGroup = profile.group;
 
       state = {
-        version: 1,
+        version: 6,
         pageId: PAGE_ID,
         mode,
         active: true,
@@ -1649,9 +1137,9 @@
           <div class="w-full max-w-2xl rounded-3xl border border-slate-800 bg-slate-900/70 backdrop-blur shadow-2xl p-5 sm:p-8">
             <div class="flex items-start justify-between gap-3">
               <div>
-                <div class="inline-flex items-center gap-2 rounded-full border border-sky-500/30 bg-sky-500/10 px-3 py-1 text-xs sm:text-sm text-sky-300">Returns Words</div>
-                <h1 class="mt-4 text-2xl sm:text-4xl font-bold tracking-tight">Topic 3</h1>
-                <div class="mt-2 text-sm sm:text-base text-slate-400">Returns, claims and replacement</div>
+                <div class="inline-flex items-center gap-2 rounded-full border border-sky-500/30 bg-sky-500/10 px-3 py-1 text-xs sm:text-sm text-sky-300">Logistics Words</div>
+                <h1 class="mt-4 text-2xl sm:text-4xl font-bold tracking-tight">Topic 1</h1>
+                <div class="mt-2 text-sm sm:text-base text-slate-400">Cold storage and warehouse basics</div>
               </div>
               <button id="menuBtnStart" class="rounded-2xl border border-slate-700 px-4 py-2 text-sm text-slate-200 hover:bg-slate-800 transition">Main menu</button>
             </div>
@@ -1667,15 +1155,9 @@
               </div>
             </div>
 
-            <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <button id="mode4Btn" class="rounded-3xl border border-emerald-500/30 bg-emerald-500/10 p-6 text-left hover:bg-emerald-500/20 transition">
-                <div class="text-sm text-emerald-300">4</div>
-                <div class="mt-2 text-3xl font-bold">15</div>
-                <div class="mt-1 text-sm text-slate-300">questions</div>
-              </button>
-
-              <button id="mode5Btn" class="rounded-3xl border border-violet-500/30 bg-violet-500/10 p-6 text-left hover:bg-violet-500/20 transition">
-                <div class="text-sm text-violet-300">5</div>
+            <div class="mt-6">
+              <button id="mode5Btn" class="w-full rounded-3xl border border-violet-500/30 bg-violet-500/10 p-6 text-left hover:bg-violet-500/20 transition">
+                <div class="text-sm text-violet-300">Full mode</div>
                 <div class="mt-2 text-3xl font-bold">${FULL_MODE_COUNT}</div>
                 <div class="mt-1 text-sm text-slate-300">questions</div>
               </button>
@@ -1700,7 +1182,6 @@
       `;
 
       document.getElementById("menuBtnStart").addEventListener("click", goToMenu);
-      document.getElementById("mode4Btn").addEventListener("click", () => startQuiz("4"));
       document.getElementById("mode5Btn").addEventListener("click", () => startQuiz("5"));
 
       const resumeBtn = document.getElementById("resumeBtn");
