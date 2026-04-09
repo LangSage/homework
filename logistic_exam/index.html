@@ -44,6 +44,32 @@
       max-width: 100%;
       height: auto;
     }
+    .dict-canvas-wrap {
+      position: relative;
+      display: inline-block;
+      width: 100%;
+    }
+    .dict-overlay {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+    .dict-word-hitbox {
+      position: absolute;
+      padding: 0;
+      margin: 0;
+      border: 0;
+      border-bottom: 1px dashed rgba(56, 189, 248, 0.35);
+      background: rgba(56, 189, 248, 0.03);
+      border-radius: 6px;
+      cursor: pointer;
+      pointer-events: auto;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .dict-word-hitbox:hover {
+      background: rgba(56, 189, 248, 0.10);
+      border-bottom-color: rgba(56, 189, 248, 0.75);
+    }
   </style>
 </head>
 <body class="text-slate-100 no-select notranslate" translate="no">
@@ -115,6 +141,368 @@
     let state = null;
     let safeNavigation = false;
 
+    const CORE_DICTIONARY = [
+      {
+            "word": "pallet",
+            "translation": "палета",
+            "emoji": "🪵"
+      },
+      {
+            "word": "dock",
+            "translation": "погрузочная зона",
+            "emoji": "🚚"
+      },
+      {
+            "word": "box",
+            "translation": "коробка",
+            "emoji": "📦"
+      },
+      {
+            "word": "carton",
+            "translation": "картонная коробка",
+            "emoji": "📦"
+      },
+      {
+            "word": "wrap",
+            "translation": "обматывать",
+            "emoji": "🎞️"
+      },
+      {
+            "word": "label",
+            "translation": "этикетка / маркировка",
+            "emoji": "🏷️"
+      },
+      {
+            "word": "barcode",
+            "translation": "штрихкод",
+            "emoji": "🧾"
+      },
+      {
+            "word": "scanner",
+            "translation": "сканер",
+            "emoji": "📟"
+      },
+      {
+            "word": "truck",
+            "translation": "грузовик",
+            "emoji": "🚛"
+      },
+      {
+            "word": "shelf",
+            "translation": "стеллаж / полка",
+            "emoji": "🗄️"
+      },
+      {
+            "word": "temperature sticker",
+            "translation": "температурная наклейка",
+            "emoji": "🌡️"
+      },
+      {
+            "word": "temperature",
+            "translation": "температура",
+            "emoji": "🌡️"
+      },
+      {
+            "word": "sticker",
+            "translation": "наклейка",
+            "emoji": "🏷️"
+      },
+      {
+            "word": "battery",
+            "translation": "аккумулятор / батарея",
+            "emoji": "🔋"
+      },
+      {
+            "word": "drum",
+            "translation": "бочка",
+            "emoji": "🛢️"
+      },
+      {
+            "word": "spill kit",
+            "translation": "набор для устранения разлива",
+            "emoji": "🧰"
+      },
+      {
+            "word": "spill",
+            "translation": "разлив",
+            "emoji": "💧"
+      },
+      {
+            "word": "kit",
+            "translation": "набор",
+            "emoji": "🧰"
+      },
+      {
+            "word": "quarantine zone",
+            "translation": "карантинная зона",
+            "emoji": "🚧"
+      },
+      {
+            "word": "quarantine",
+            "translation": "карантин",
+            "emoji": "🚧"
+      },
+      {
+            "word": "zone",
+            "translation": "зона",
+            "emoji": "📍"
+      },
+      {
+            "word": "scan",
+            "translation": "сканировать",
+            "emoji": "📟"
+      },
+      {
+            "word": "inspect",
+            "translation": "осматривать / проверять",
+            "emoji": "🔎"
+      },
+      {
+            "word": "seal",
+            "translation": "запечатывать",
+            "emoji": "🔒"
+      },
+      {
+            "word": "repack",
+            "translation": "переупаковывать",
+            "emoji": "📦"
+      },
+      {
+            "word": "store",
+            "translation": "хранить",
+            "emoji": "🏬"
+      },
+      {
+            "word": "load",
+            "translation": "загружать",
+            "emoji": "⬆️"
+      },
+      {
+            "word": "unload",
+            "translation": "разгружать",
+            "emoji": "⬇️"
+      },
+      {
+            "word": "separate",
+            "translation": "отделять",
+            "emoji": "↔️"
+      },
+      {
+            "word": "clean",
+            "translation": "убирать / очищать",
+            "emoji": "🧼"
+      },
+      {
+            "word": "stop",
+            "translation": "остановить",
+            "emoji": "🛑"
+      },
+      {
+            "word": "report",
+            "translation": "сообщить",
+            "emoji": "📝"
+      },
+      {
+            "word": "order",
+            "translation": "заказ",
+            "emoji": "📋"
+      },
+      {
+            "word": "item",
+            "translation": "товар / позиция",
+            "emoji": "🧩"
+      },
+      {
+            "word": "quantity",
+            "translation": "количество",
+            "emoji": "🔢"
+      },
+      {
+            "word": "packing list",
+            "translation": "упаковочный лист",
+            "emoji": "📄"
+      },
+      {
+            "word": "packing",
+            "translation": "упаковка",
+            "emoji": "📦"
+      },
+      {
+            "word": "list",
+            "translation": "список",
+            "emoji": "📄"
+      },
+      {
+            "word": "shortage",
+            "translation": "недостача",
+            "emoji": "⚠️"
+      },
+      {
+            "word": "supervisor",
+            "translation": "супервайзер / руководитель",
+            "emoji": "👷"
+      },
+      {
+            "word": "pick",
+            "translation": "отбирать товар",
+            "emoji": "☑️"
+      },
+      {
+            "word": "count",
+            "translation": "считать",
+            "emoji": "🔢"
+      },
+      {
+            "word": "check",
+            "translation": "проверять",
+            "emoji": "✅"
+      },
+      {
+            "word": "compare",
+            "translation": "сравнивать",
+            "emoji": "⚖️"
+      },
+      {
+            "word": "confirm",
+            "translation": "подтверждать",
+            "emoji": "✔️"
+      },
+      {
+            "word": "return",
+            "translation": "возврат / вернуть",
+            "emoji": "↩️"
+      },
+      {
+            "word": "claim",
+            "translation": "претензия",
+            "emoji": "📣"
+      },
+      {
+            "word": "customer",
+            "translation": "клиент",
+            "emoji": "🙋"
+      },
+      {
+            "word": "receipt",
+            "translation": "чек",
+            "emoji": "🧾"
+      },
+      {
+            "word": "reason",
+            "translation": "причина",
+            "emoji": "💡"
+      },
+      {
+            "word": "package",
+            "translation": "посылка / упаковка",
+            "emoji": "📦"
+      },
+      {
+            "word": "refund",
+            "translation": "возврат денег",
+            "emoji": "💸"
+      },
+      {
+            "word": "replacement",
+            "translation": "замена",
+            "emoji": "🔁"
+      },
+      {
+            "word": "warehouse",
+            "translation": "склад",
+            "emoji": "🏬"
+      },
+      {
+            "word": "accept",
+            "translation": "принимать",
+            "emoji": "✅"
+      },
+      {
+            "word": "refuse",
+            "translation": "отказывать",
+            "emoji": "❌"
+      },
+      {
+            "word": "replace",
+            "translation": "заменять",
+            "emoji": "🔁"
+      },
+      {
+            "word": "pack",
+            "translation": "упаковывать",
+            "emoji": "📦"
+      },
+      {
+            "word": "goods",
+            "translation": "товары",
+            "emoji": "📦"
+      },
+      {
+            "word": "liquid",
+            "translation": "жидкость",
+            "emoji": "💧"
+      },
+      {
+            "word": "floor",
+            "translation": "пол",
+            "emoji": "🪵"
+      },
+      {
+            "word": "dangerous",
+            "translation": "опасный",
+            "emoji": "⚠️"
+      },
+      {
+            "word": "worker",
+            "translation": "работник",
+            "emoji": "👷"
+      },
+      {
+            "word": "boss",
+            "translation": "начальник",
+            "emoji": "👔"
+      },
+      {
+            "word": "paper",
+            "translation": "документ / бумага",
+            "emoji": "📄"
+      },
+      {
+            "word": "pieces",
+            "translation": "штуки",
+            "emoji": "🔢"
+      },
+      {
+            "word": "number",
+            "translation": "число / номер",
+            "emoji": "🔢"
+      },
+      {
+            "word": "money",
+            "translation": "деньги",
+            "emoji": "💰"
+      },
+      {
+            "word": "new",
+            "translation": "новый",
+            "emoji": "🆕"
+      },
+      {
+            "word": "true",
+            "translation": "верно",
+            "emoji": "✅"
+      },
+      {
+            "word": "false",
+            "translation": "неверно",
+            "emoji": "❌"
+      }
+];
+    let dictionaryMap = new Map();
+    let dictionaryMaxPhraseLength = 1;
+    let popupHideTimer = null;
+
+
     function shuffle(arr) {
       const a = arr.slice();
       for (let i = a.length - 1; i > 0; i--) {
@@ -124,29 +512,104 @@
       return a;
     }
 
-    function wrapCanvasText(ctx, text, maxWidth) {
-      const raw = String(text || "").trim();
-      if (!raw) return [""];
-      const words = raw.split(/\s+/);
-      const lines = [];
-      let line = words[0] || "";
 
-      for (let i = 1; i < words.length; i++) {
-        const testLine = line + " " + words[i];
-        if (ctx.measureText(testLine).width <= maxWidth) {
-          line = testLine;
-        } else {
-          lines.push(line);
-          line = words[i];
-        }
+    function normalizeDictKey(value) {
+      return String(value || "")
+        .toLowerCase()
+        .replace(/[’]/g, "'")
+        .replace(/[^a-z0-9'\- ]+/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+    }
+
+    function rebuildDictionaryPhraseLength() {
+      dictionaryMaxPhraseLength = 1;
+      dictionaryMap.forEach((_, key) => {
+        const size = key.split(" ").filter(Boolean).length;
+        if (size > dictionaryMaxPhraseLength) dictionaryMaxPhraseLength = size;
+      });
+    }
+
+    function seedCoreDictionary() {
+      dictionaryMap = new Map();
+      CORE_DICTIONARY.forEach((entry) => {
+        const key = normalizeDictKey(entry.word);
+        if (!key) return;
+        dictionaryMap.set(key, {
+          word: entry.word,
+          translation: entry.translation,
+          emoji: entry.emoji || "📘"
+        });
+      });
+      rebuildDictionaryPhraseLength();
+    }
+
+    async function loadExternalDictionary() {
+      try {
+        const response = await fetch("words.json", { cache: "no-store" });
+        if (!response.ok) return;
+        const rows = await response.json();
+        rows.forEach((row) => {
+          const key = normalizeDictKey(row && row.Word);
+          if (!key || !row || !row.Translation || dictionaryMap.has(key)) return;
+          dictionaryMap.set(key, {
+            word: String(row.Word),
+            translation: String(row.Translation),
+            emoji: row.Emoji || "📘"
+          });
+        });
+        rebuildDictionaryPhraseLength();
+      } catch (e) {}
+
+      if (state && !state.done && state.presented && state.presented[state.current]) {
+        renderTaskTextCanvases(state.presented[state.current]);
+      }
+    }
+
+    function buildTextLayout(text, maxWidth, fontSpec) {
+      const raw = String(text || "").trim();
+      const measureCanvas = document.createElement("canvas");
+      const ctx = measureCanvas.getContext("2d");
+      ctx.font = fontSpec;
+
+      if (!raw) {
+        return {
+          lines: [[{ raw: "", width: 0 }]],
+          spaceWidth: ctx.measureText(" ").width
+        };
       }
 
-      if (line) lines.push(line);
-      return lines;
+      const tokens = raw.split(/\s+/).map((token) => ({
+        raw: token,
+        width: ctx.measureText(token).width
+      }));
+
+      const lines = [];
+      let currentLine = [];
+      let currentText = "";
+
+      tokens.forEach((token) => {
+        const nextText = currentText ? currentText + " " + token.raw : token.raw;
+        if (currentText && ctx.measureText(nextText).width > maxWidth) {
+          lines.push(currentLine);
+          currentLine = [token];
+          currentText = token.raw;
+        } else {
+          currentLine.push(token);
+          currentText = nextText;
+        }
+      });
+
+      if (currentLine.length) lines.push(currentLine);
+
+      return {
+        lines,
+        spaceWidth: ctx.measureText(" ").width
+      };
     }
 
     function drawTextCanvas(canvas, text, config = {}) {
-      if (!canvas) return;
+      if (!canvas) return null;
 
       const {
         width = null,
@@ -163,15 +626,11 @@
       const hostWidth = width || canvas.parentElement?.clientWidth || 320;
       const innerWidth = Math.max(minWidth, Math.floor(hostWidth - paddingX * 2));
       const ratio = window.devicePixelRatio || 1;
-
-      const probeCanvas = document.createElement("canvas");
-      const probe = probeCanvas.getContext("2d");
-      probe.font = `${fontWeight} ${fontSize}px ${fontFamily}`;
-
-      const lines = wrapCanvasText(probe, text, innerWidth);
+      const fontSpec = `${fontWeight} ${fontSize}px ${fontFamily}`;
+      const layout = buildTextLayout(text, innerWidth, fontSpec);
       const linePx = Math.max(fontSize + 6, Math.round(fontSize * lineHeight));
       const cssWidth = innerWidth + paddingX * 2;
-      const cssHeight = Math.max(linePx, lines.length * linePx + paddingY * 2);
+      const cssHeight = Math.max(linePx, layout.lines.length * linePx + paddingY * 2);
 
       canvas.width = Math.max(1, Math.floor(cssWidth * ratio));
       canvas.height = Math.max(1, Math.floor(cssHeight * ratio));
@@ -183,13 +642,112 @@
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.scale(ratio, ratio);
 
-      ctx.font = `${fontWeight} ${fontSize}px ${fontFamily}`;
+      ctx.font = fontSpec;
       ctx.fillStyle = color;
       ctx.textBaseline = "top";
 
-      lines.forEach((line, index) => {
-        ctx.fillText(line, paddingX, paddingY + index * linePx);
+      layout.lines.forEach((line, index) => {
+        const lineText = line.map((item) => item.raw).join(" ");
+        ctx.fillText(lineText, paddingX, paddingY + index * linePx);
       });
+
+      canvas.__textLayout = {
+        lines: layout.lines,
+        linePx,
+        paddingX,
+        paddingY,
+        spaceWidth: layout.spaceWidth
+      };
+
+      return canvas.__textLayout;
+    }
+
+    function hideDictionaryPopup() {
+      const popup = document.getElementById("dictPopup");
+      if (!popup) return;
+      popup.classList.add("opacity-0", "translate-y-3", "pointer-events-none");
+      popup.classList.remove("opacity-100", "translate-y-0");
+    }
+
+    function showDictionaryPopup(entry) {
+      const popup = document.getElementById("dictPopup");
+      if (!popup || !entry) return;
+
+      const emojiNode = popup.querySelector('[data-role="emoji"]');
+      const wordNode = popup.querySelector('[data-role="word"]');
+      const translationNode = popup.querySelector('[data-role="translation"]');
+
+      if (emojiNode) emojiNode.textContent = entry.emoji || "📘";
+      if (wordNode) wordNode.textContent = entry.word || "";
+      if (translationNode) translationNode.textContent = entry.translation || "";
+
+      popup.classList.remove("opacity-0", "translate-y-3", "pointer-events-none");
+      popup.classList.add("opacity-100", "translate-y-0");
+
+      clearTimeout(popupHideTimer);
+      popupHideTimer = setTimeout(hideDictionaryPopup, 2600);
+    }
+
+    function renderDictionaryHotspots(canvas, overlay) {
+      if (!canvas || !overlay) return;
+
+      overlay.innerHTML = "";
+      overlay.style.width = canvas.style.width || "100%";
+      overlay.style.height = canvas.style.height || "100%";
+
+      const layout = canvas.__textLayout;
+      if (!layout || !dictionaryMap.size) return;
+
+      const fragment = document.createDocumentFragment();
+
+      layout.lines.forEach((line, lineIndex) => {
+        let x = layout.paddingX;
+        let index = 0;
+
+        while (index < line.length) {
+          let matchedEntry = null;
+          let matchedLen = 0;
+          const maxLen = Math.min(dictionaryMaxPhraseLength, line.length - index);
+
+          for (let len = maxLen; len >= 1; len--) {
+            const phrase = line.slice(index, index + len).map((item) => item.raw).join(" ");
+            const key = normalizeDictKey(phrase);
+            if (key && dictionaryMap.has(key)) {
+              matchedEntry = dictionaryMap.get(key);
+              matchedLen = len;
+              break;
+            }
+          }
+
+          if (matchedEntry) {
+            const wordGroup = line.slice(index, index + matchedLen);
+            const width = wordGroup.reduce((sum, item) => sum + item.width, 0) + layout.spaceWidth * (matchedLen - 1);
+
+            const button = document.createElement("button");
+            button.type = "button";
+            button.className = "dict-word-hitbox";
+            button.style.left = `${x}px`;
+            button.style.top = `${layout.paddingY + lineIndex * layout.linePx}px`;
+            button.style.width = `${Math.max(18, width)}px`;
+            button.style.height = `${layout.linePx}px`;
+            button.setAttribute("aria-label", `Show translation for ${matchedEntry.word}`);
+            button.addEventListener("click", (event) => {
+              event.preventDefault();
+              event.stopPropagation();
+              showDictionaryPopup(matchedEntry);
+            });
+
+            fragment.appendChild(button);
+            x += width + layout.spaceWidth;
+            index += matchedLen;
+          } else {
+            x += line[index].width + layout.spaceWidth;
+            index += 1;
+          }
+        }
+      });
+
+      overlay.appendChild(fragment);
     }
 
     function renderTaskTextCanvases(task) {
@@ -204,6 +762,7 @@
             lineHeight: 1.18,
             paddingY: 2
           });
+          renderDictionaryHotspots(promptCanvas, document.getElementById("promptOverlay"));
         }
 
         document.querySelectorAll(".option-canvas").forEach((canvas) => {
@@ -217,11 +776,14 @@
             fontWeight: 600,
             lineHeight: 1.24
           });
+
+          renderDictionaryHotspots(canvas, canvas.nextElementSibling);
         });
       });
     }
 
     function now() {
+
       return Date.now();
     }
 
@@ -318,7 +880,7 @@
 
     function buildPresentedList(mode) {
       const ids = shuffle(TASK_BANK.map(t => t.id));
-      const count = FULL_MODE_COUNT;
+      const count = mode === "5" ? FULL_MODE_COUNT : 15;
       return ids.slice(0, count).map(id => makePresentedTask(getTaskById(id)));
     }
 
@@ -582,9 +1144,26 @@
               <button id="menuBtnStart" class="rounded-2xl border border-slate-700 px-4 py-2 text-sm text-slate-200 hover:bg-slate-800 transition">Main menu</button>
             </div>
 
-            <div class="mt-6 grid grid-cols-1 gap-4">
+            <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="rounded-3xl border border-slate-800 bg-slate-950/50 p-4 sm:p-5">
+                <div class="text-xs text-slate-400">Name</div>
+                <div class="mt-2 text-lg font-semibold text-slate-100">${profile.name || "—"}</div>
+              </div>
+              <div class="rounded-3xl border border-slate-800 bg-slate-950/50 p-4 sm:p-5">
+                <div class="text-xs text-slate-400">Group</div>
+                <div class="mt-2 text-lg font-semibold text-slate-100">${profile.group || "—"}</div>
+              </div>
+            </div>
+
+            <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <button id="mode4Btn" class="rounded-3xl border border-emerald-500/30 bg-emerald-500/10 p-6 text-left hover:bg-emerald-500/20 transition">
+                <div class="text-sm text-emerald-300">4</div>
+                <div class="mt-2 text-3xl font-bold">15</div>
+                <div class="mt-1 text-sm text-slate-300">questions</div>
+              </button>
+
               <button id="mode5Btn" class="rounded-3xl border border-violet-500/30 bg-violet-500/10 p-6 text-left hover:bg-violet-500/20 transition">
-                <div class="text-sm text-violet-300">Only mode</div>
+                <div class="text-sm text-violet-300">5</div>
                 <div class="mt-2 text-3xl font-bold">${FULL_MODE_COUNT}</div>
                 <div class="mt-1 text-sm text-slate-300">questions</div>
               </button>
@@ -609,6 +1188,7 @@
       `;
 
       document.getElementById("menuBtnStart").addEventListener("click", goToMenu);
+      document.getElementById("mode4Btn").addEventListener("click", () => startQuiz("4"));
       document.getElementById("mode5Btn").addEventListener("click", () => startQuiz("5"));
 
       const resumeBtn = document.getElementById("resumeBtn");
@@ -639,7 +1219,7 @@
                 <button data-idx="${idx}" translate="no" class="multi-btn rounded-2xl border ${active ? 'border-sky-400 bg-sky-500/20' : 'border-slate-700 bg-slate-950/70'} p-4 sm:p-5 text-left hover:border-sky-500/50 hover:bg-slate-900 transition flex items-start gap-3">
                   <span class="mt-0.5 shrink-0 font-semibold text-slate-200">${String.fromCharCode(65 + idx)}.</span>
                   <div class="min-w-0 flex-1">
-                    <canvas class="option-canvas text-canvas" data-idx="${idx}"></canvas>
+                    <div class="dict-canvas-wrap"><canvas class="option-canvas text-canvas" data-idx="${idx}"></canvas><div class="dict-overlay option-overlay" data-idx="${idx}"></div></div>
                   </div>
                 </button>
               `;
@@ -657,7 +1237,7 @@
             <button data-idx="${idx}" translate="no" class="answer-btn rounded-2xl border border-slate-700 bg-slate-950/70 p-4 sm:p-5 text-left hover:border-sky-500/50 hover:bg-slate-900 transition flex items-start gap-3">
               <span class="mt-0.5 shrink-0 font-semibold text-slate-200">${String.fromCharCode(65 + idx)}.</span>
               <div class="min-w-0 flex-1">
-                <canvas class="option-canvas text-canvas" data-idx="${idx}"></canvas>
+                <div class="dict-canvas-wrap"><canvas class="option-canvas text-canvas" data-idx="${idx}"></canvas><div class="dict-overlay option-overlay" data-idx="${idx}"></div></div>
               </div>
             </button>
           `).join("")}
@@ -756,7 +1336,8 @@
                   <div class="inline-flex rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-xs text-emerald-300">${typeBadge}</div>
 
                   <div class="mt-4">
-                    <canvas id="promptCanvas" class="text-canvas"></canvas>
+                    <div class="dict-canvas-wrap"><canvas id="promptCanvas" class="text-canvas"></canvas><div id="promptOverlay" class="dict-overlay"></div></div>
+                    <div class="mt-3 text-xs text-slate-500">Tap underlined words for RU help</div>
                   </div>
 
                   ${renderOptions(task)}
@@ -765,11 +1346,26 @@
             </div>
           </div>
         </div>
+
+        <div id="dictPopup" class="fixed left-1/2 bottom-4 z-50 w-[min(92vw,420px)] -translate-x-1/2 translate-y-3 opacity-0 pointer-events-none transition-all duration-200">
+          <div class="rounded-3xl border border-sky-400/30 bg-slate-950/95 shadow-2xl backdrop-blur px-4 py-3">
+            <div class="flex items-start gap-3">
+              <div data-role="emoji" class="text-2xl leading-none">📘</div>
+              <div class="min-w-0 flex-1">
+                <div data-role="word" class="text-sm font-semibold text-sky-300"></div>
+                <div data-role="translation" class="mt-1 text-sm text-slate-100"></div>
+              </div>
+              <button id="dictCloseBtn" class="rounded-xl border border-slate-700 px-2 py-1 text-xs text-slate-300 hover:bg-slate-800 transition">✕</button>
+            </div>
+          </div>
+        </div>
       `;
 
       renderTaskTextCanvases(task);
 
       document.getElementById("menuBtnQuiz").addEventListener("click", goToMenu);
+      const dictCloseBtn = document.getElementById("dictCloseBtn");
+      if (dictCloseBtn) dictCloseBtn.addEventListener("click", hideDictionaryPopup);
 
       if (task.type === "multi2") {
         document.querySelectorAll(".multi-btn").forEach(btn => {
@@ -848,6 +1444,8 @@
       }, 120);
     });
 
+    seedCoreDictionary();
+    loadExternalDictionary();
     blockActions();
     state = loadState();
     render();
