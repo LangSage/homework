@@ -7,410 +7,158 @@
   <meta name="robots" content="noindex,nofollow,noarchive" />
   <title>Person Description Practice</title>
   <style>
-    :root {
-      --bg-1: #020617;
-      --bg-2: #0f172a;
-      --panel: rgba(7, 16, 36, 0.9);
-      --panel-2: rgba(12, 24, 50, 0.9);
-      --line: rgba(148, 163, 184, 0.16);
-      --text: #e5eefc;
-      --muted: #a8b7d2;
-      --accent: #60a5fa;
-      --accent-2: #22d3ee;
-      --good: #34d399;
-      --bad: #fb7185;
-      --shadow: 0 22px 60px rgba(2, 8, 23, 0.42);
-      --radius: 24px;
-      --radius-sm: 18px;
+    :root{
+      --bg:#eaf1f7;
+      --panel:#ffffff;
+      --panel-2:#f6f9fc;
+      --line:#d7e1ec;
+      --text:#17324d;
+      --muted:#5f768d;
+      --accent:#3aa0ff;
+      --accent-2:#1783e6;
+      --good:#1fa971;
+      --bad:#d4546a;
+      --ink:#14314e;
+      --chip:#e5f2ff;
+      --chip-text:#1568b8;
     }
-
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
-    html, body {
-      margin: 0;
-      min-height: 100%;
-      background:
-        radial-gradient(circle at top left, rgba(34, 211, 238, 0.08), transparent 24%),
-        radial-gradient(circle at top right, rgba(96, 165, 250, 0.08), transparent 24%),
-        linear-gradient(180deg, var(--bg-1), var(--bg-2));
-      color: var(--text);
-      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      user-select: none;
-      -webkit-user-select: none;
-      -webkit-touch-callout: none;
-      overflow-x: hidden;
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+    html,body{
+      margin:0;
+      min-height:100%;
+      background:var(--bg);
+      color:var(--text);
+      font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      user-select:none;
+      -webkit-user-select:none;
+      -webkit-touch-callout:none;
     }
-
-    body * { user-select: none; -webkit-user-select: none; }
-    body.locked-copy { -webkit-user-select: none; user-select: none; }
-
-    button, input { font: inherit; }
-
-    .app {
-      min-height: 100vh;
-      padding: 12px;
-      display: grid;
-      place-items: center;
-    }
-
-    .shell {
-      width: min(980px, 100%);
-      background: linear-gradient(180deg, rgba(8,16,36,0.95), rgba(8,16,36,0.88));
-      border: 1px solid var(--line);
-      border-radius: 28px;
-      box-shadow: var(--shadow);
-      overflow: hidden;
-    }
-
-    .screen { display: none; }
-    .screen.active { display: block; }
-
-    .start-screen,
-    .practice-screen,
-    .result-screen {
-      padding: 18px;
-      display: grid;
-      gap: 16px;
-    }
-
-    .top-simple {
-      display: grid;
-      gap: 10px;
-    }
-
-    .title {
-      font-size: clamp(1.6rem, 3vw, 2.5rem);
-      font-weight: 800;
-      text-align: center;
-      letter-spacing: -0.03em;
-    }
-
-    .mini {
-      text-align: center;
-      color: var(--muted);
-      font-size: 0.95rem;
-    }
-
-    .start-fields {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
-    }
-
-    .field-wrap {
-      display: grid;
-      gap: 6px;
-    }
-
-    .label {
-      color: var(--muted);
-      font-size: 0.9rem;
-    }
-
-    .field {
-      width: 100%;
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      padding: 14px 15px;
-      background: rgba(15, 23, 42, 0.72);
-      color: var(--text);
-      outline: none;
-    }
-
-    .field:focus {
-      border-color: rgba(96, 165, 250, 0.65);
-      box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.14);
-    }
-
-    .btn {
-      border: 0;
-      border-radius: 18px;
-      min-height: 54px;
-      padding: 14px 18px;
-      font-weight: 800;
-      cursor: pointer;
-      color: white;
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
-    }
-
-    .btn.secondary {
-      background: rgba(15, 23, 42, 0.75);
-      border: 1px solid var(--line);
-      color: var(--text);
-    }
-
-    .header-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-      color: var(--muted);
-      flex-wrap: wrap;
-      font-size: 0.92rem;
-    }
-
-    .progress-track {
-      width: 100%;
-      height: 12px;
-      background: rgba(30, 41, 59, 0.95);
-      border: 1px solid rgba(148, 163, 184, 0.14);
-      border-radius: 999px;
-      overflow: hidden;
-    }
-
-    .progress-fill {
-      width: 0%;
-      height: 100%;
-      background: linear-gradient(90deg, var(--accent), var(--accent-2));
-      transition: width 0.25s ease;
-    }
-
-    .task-wrap {
-      display: grid;
-      gap: 14px;
-    }
-
-    .canvas-box,
-    .support-box,
-    .result-box {
-      border: 1px solid var(--line);
-      border-radius: 22px;
-      overflow: hidden;
-      background: linear-gradient(180deg, rgba(11, 21, 46, 0.96), rgba(6, 16, 36, 0.96));
-    }
-
-    canvas {
-      display: block;
-      width: 100%;
-      max-width: 100%;
-      image-rendering: -webkit-optimize-contrast;
-      image-rendering: crisp-edges;
-    }
-
-    .support-grid,
-    .options-grid {
-      display: grid;
-      gap: 12px;
-    }
-
-    .support-grid.two,
-    .options-grid.two {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    .option-btn {
-      padding: 0;
-      border: 1px solid var(--line);
-      border-radius: 20px;
-      overflow: hidden;
-      background: rgba(12, 24, 50, 0.88);
-      cursor: pointer;
-      transition: transform 0.14s ease, border-color 0.14s ease, box-shadow 0.14s ease;
-      min-height: 92px;
-    }
-
-    .option-btn:hover,
-    .option-btn:focus-visible {
-      transform: translateY(-1px);
-      border-color: rgba(96, 165, 250, 0.55);
-      box-shadow: 0 10px 24px rgba(15,23,42,0.2);
-      outline: none;
-    }
-
-    .option-btn.correct { border-color: rgba(52, 211, 153, 0.8); box-shadow: 0 0 0 2px rgba(52, 211, 153, 0.12); }
-    .option-btn.wrong { border-color: rgba(251, 113, 133, 0.8); box-shadow: 0 0 0 2px rgba(251, 113, 133, 0.1); }
-    .option-btn:disabled { cursor: default; transform: none; }
-
-    .task-foot {
-      min-height: 30px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      color: var(--muted);
-      flex-wrap: wrap;
-    }
-
-    .status {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 12px;
-      border-radius: 999px;
-      border: 1px solid var(--line);
-      background: rgba(15, 23, 42, 0.6);
-      font-size: 0.92rem;
-    }
-
-    .status.good {
-      color: #d1fae5;
-      border-color: rgba(52, 211, 153, 0.3);
-      background: rgba(6, 78, 59, 0.28);
-    }
-
-    .status.bad {
-      color: #ffe4e6;
-      border-color: rgba(251, 113, 133, 0.3);
-      background: rgba(127, 29, 29, 0.22);
-    }
-
-    .glossary-btn {
-      border: 1px solid var(--line);
-      background: rgba(15, 23, 42, 0.72);
-      color: var(--text);
-      border-radius: 14px;
-      min-height: 42px;
-      padding: 8px 12px;
-      cursor: pointer;
-    }
-
-    .glossary-popup {
-      position: fixed;
-      z-index: 40;
-      display: none;
-      width: min(320px, calc(100vw - 24px));
-      padding: 14px;
-      border-radius: 18px;
-      border: 1px solid rgba(148, 163, 184, 0.18);
-      background: rgba(8, 15, 32, 0.96);
-      box-shadow: 0 24px 60px rgba(2, 8, 23, 0.5);
-    }
-
-    .glossary-popup.visible { display: grid; gap: 8px; }
-    .glossary-popup strong { font-size: 1.08rem; }
-    .glossary-popup .muted { color: var(--muted); }
-
-    .result-panel {
-      display: grid;
-      grid-template-columns: minmax(0, 1.15fr) minmax(260px, 0.85fr);
-      gap: 16px;
-    }
-
-    .stat-list {
-      display: grid;
-      gap: 10px;
-    }
-
-    .stat-row {
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      padding: 12px 14px;
-      border-radius: 16px;
-      border: 1px solid var(--line);
-      background: rgba(15, 23, 42, 0.72);
-      color: var(--muted);
-    }
-
-    .stat-row strong { color: var(--text); }
-
-    .toast {
-      position: fixed;
-      left: 50%;
-      bottom: 18px;
-      transform: translateX(-50%) translateY(16px);
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.22s ease, transform 0.22s ease;
-      z-index: 50;
-      max-width: min(92vw, 560px);
-      padding: 12px 16px;
-      border-radius: 16px;
-      border: 1px solid var(--line);
-      background: rgba(8, 15, 32, 0.96);
-      color: var(--text);
-      box-shadow: var(--shadow);
-    }
-
-    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-    @media (max-width: 760px) {
-      .app { padding: 8px; }
-      .start-fields,
-      .support-grid.two,
-      .options-grid.two,
-      .result-panel {
-        grid-template-columns: 1fr;
-      }
-      .start-screen,
-      .practice-screen,
-      .result-screen { padding: 12px; }
+    body *{user-select:none;-webkit-user-select:none;}
+    button,input{font:inherit;}
+    .app{min-height:100vh;padding:14px;display:grid;place-items:center;}
+    .shell{width:min(860px,100%);background:var(--panel);border:1px solid var(--line);border-radius:24px;overflow:hidden;}
+    .screen{display:none;}
+    .screen.active{display:block;}
+    .start-screen,.practice-screen,.result-screen{padding:18px;display:grid;gap:14px;}
+    .title{margin:0;text-align:center;font-size:clamp(1.5rem,3.5vw,2.3rem);font-weight:900;letter-spacing:-0.03em;color:var(--ink);}
+    .subtitle{margin:0;text-align:center;color:var(--muted);font-size:.98rem;}
+    .fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}
+    .field-wrap{display:grid;gap:6px;}
+    .label{color:var(--muted);font-size:.9rem;}
+    .field{width:100%;border:1px solid var(--line);border-radius:16px;padding:14px 15px;background:#fff;color:var(--ink);outline:none;}
+    .field:focus{border-color:#8bc6ff;}
+    .btn{border:0;border-radius:16px;min-height:52px;padding:14px 18px;font-weight:800;cursor:pointer;background:var(--accent);color:#fff;}
+    .header-row{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;color:var(--muted);font-size:.95rem;}
+    .progress-track{width:100%;height:12px;background:#dde8f2;border-radius:999px;overflow:hidden;border:1px solid #d2dde9;}
+    .progress-fill{width:0%;height:100%;background:var(--accent);transition:width .2s ease;}
+    .panel{border:1px solid var(--line);border-radius:20px;background:var(--panel-2);overflow:hidden;}
+    canvas{display:block;width:100%;max-width:100%;image-rendering:-webkit-optimize-contrast;image-rendering:crisp-edges;}
+    .chip-row{display:flex;flex-wrap:wrap;gap:8px;}
+    .chip{border:1px solid #cfe3f7;background:var(--chip);color:var(--chip-text);border-radius:999px;padding:8px 12px;font-weight:700;cursor:pointer;}
+    .options-grid{display:grid;gap:10px;grid-template-columns:repeat(2,minmax(0,1fr));}
+    .option-btn{padding:0;border:1px solid var(--line);border-radius:18px;overflow:hidden;background:#fff;cursor:pointer;}
+    .status-line{min-height:24px;color:var(--muted);font-size:.95rem;}
+    .status.good{color:var(--good);font-weight:800;}
+    .status.bad{color:var(--bad);font-weight:800;}
+    .result-box{border:2px solid var(--accent);border-radius:22px;background:#fff;padding:22px;display:grid;gap:12px;}
+    .result-title{margin:0;text-align:center;font-size:1.8rem;font-weight:900;color:var(--ink);}
+    .score-big{text-align:center;font-size:3rem;font-weight:900;color:var(--accent-2);line-height:1;}
+    .result-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}
+    .result-item{border:1px solid var(--line);border-radius:16px;background:var(--panel-2);padding:12px;display:grid;gap:4px;}
+    .result-item .k{font-size:.85rem;color:var(--muted);}
+    .result-item .v{font-size:1.05rem;font-weight:800;color:var(--ink);}
+    .popup{position:fixed;inset:auto 12px 12px 12px;z-index:30;display:none;}
+    .popup.show{display:block;}
+    .popup-card{width:min(520px,100%);margin-left:auto;margin-right:auto;background:#fff;border:1px solid var(--line);border-radius:18px;padding:14px;display:grid;gap:8px;}
+    .popup-top{display:flex;justify-content:space-between;align-items:start;gap:10px;}
+    .popup-title{font-size:1.1rem;font-weight:900;color:var(--ink);}
+    .popup-sub{color:var(--muted);line-height:1.35;}
+    .popup-close{border:0;background:#eef4fa;color:var(--ink);width:34px;height:34px;border-radius:10px;cursor:pointer;font-size:1rem;font-weight:900;}
+    .toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%) translateY(20px);background:#17324d;color:#fff;padding:10px 14px;border-radius:999px;opacity:0;pointer-events:none;transition:opacity .18s ease, transform .18s ease;z-index:40;font-weight:700;}
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+    @media (max-width:720px){
+      .fields,.result-grid,.options-grid{grid-template-columns:1fr;}
+      .start-screen,.practice-screen,.result-screen{padding:14px;}
+      .app{padding:10px;}
     }
   </style>
 </head>
-<body class="locked-copy notranslate" translate="no">
+<body>
   <div class="app">
     <div class="shell">
-      <section class="screen active start-screen" id="startScreen">
-        <div class="top-simple">
-          <div class="title">Person description practice</div>
-          <div class="mini">45 exercises · 35 definition · 10 true or false</div>
-        </div>
-
-        <div class="start-fields">
+      <section id="startScreen" class="screen start-screen active">
+        <h1 class="title">Person description practice</h1>
+        <p class="subtitle">20 simple tasks</p>
+        <div class="fields">
           <div class="field-wrap">
             <label class="label" for="studentName">Name</label>
-            <input class="field" id="studentName" autocomplete="off" spellcheck="false" />
+            <input id="studentName" class="field" type="text" autocomplete="off" spellcheck="false" />
           </div>
           <div class="field-wrap">
             <label class="label" for="studentGroup">Group</label>
-            <input class="field" id="studentGroup" autocomplete="off" spellcheck="false" />
+            <input id="studentGroup" class="field" type="text" autocomplete="off" spellcheck="false" />
           </div>
         </div>
-
-        <button class="btn" id="startBtn" type="button">Start</button>
+        <button id="startBtn" class="btn" type="button">Start</button>
       </section>
 
-      <section class="screen practice-screen" id="practiceScreen">
+      <section id="practiceScreen" class="screen practice-screen">
         <div class="header-row">
-          <span id="progressText">1 / 45</span>
-          <span id="scoreText">0 correct</span>
+          <div id="progressText">1 / 20</div>
+          <div id="scoreText">0 correct</div>
         </div>
-        <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+        <div class="progress-track"><div id="progressFill" class="progress-fill"></div></div>
 
-        <div class="task-wrap">
-          <div class="canvas-box">
-            <canvas id="promptCanvas" width="1400" height="260" aria-label="Task"></canvas>
-          </div>
-          <div class="support-grid" id="supportGrid"></div>
-          <div class="options-grid" id="optionsGrid"></div>
-        </div>
-
-        <div class="task-foot">
-          <div id="statusLine"></div>
-          <button class="glossary-btn" id="glossaryBtn" type="button">Dictionary</button>
-        </div>
+        <div class="panel"><canvas id="promptCanvas" width="1200" height="220"></canvas></div>
+        <div id="chipsRow" class="chip-row"></div>
+        <div id="supportWrap" class="panel" style="display:none;"><canvas id="supportCanvas" width="1200" height="96"></canvas></div>
+        <div id="optionsGrid" class="options-grid"></div>
+        <div id="statusLine" class="status-line"></div>
       </section>
 
-      <section class="screen result-screen" id="resultScreen">
-        <div class="result-panel">
-          <div class="result-box">
-            <canvas id="resultCanvas" width="1400" height="880" aria-label="Result"></canvas>
+      <section id="resultScreen" class="screen result-screen">
+        <div class="result-box">
+          <h2 class="result-title">Finished</h2>
+          <div id="scoreBig" class="score-big">0 / 20</div>
+          <div class="result-grid">
+            <div class="result-item"><div class="k">Name</div><div id="resultName" class="v">—</div></div>
+            <div class="result-item"><div class="k">Group</div><div id="resultGroup" class="v">—</div></div>
+            <div class="result-item"><div class="k">Correct</div><div id="resultCorrect" class="v">0</div></div>
+            <div class="result-item"><div class="k">Percent</div><div id="resultPercent" class="v">0%</div></div>
           </div>
-          <div class="stat-list" id="resultStats"></div>
+          <div class="subtitle">Take a screenshot now.</div>
         </div>
       </section>
     </div>
   </div>
 
-  <div class="glossary-popup" id="glossaryPopup"></div>
-  <div class="toast" id="toast"></div>
+  <div id="popup" class="popup">
+    <div class="popup-card">
+      <div class="popup-top">
+        <div>
+          <div id="popupTitle" class="popup-title">word</div>
+          <div id="popupBody" class="popup-sub"></div>
+        </div>
+        <button id="popupClose" class="popup-close" type="button">×</button>
+      </div>
+    </div>
+  </div>
 
-  
+  <div id="toast" class="toast"></div>
+
   <script>
     const CONFIG = {
-      appVersion: '3.0.0',
-      totalTasks: 45,
-      trueFalseCount: 10,
+      appVersion: '3.1.0',
+      totalTasks: 20,
       topicValue: 'topic',
       topicDisplay: 'Description of a person',
       storage: {
-        state: 'personDescriptionPracticeStateV3',
-        shuffle: 'personDescriptionPracticeShuffleV3',
-        submittedPrefix: 'personDescriptionPracticeSubmittedV3:'
+        state: 'personDescriptionPracticeStateV31',
+        shuffle: 'personDescriptionPracticeShuffleV31',
+        submittedPrefix: 'personDescriptionPracticeSubmittedV31:'
       },
       form: {
-        actionUrl: 'https://docs.google.com/forms/d/e/1FAIpQLSeUzYUvQbbzo_1r81AacP6Kj7HlKDzEVfa93Dam39LiVjcItA/viewform?usp=pp_url',
+        actionUrl: 'https://docs.google.com/forms/d/e/1FAIpQLSeUzYUvQbbzo_1r81AacP6Kj7HlKDzEVfa93Dam39LiVjcItA/formResponse',
         fields: {
           name: 'entry.1582931880',
           group: 'entry.1222434157',
@@ -420,45 +168,10 @@
       }
     };
 
-    const WORD_BANK = {
-      hairLength: ['short', 'medium-length', 'long'],
-      hairColor: ['black', 'brown', 'blonde', 'red', 'gray'],
-      hairType: ['straight', 'wavy', 'curly', 'messy', 'bald'],
-      lips: ['thin', 'full'],
-      height: ['tall', 'short'],
-      body: ['slim', 'thin', 'athletic', 'strong', 'chubby', 'average']
-    };
-
-    const DEFINITION_BANK = [
-      { answer: 'short', prompt: 'Choose the word: hair that is not long.', options: ['short', 'long', 'medium-length', 'bald'] },
-      { answer: 'medium-length', prompt: 'Choose the word: hair that is not short and not long.', options: ['medium-length', 'short', 'long', 'bald'] },
-      { answer: 'long', prompt: 'Choose the word: hair that goes far down.', options: ['long', 'short', 'medium-length', 'bald'] },
-      { answer: 'straight', prompt: 'Choose the word: hair with no waves and no curls.', options: ['straight', 'wavy', 'curly', 'messy'] },
-      { answer: 'wavy', prompt: 'Choose the word: hair with soft waves.', options: ['wavy', 'straight', 'curly', 'messy'] },
-      { answer: 'curly', prompt: 'Choose the word: hair with curls.', options: ['curly', 'straight', 'wavy', 'messy'] },
-      { answer: 'messy', prompt: 'Choose the word: hair that is not neat.', options: ['messy', 'straight', 'wavy', 'curly'] },
-      { answer: 'bald', prompt: 'Choose the word: a person with no hair.', options: ['bald', 'curly', 'messy', 'long'] },
-      { answer: 'thin', prompt: 'Choose the word: lips that are not full.', options: ['thin', 'full', 'tall', 'strong'] },
-      { answer: 'full', prompt: 'Choose the word: lips that look big.', options: ['full', 'thin', 'short', 'brown'] },
-      { answer: 'tall', prompt: 'Choose the word: a person with much height.', options: ['tall', 'short', 'slim', 'strong'] },
-      { answer: 'short', prompt: 'Choose the word: a person who is not tall.', options: ['short', 'tall', 'thin', 'average'] },
-      { answer: 'slim', prompt: 'Choose the word: a body that is slim and not big.', options: ['slim', 'chubby', 'strong', 'average'] },
-      { answer: 'thin', prompt: 'Choose the word: a very slim body.', options: ['thin', 'strong', 'chubby', 'average'] },
-      { answer: 'athletic', prompt: 'Choose the word: a sports body.', options: ['athletic', 'chubby', 'average', 'thin'] },
-      { answer: 'strong', prompt: 'Choose the word: a powerful body.', options: ['strong', 'slim', 'average', 'medium-length'] },
-      { answer: 'chubby', prompt: 'Choose the word: a body that is a little fat.', options: ['chubby', 'slim', 'athletic', 'thin'] },
-      { answer: 'average', prompt: 'Choose the word: a normal body, not very thin and not very chubby.', options: ['average', 'athletic', 'strong', 'slim'] },
-      { answer: 'black', prompt: 'Choose the word: very dark hair color.', options: ['black', 'brown', 'blonde', 'gray'] },
-      { answer: 'brown', prompt: 'Choose the word: hair color like chocolate.', options: ['brown', 'black', 'blonde', 'red'] },
-      { answer: 'blonde', prompt: 'Choose the word: light yellow hair color.', options: ['blonde', 'brown', 'gray', 'red'] },
-      { answer: 'red', prompt: 'Choose the word: orange-red hair color.', options: ['red', 'brown', 'black', 'gray'] },
-      { answer: 'gray', prompt: 'Choose the word: hair color like silver.', options: ['gray', 'black', 'brown', 'red'] }
-    ];
-
-    const NAMES = ['Julia', 'Alex', 'Max', 'Ben', 'Kate', 'Mia', 'Nick', 'Emma', 'Leo', 'Sofia', 'Tom', 'Anna', 'Mark', 'Lina', 'Sam', 'Nora', 'Dan', 'Mary', 'Ira', 'Paul'];
-    const CATEGORY_LABELS = { definition: 'Definition', tf: 'True or false' };
-
     const elements = {
+      startScreen: document.getElementById('startScreen'),
+      practiceScreen: document.getElementById('practiceScreen'),
+      resultScreen: document.getElementById('resultScreen'),
       studentName: document.getElementById('studentName'),
       studentGroup: document.getElementById('studentGroup'),
       startBtn: document.getElementById('startBtn'),
@@ -466,50 +179,100 @@
       scoreText: document.getElementById('scoreText'),
       progressFill: document.getElementById('progressFill'),
       promptCanvas: document.getElementById('promptCanvas'),
-      supportGrid: document.getElementById('supportGrid'),
+      supportCanvas: document.getElementById('supportCanvas'),
+      supportWrap: document.getElementById('supportWrap'),
+      chipsRow: document.getElementById('chipsRow'),
       optionsGrid: document.getElementById('optionsGrid'),
       statusLine: document.getElementById('statusLine'),
-      glossaryBtn: document.getElementById('glossaryBtn'),
-      glossaryPopup: document.getElementById('glossaryPopup'),
-      toast: document.getElementById('toast'),
-      resultCanvas: document.getElementById('resultCanvas'),
-      resultStats: document.getElementById('resultStats'),
-      startScreen: document.getElementById('startScreen'),
-      practiceScreen: document.getElementById('practiceScreen'),
-      resultScreen: document.getElementById('resultScreen')
+      resultName: document.getElementById('resultName'),
+      resultGroup: document.getElementById('resultGroup'),
+      resultCorrect: document.getElementById('resultCorrect'),
+      resultPercent: document.getElementById('resultPercent'),
+      scoreBig: document.getElementById('scoreBig'),
+      popup: document.getElementById('popup'),
+      popupTitle: document.getElementById('popupTitle'),
+      popupBody: document.getElementById('popupBody'),
+      popupClose: document.getElementById('popupClose'),
+      toast: document.getElementById('toast')
     };
 
     let dictionary = {};
+    const canvasHits = new WeakMap();
     let toastTimer = null;
     let answerLocked = false;
-    let nextTimer = null;
-    const canvasHits = new WeakMap();
-    let appState = createEmptyState();
 
-    function createEmptyState() {
-      return {
-        sessionId: '',
-        seed: 0,
-        startedAt: null,
-        completedAt: null,
-        student: { name: '', group: '' },
-        tasks: [],
-        currentIndex: 0,
-        results: [],
-        score: { correct: 0 },
-        stage: 'idle',
-        currentTaskStartedAt: null,
-        lastVisibilityShuffleAt: null,
-        submission: { sent: false, inFlight: false, sentAt: null, message: '' },
-        autosavedAt: null
-      };
-    }
+    const appState = {
+      stage: 'start',
+      studentName: '',
+      studentGroup: '',
+      sessionId: '',
+      seed: 0,
+      currentIndex: 0,
+      score: { correct: 0 },
+      results: [],
+      tasks: [],
+      usedTaskIds: [],
+      submitDone: false,
+      currentTaskStartedAt: null,
+      autosavedAt: null
+    };
+
+    const DEFINITION_BANK = [
+      { id:'def-wavy', prompt:'Which word means: hair with waves?', options:['wavy','straight','curly','bald'], answer:'wavy', terms:['which','word','means','hair','waves','wavy','straight','curly','bald'] },
+      { id:'def-curly', prompt:'Which word means: hair in small circles?', options:['curly','wavy','straight','messy'], answer:'curly', terms:['which','word','means','hair','small','circles','curly','wavy','straight','messy'] },
+      { id:'def-straight', prompt:'Which word means: hair with no waves?', options:['straight','wavy','curly','messy'], answer:'straight', terms:['which','word','means','hair','no','waves','straight','wavy','curly','messy'] },
+      { id:'def-bald', prompt:'Which word means: no hair?', options:['bald','long','short','curly'], answer:'bald', terms:['which','word','means','no','hair','bald','long','short','curly'] },
+      { id:'def-messy', prompt:'Which word means: hair not neat?', options:['messy','straight','full','tall'], answer:'messy', terms:['which','word','means','hair','not','neat','messy','straight','full','tall'] },
+      { id:'def-full', prompt:'Which word means: big lips?', options:['full','thin','long','average'], answer:'full', terms:['which','word','means','big','lips','full','thin','long','average'] },
+      { id:'def-thin', prompt:'Which word means: small lips?', options:['thin','full','strong','short'], answer:'thin', terms:['which','word','means','small','lips','thin','full','strong','short'] },
+      { id:'def-tall', prompt:'Which word means: high height?', options:['tall','short','slim','wavy'], answer:'tall', terms:['which','word','means','high','height','tall','short','slim','wavy'] },
+      { id:'def-athletic', prompt:'Which word means: body good for sport?', options:['athletic','chubby','average','thin'], answer:'athletic', terms:['which','word','means','body','good','sport','athletic','chubby','average','thin'] },
+      { id:'def-strong', prompt:'Which word means: body with muscles?', options:['strong','slim','average','messy'], answer:'strong', terms:['which','word','means','body','muscles','strong','slim','average','messy'] },
+      { id:'def-chubby', prompt:'Which word means: body a little fat?', options:['chubby','athletic','thin','straight'], answer:'chubby', terms:['which','word','means','body','little','fat','chubby','athletic','thin','straight'] },
+      { id:'def-average', prompt:'Which word means: normal body?', options:['average','strong','bald','full'], answer:'average', terms:['which','word','means','normal','body','average','strong','bald','full'] },
+      { id:'def-long', prompt:'Which word means: not short hair?', options:['long','bald','thin','full'], answer:'long', terms:['which','word','means','not','short','hair','long','bald','thin','full'] },
+      { id:'def-short', prompt:'Which word means: not tall?', options:['short','tall','curly','strong'], answer:'short', terms:['which','word','means','not','tall','short','curly','strong'] },
+      { id:'def-slim', prompt:'Which word means: body thin and nice?', options:['slim','chubby','strong','messy'], answer:'slim', terms:['which','word','means','body','thin','nice','slim','chubby','strong','messy'] }
+    ];
+
+    const TRUE_FALSE_BANK = [
+      { id:'tf1', statement:'Long means not short.', answer:true, terms:['true','false','long','means','not','short'] },
+      { id:'tf2', statement:'Thin lips are big lips.', answer:false, terms:['true','false','thin','lips','big','full'] },
+      { id:'tf3', statement:'Bald means no hair.', answer:true, terms:['true','false','bald','means','no','hair'] },
+      { id:'tf4', statement:'Athletic is a body type.', answer:true, terms:['true','false','athletic','body','type'] },
+      { id:'tf5', statement:'Curly hair is straight hair.', answer:false, terms:['true','false','curly','hair','straight'] },
+      { id:'tf6', statement:'Tall is the opposite of short.', answer:true, terms:['true','false','tall','opposite','short'] },
+      { id:'tf7', statement:'Messy hair is very neat hair.', answer:false, terms:['true','false','messy','hair','neat'] },
+      { id:'tf8', statement:'Chubby means very slim.', answer:false, terms:['true','false','chubby','slim'] },
+      { id:'tf9', statement:'Full lips are not thin lips.', answer:true, terms:['true','false','full','lips','thin'] },
+      { id:'tf10', statement:'Wavy hair has waves.', answer:true, terms:['true','false','wavy','hair','waves'] },
+      { id:'tf11', statement:'Average body means normal body.', answer:true, terms:['true','false','average','body','normal'] },
+      { id:'tf12', statement:'Strong body means weak body.', answer:false, terms:['true','false','strong','body','weak'] },
+      { id:'tf13', statement:'Short can talk about height.', answer:true, terms:['true','false','short','height'] },
+      { id:'tf14', statement:'Slim means a little fat.', answer:false, terms:['true','false','slim','little','fat'] },
+      { id:'tf15', statement:'Straight hair has no waves.', answer:true, terms:['true','false','straight','hair','waves'] }
+    ];
 
     function nowIso() { return new Date().toISOString(); }
-    function simpleId() { return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`; }
-    function randomSeed() { return Math.floor(Math.random() * 2147483646) + 1; }
-    function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
-    function choice(list, rnd) { return list[Math.floor(rnd() * list.length)]; }
+    function randomSeed() { return Math.floor(Date.now() + Math.random() * 1000000); }
+    function normalizeKey(value) {
+      return String(value || '')
+        .toLowerCase()
+        .replace(/[“”"'.,!?;:()]/g, '')
+        .replace(/-/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+    function mulberry32(seed) {
+      let a = seed >>> 0;
+      return function() {
+        a |= 0;
+        a = (a + 0x6D2B79F5) | 0;
+        let t = Math.imul(a ^ (a >>> 15), 1 | a);
+        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+      };
+    }
     function shuffle(list, rnd) {
       const arr = [...list];
       for (let i = arr.length - 1; i > 0; i -= 1) {
@@ -518,206 +281,14 @@
       }
       return arr;
     }
-    function mulberry32(seed) {
-      let a = seed >>> 0;
-      return function () {
-        a |= 0;
-        a = (a + 0x6D2B79F5) | 0;
-        let t = Math.imul(a ^ (a >>> 15), 1 | a);
-        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-      };
-    }
-
-    function normalizeKey(value) {
-      return String(value || '')
-        .toLowerCase()
-        .replace(/[“”"'.,!?;:()]/g, '')
-        .replace(/\s+/g, ' ')
-        .trim();
-    }
-
-    function createPerson(rnd, forcedName = null) {
-      const hairType = choice(WORD_BANK.hairType, rnd);
-      const person = {
-        name: forcedName || choice(NAMES, rnd),
-        hairType,
-        hairLength: hairType === 'bald' ? null : choice(WORD_BANK.hairLength, rnd),
-        hairColor: hairType === 'bald' ? null : choice(WORD_BANK.hairColor, rnd),
-        lips: choice(WORD_BANK.lips, rnd),
-        height: choice(WORD_BANK.height, rnd),
-        body: choice(WORD_BANK.body, rnd)
-      };
-      return person;
-    }
-
-    function hairText(person) {
-      if (person.hairType === 'bald') return 'bald';
-      return `${person.hairLength} ${person.hairColor} ${person.hairType} hair`;
-    }
-
-    function personLines(person) {
-      return [
-        person.name,
-        `Hair: ${hairText(person)}`,
-        `Lips: ${person.lips}`,
-        `Height: ${person.height}`,
-        `Body: ${person.body}`
-      ];
-    }
-
-    function statementFromPerson(person, rnd) {
-      const modes = ['hair', 'lips', 'height', 'body'];
-      const mode = choice(modes, rnd);
-      const makeFalse = rnd() < 0.45;
-      let statement = '';
-      let correct = true;
-
-      if (mode === 'hair') {
-        if (person.hairType === 'bald') {
-          const value = makeFalse ? choice(['curly hair', 'wavy hair', 'long hair', 'brown hair'], rnd) : 'bald';
-          correct = value === 'bald';
-          statement = `${person.name} is ${value}.`;
-        } else {
-          const actual = `${person.hairLength} ${person.hairColor} ${person.hairType} hair`;
-          if (!makeFalse) {
-            statement = `${person.name} has ${actual}.`;
-            correct = true;
-          } else {
-            const wrongColor = choice(WORD_BANK.hairColor.filter((x) => x !== person.hairColor), rnd);
-            statement = `${person.name} has ${person.hairLength} ${wrongColor} ${person.hairType} hair.`;
-            correct = false;
-          }
-        }
-      } else if (mode === 'lips') {
-        const value = makeFalse ? (person.lips === 'thin' ? 'full' : 'thin') : person.lips;
-        statement = `${person.name} has ${value} lips.`;
-        correct = value === person.lips;
-      } else if (mode === 'height') {
-        const value = makeFalse ? (person.height === 'tall' ? 'short' : 'tall') : person.height;
-        statement = `${person.name} is ${value}.`;
-        correct = value === person.height;
-      } else {
-        const value = makeFalse ? choice(WORD_BANK.body.filter((x) => x !== person.body), rnd) : person.body;
-        statement = `${person.name} has a ${value} body.`;
-        correct = value === person.body;
-      }
-
-      return { statement, correct };
-    }
-
-    function buildDefinitionTask(rnd) {
-      const item = { ...choice(DEFINITION_BANK, rnd) };
-      const options = shuffle(item.options, rnd);
-      return {
-        id: simpleId(),
-        type: 'definition',
-        prompt: item.prompt,
-        supportCards: [],
-        options: options.map((text) => ({ kind: 'word', text })),
-        correctIndex: options.indexOf(item.answer),
-        glossaryText: `${item.prompt} ${options.join(' ')}`
-      };
-    }
-
-    function buildTrueFalseTask(rnd) {
-      const person = createPerson(rnd);
-      const details = statementFromPerson(person, rnd);
-      return {
-        id: simpleId(),
-        type: 'tf',
-        prompt: `True or false? ${details.statement}`,
-        supportCards: [{ kind: 'support', lines: personLines(person) }],
-        options: [{ kind: 'word', text: 'True' }, { kind: 'word', text: 'False' }],
-        correctIndex: details.correct ? 0 : 1,
-        glossaryText: `True or false? ${details.statement} ${personLines(person).join(' ')}`
-      };
-    }
-
-    function createTaskSet(seed) {
-      const rnd = mulberry32(seed);
-      const tasks = [];
-      const tfPositions = new Set(shuffle([...Array(CONFIG.totalTasks).keys()], rnd).slice(0, CONFIG.trueFalseCount));
-      for (let i = 0; i < CONFIG.totalTasks; i += 1) {
-        const task = tfPositions.has(i) ? buildTrueFalseTask(rnd) : buildDefinitionTask(rnd);
-        task.number = i + 1;
-        tasks.push(task);
-      }
-      return tasks;
-    }
-
-    function buildOneTask(seedValue, typeHint = null) {
-      const rnd = mulberry32(seedValue);
-      if (typeHint === 'tf') return buildTrueFalseTask(rnd);
-      if (typeHint === 'definition') return buildDefinitionTask(rnd);
-      return rnd() < 0.25 ? buildTrueFalseTask(rnd) : buildDefinitionTask(rnd);
-    }
-
-    function persistState() {
-      appState.autosavedAt = nowIso();
-      localStorage.setItem(CONFIG.storage.state, JSON.stringify(appState));
-    }
-
-    function loadState() {
-      try {
-        const raw = localStorage.getItem(CONFIG.storage.state);
-        return raw ? JSON.parse(raw) : null;
-      } catch (e) {
-        return null;
-      }
-    }
-
-    function setShuffleFlag(reason) {
-      if (appState.stage !== 'running') return;
-      const payload = { sessionId: appState.sessionId, index: appState.currentIndex, reason, at: nowIso() };
-      localStorage.setItem(CONFIG.storage.shuffle, JSON.stringify(payload));
-      persistState();
-    }
-
-    function consumeShuffleFlag() {
-      try {
-        const raw = localStorage.getItem(CONFIG.storage.shuffle);
-        if (!raw) return null;
-        localStorage.removeItem(CONFIG.storage.shuffle);
-        return JSON.parse(raw);
-      } catch (e) {
-        localStorage.removeItem(CONFIG.storage.shuffle);
-        return null;
-      }
-    }
-
-    function setScreen(name) {
-      elements.startScreen.classList.toggle('active', name === 'start');
-      elements.practiceScreen.classList.toggle('active', name === 'practice');
-      elements.resultScreen.classList.toggle('active', name === 'result');
-    }
-
-    function showToast(text) {
-      elements.toast.textContent = text;
-      elements.toast.classList.add('show');
-      clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => elements.toast.classList.remove('show'), 2200);
-    }
-
-    function setStatus(text, kind = '') {
-      elements.statusLine.innerHTML = '';
-      const span = document.createElement('span');
-      span.className = `status ${kind}`.trim();
-      span.textContent = text;
-      elements.statusLine.appendChild(span);
-    }
-
-    function useRetinaCanvas(canvas, logicalWidth = null, logicalHeight = null) {
+    function useRetinaCanvas(canvas, logicalWidth, logicalHeight) {
       const ratio = Math.max(window.devicePixelRatio || 1, 1);
-      const width = logicalWidth || Number(canvas.getAttribute('width')) || canvas.clientWidth || 1000;
-      const height = logicalHeight || Number(canvas.getAttribute('height')) || 200;
-      canvas.width = Math.round(width * ratio);
-      canvas.height = Math.round(height * ratio);
+      canvas.width = Math.round(logicalWidth * ratio);
+      canvas.height = Math.round(logicalHeight * ratio);
       const ctx = canvas.getContext('2d');
       ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
-      return { ctx, width, height };
+      return { ctx, width: logicalWidth, height: logicalHeight };
     }
-
     function roundedRect(ctx, x, y, w, h, r) {
       ctx.beginPath();
       ctx.moveTo(x + r, y);
@@ -727,14 +298,6 @@
       ctx.arcTo(x, y, x + w, y, r);
       ctx.closePath();
     }
-
-    function fillGradient(ctx, w, h, a, b) {
-      const g = ctx.createLinearGradient(0, 0, w, h);
-      g.addColorStop(0, a);
-      g.addColorStop(1, b);
-      return g;
-    }
-
     function wrapLines(ctx, text, maxWidth) {
       const words = String(text).split(/\s+/).filter(Boolean);
       const lines = [];
@@ -751,88 +314,66 @@
       if (line) lines.push(line);
       return lines;
     }
-
     function normalizeDictionary(raw) {
       const out = {};
+      const addItem = (key, value) => {
+        const clean = normalizeKey(key);
+        if (!clean) return;
+        out[clean] = {
+          translation: value.translation || value.Translation || value.hint || '',
+          emoji: value.emoji || value.Emoji || '',
+          example: value.example || value.Example || ''
+        };
+      };
       if (Array.isArray(raw)) {
-        raw.forEach((item) => {
-          const key = normalizeKey(item.Word || item.word || item.term);
-          if (!key) return;
-          out[key] = {
-            translation: item.Translation || item.translation || '',
-            emoji: item.Emoji || item.emoji || '',
-            category: item.Category || item.category || 'word',
-            example: item.Example || item.example || ''
-          };
-        });
+        raw.forEach((item) => addItem(item.Word || item.word || item.term, item));
       } else if (raw && typeof raw === 'object') {
         Object.entries(raw).forEach(([key, value]) => {
-          const clean = normalizeKey(key);
-          if (!clean) return;
-          if (typeof value === 'string') {
-            out[clean] = { translation: value, emoji: '', category: 'word', example: '' };
-          } else {
-            out[clean] = {
-              translation: value.Translation || value.translation || value.hint || '',
-              emoji: value.Emoji || value.emoji || '',
-              category: value.Category || value.category || 'word',
-              example: value.Example || value.example || ''
-            };
-          }
+          if (typeof value === 'string') addItem(key, { translation: value });
+          else addItem(key, value || {});
         });
       }
       return out;
     }
-
     async function loadDictionary() {
       try {
         const response = await fetch('words.json', { cache: 'no-store' });
-        if (!response.ok) throw new Error('words.json not found');
+        if (!response.ok) throw new Error('no words');
         dictionary = normalizeDictionary(await response.json());
       } catch (e) {
         dictionary = {};
       }
     }
-
-    function storeHits(canvas, hits) {
-      canvasHits.set(canvas, hits || []);
-    }
-
-    function renderTextBlock(canvas, text, opts = {}) {
-      const logicalHeight = opts.height || 200;
-      const { ctx, width, height } = useRetinaCanvas(canvas, opts.width || 1400, logicalHeight);
+    function storeHits(canvas, hits) { canvasHits.set(canvas, hits || []); }
+    function renderTextBlock(canvas, text, options = {}) {
+      const height = options.height || 180;
+      const { ctx, width } = useRetinaCanvas(canvas, 1200, height);
       const hits = [];
       ctx.clearRect(0, 0, width, height);
-      ctx.fillStyle = fillGradient(ctx, width, height, 'rgba(12,24,50,0.96)', 'rgba(6,16,36,0.96)');
-      roundedRect(ctx, 0, 0, width, height, 22);
+      ctx.fillStyle = '#f6f9fc';
+      roundedRect(ctx, 0, 0, width, height, 20);
       ctx.fill();
-      ctx.strokeStyle = 'rgba(148,163,184,0.14)';
-      roundedRect(ctx, 0.5, 0.5, width - 1, height - 1, 22);
+      ctx.strokeStyle = '#d7e1ec';
+      roundedRect(ctx, 0.5, 0.5, width - 1, height - 1, 20);
       ctx.stroke();
 
-      const padX = opts.padX || 28;
-      let y = opts.startY || 48;
-
-      if (opts.badge) {
-        ctx.font = '700 18px Inter, system-ui, sans-serif';
-        const badgeWidth = ctx.measureText(opts.badge).width + 26;
-        ctx.fillStyle = 'rgba(34,211,238,0.14)';
-        roundedRect(ctx, padX, y - 24, badgeWidth, 34, 17);
+      const padX = 26;
+      let y = 42;
+      if (options.badge) {
+        ctx.fillStyle = '#e5f2ff';
+        roundedRect(ctx, padX, 16, 126, 32, 16);
         ctx.fill();
-        ctx.strokeStyle = 'rgba(34,211,238,0.24)';
-        roundedRect(ctx, padX, y - 24, badgeWidth, 34, 17);
-        ctx.stroke();
-        ctx.fillStyle = '#7dd3fc';
-        ctx.fillText(opts.badge, padX + 13, y - 1);
-        y += 26;
+        ctx.fillStyle = '#1568b8';
+        ctx.font = '800 18px Inter, system-ui, sans-serif';
+        ctx.fillText(options.badge, padX + 14, 37);
+        y = 78;
       }
 
-      ctx.font = `${opts.fontWeight || 800} ${opts.fontSize || 26}px Inter, system-ui, sans-serif`;
-      const lineHeight = opts.lineHeight || 38;
+      ctx.fillStyle = '#14314e';
+      ctx.font = `${options.weight || 900} ${options.fontSize || 24}px Inter, system-ui, sans-serif`;
+      const lineHeight = options.lineHeight || 34;
       const lines = wrapLines(ctx, text, width - padX * 2);
-      const fontSize = Number((ctx.font.match(/(\d+)px/) || [0, 26])[1]);
-      const boxHeight = Math.round(fontSize * 1.05) + 12;
-      const interactive = opts.interactive !== false;
+      const boxHeight = (options.fontSize || 24) + 14;
       lines.forEach((line) => {
         let x = padX;
         const words = line.split(/\s+/).filter(Boolean);
@@ -840,117 +381,228 @@
         words.forEach((word) => {
           const normalized = normalizeKey(word);
           const dictItem = dictionary[normalized];
-          const widthWord = ctx.measureText(word).width;
-          ctx.fillStyle = dictItem ? '#7dd3fc' : (opts.color || '#eef6ff');
+          const wordWidth = ctx.measureText(word).width;
+          ctx.fillStyle = dictItem ? '#1976d2' : '#14314e';
           ctx.fillText(word, x, y);
           if (dictItem) {
-            ctx.strokeStyle = 'rgba(125,211,252,0.8)';
+            ctx.strokeStyle = '#1976d2';
             ctx.lineWidth = 2;
             ctx.beginPath();
-            ctx.moveTo(x, y + 6);
-            ctx.lineTo(x + widthWord, y + 6);
+            ctx.moveTo(x, y + 5);
+            ctx.lineTo(x + wordWidth, y + 5);
             ctx.stroke();
-            if (interactive) {
-              hits.push({ term: normalized, data: dictItem, x, y: y - boxHeight + 2, width: widthWord, height: boxHeight + 10 });
-            }
+            hits.push({ term: normalized, data: dictItem, x, y: y - boxHeight + 2, width: wordWidth, height: boxHeight + 8 });
           }
-          x += widthWord + space;
+          x += wordWidth + space;
         });
         y += lineHeight;
       });
       storeHits(canvas, hits);
     }
-
-    function renderOptionCanvas(canvas, option, index, state = 'idle') {
-      const height = 96;
-      const { ctx, width, height: logicalHeight } = useRetinaCanvas(canvas, 900, height);
-      ctx.clearRect(0, 0, width, logicalHeight);
-      const bg = state === 'correct'
-        ? ['rgba(6,78,59,0.88)', 'rgba(5,60,47,0.96)']
-        : state === 'wrong'
-          ? ['rgba(127,29,29,0.84)', 'rgba(88,28,43,0.96)']
-          : ['rgba(14,27,56,0.95)', 'rgba(8,16,36,0.96)'];
-      ctx.fillStyle = fillGradient(ctx, width, logicalHeight, bg[0], bg[1]);
-      roundedRect(ctx, 0, 0, width, logicalHeight, 20);
+    function renderOptionCanvas(canvas, option, index, state='idle') {
+      const height = 92;
+      const { ctx, width } = useRetinaCanvas(canvas, 900, height);
+      ctx.clearRect(0, 0, width, height);
+      const fill = state === 'correct' ? '#e7f8f1' : state === 'wrong' ? '#fff0f3' : '#ffffff';
+      const border = state === 'correct' ? '#9ddbbf' : state === 'wrong' ? '#efb2be' : '#d7e1ec';
+      const labelFill = state === 'correct' ? '#1fa971' : state === 'wrong' ? '#d4546a' : '#e5f2ff';
+      const labelText = state === 'correct' || state === 'wrong' ? '#ffffff' : '#1568b8';
+      roundedRect(ctx, 0, 0, width, height, 18);
+      ctx.fillStyle = fill;
       ctx.fill();
-      ctx.strokeStyle = 'rgba(148,163,184,0.14)';
-      roundedRect(ctx, 0.5, 0.5, width - 1, logicalHeight - 1, 20);
+      ctx.strokeStyle = border;
+      roundedRect(ctx, 0.5, 0.5, width - 1, height - 1, 18);
       ctx.stroke();
 
-      ctx.fillStyle = 'rgba(125,211,252,0.18)';
-      roundedRect(ctx, 18, 18, 42, 42, 15);
+      ctx.fillStyle = labelFill;
+      roundedRect(ctx, 18, 21, 42, 42, 14);
       ctx.fill();
-      ctx.fillStyle = '#bae6fd';
+      ctx.fillStyle = labelText;
       ctx.font = '800 22px Inter, system-ui, sans-serif';
-      ctx.fillText(String.fromCharCode(65 + index), 32, 47);
+      ctx.fillText(String.fromCharCode(65 + index), 32, 48);
 
-      ctx.fillStyle = '#eef6ff';
-      ctx.font = '800 26px Inter, system-ui, sans-serif';
-      const lines = wrapLines(ctx, option.text, width - 110);
-      let y = logicalHeight / 2 - ((lines.length - 1) * 16);
+      ctx.fillStyle = '#14314e';
+      ctx.font = '900 28px Inter, system-ui, sans-serif';
+      const lines = wrapLines(ctx, option, width - 100);
+      let y = height / 2 - ((lines.length - 1) * 16);
       lines.forEach((line) => {
         ctx.fillText(line, 82, y);
         y += 32;
       });
       storeHits(canvas, []);
     }
-
-    function renderSupportCanvas(canvas, lines) {
-      renderTextBlock(canvas, lines.join('  '), {
-        width: 1200,
-        height: 150,
-        fontSize: 22,
-        lineHeight: 32,
-        interactive: true,
-        color: '#dbeafe'
+    function setScreen(name) {
+      elements.startScreen.classList.toggle('active', name === 'start');
+      elements.practiceScreen.classList.toggle('active', name === 'practice');
+      elements.resultScreen.classList.toggle('active', name === 'result');
+    }
+    function showToast(text) {
+      elements.toast.textContent = text;
+      elements.toast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => elements.toast.classList.remove('show'), 1800);
+    }
+    function setStatus(text, kind='') {
+      elements.statusLine.innerHTML = '';
+      const span = document.createElement('span');
+      span.className = `status ${kind}`.trim();
+      span.textContent = text;
+      elements.statusLine.appendChild(span);
+    }
+    function buildInitialTasks(seed) {
+      const rnd = mulberry32(seed);
+      const defs = shuffle(DEFINITION_BANK, rnd).slice(0, 10).map((item) => ({
+        id: item.id,
+        baseId: item.id,
+        type: 'definition',
+        prompt: item.prompt,
+        options: shuffle(item.options, rnd),
+        answer: item.answer,
+        terms: item.terms,
+        support: 'Choose one word.'
+      }));
+      const tfs = shuffle(TRUE_FALSE_BANK, rnd).slice(0, 10).map((item) => ({
+        id: item.id,
+        baseId: item.id,
+        type: 'truefalse',
+        prompt: `True or False: ${item.statement}`,
+        options: ['True', 'False'],
+        answer: item.answer ? 'True' : 'False',
+        terms: item.terms,
+        support: 'Read and check the meaning.'
+      }));
+      return shuffle([...defs, ...tfs], rnd).map((task, index) => ({
+        ...task,
+        number: index + 1,
+        correctIndex: task.options.indexOf(task.answer)
+      }));
+    }
+    function availableBankForType(type) {
+      return type === 'definition' ? DEFINITION_BANK : TRUE_FALSE_BANK;
+    }
+    function makeReplacementTask(type, usedBaseIds) {
+      const bank = availableBankForType(type);
+      const free = bank.filter((item) => !usedBaseIds.includes(item.id));
+      const source = free.length ? free[Math.floor(Math.random() * free.length)] : bank[Math.floor(Math.random() * bank.length)];
+      const rnd = mulberry32(randomSeed());
+      const options = type === 'definition' ? shuffle(source.options, rnd) : ['True', 'False'];
+      const answer = type === 'definition' ? source.answer : (source.answer ? 'True' : 'False');
+      return {
+        id: `${source.id}-r-${Date.now().toString(36)}`,
+        baseId: source.id,
+        type,
+        prompt: type === 'definition' ? source.prompt : `True or False: ${source.statement}`,
+        options,
+        answer,
+        terms: source.terms,
+        support: type === 'definition' ? 'Choose one word.' : 'Read and check the meaning.',
+        correctIndex: options.indexOf(answer)
+      };
+    }
+    function persistState() {
+      appState.autosavedAt = nowIso();
+      localStorage.setItem(CONFIG.storage.state, JSON.stringify(appState));
+    }
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(CONFIG.storage.state);
+        return raw ? JSON.parse(raw) : null;
+      } catch (e) {
+        return null;
+      }
+    }
+    function setShuffleFlag(reason) {
+      if (appState.stage !== 'running') return;
+      localStorage.setItem(CONFIG.storage.shuffle, JSON.stringify({
+        sessionId: appState.sessionId,
+        index: appState.currentIndex,
+        reason,
+        at: nowIso()
+      }));
+      persistState();
+    }
+    function consumeShuffleFlag() {
+      try {
+        const raw = localStorage.getItem(CONFIG.storage.shuffle);
+        if (!raw) return null;
+        localStorage.removeItem(CONFIG.storage.shuffle);
+        return JSON.parse(raw);
+      } catch (e) {
+        localStorage.removeItem(CONFIG.storage.shuffle);
+        return null;
+      }
+    }
+    function deriveKeywords(task) {
+      const set = new Set((task.terms || []).map(normalizeKey).filter(Boolean));
+      task.options.forEach((item) => {
+        const clean = normalizeKey(item);
+        if (clean && dictionary[clean]) set.add(clean);
+      });
+      return [...set].filter((item) => dictionary[item]);
+    }
+    function renderKeywords(task) {
+      elements.chipsRow.innerHTML = '';
+      deriveKeywords(task).forEach((term) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'chip';
+        btn.textContent = term;
+        btn.addEventListener('click', () => openDictionary(term, dictionary[term]));
+        elements.chipsRow.appendChild(btn);
       });
     }
-
-    function renderPrompt(task) {
-      const badge = task.type === 'tf' ? CATEGORY_LABELS.tf : CATEGORY_LABELS.definition;
-      renderTextBlock(elements.promptCanvas, task.prompt, {
-        badge,
-        height: task.type === 'tf' ? 180 : 160,
-        fontSize: 24,
-        lineHeight: 34,
-        interactive: true
+    function openDictionary(term, entry) {
+      if (!entry) return;
+      const parts = [];
+      if (entry.emoji) parts.push(entry.emoji);
+      if (entry.translation) parts.push(entry.translation);
+      if (entry.example) parts.push(entry.example);
+      elements.popupTitle.textContent = term;
+      elements.popupBody.textContent = parts.join('  •  ') || 'No note';
+      elements.popup.classList.add('show');
+    }
+    function closeDictionary() { elements.popup.classList.remove('show'); }
+    function bindCanvasClicks(canvas) {
+      canvas.addEventListener('click', (event) => {
+        const hits = canvasHits.get(canvas) || [];
+        if (!hits.length) return;
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = (canvas.width / (window.devicePixelRatio || 1)) / rect.width;
+        const scaleY = (canvas.height / (window.devicePixelRatio || 1)) / rect.height;
+        const x = (event.clientX - rect.left) * scaleX;
+        const y = (event.clientY - rect.top) * scaleY;
+        const hit = hits.find((item) => x >= item.x && x <= item.x + item.width && y >= item.y && y <= item.y + item.height);
+        if (hit) openDictionary(hit.term, hit.data);
       });
     }
-
     function updateProgress() {
       const done = appState.results.length;
       elements.progressText.textContent = `${Math.min(appState.currentIndex + 1, CONFIG.totalTasks)} / ${CONFIG.totalTasks}`;
       elements.scoreText.textContent = `${appState.score.correct} correct`;
-      const pct = CONFIG.totalTasks ? Math.round((done / CONFIG.totalTasks) * 100) : 0;
+      const pct = Math.round((done / CONFIG.totalTasks) * 100);
       elements.progressFill.style.width = `${pct}%`;
     }
-
     function renderTask() {
       const task = appState.tasks[appState.currentIndex];
       if (!task) return;
-      clearTimeout(nextTimer);
       answerLocked = false;
       appState.currentTaskStartedAt = nowIso();
-      renderPrompt(task);
-
-      elements.supportGrid.innerHTML = '';
-      if (task.supportCards && task.supportCards.length) {
-        elements.supportGrid.className = 'support-grid';
-        task.supportCards.forEach((card) => {
-          const wrapper = document.createElement('div');
-          wrapper.className = 'support-box';
-          const canvas = document.createElement('canvas');
-          wrapper.appendChild(canvas);
-          elements.supportGrid.appendChild(wrapper);
-          renderSupportCanvas(canvas, card.lines);
-          canvas.addEventListener('click', handleCanvasClick);
-        });
-      } else {
-        elements.supportGrid.className = 'support-grid';
-      }
+      renderTextBlock(elements.promptCanvas, task.prompt, {
+        badge: task.type === 'definition' ? 'Definition' : 'True / False',
+        height: 180,
+        fontSize: 24,
+        lineHeight: 34
+      });
+      elements.supportWrap.style.display = 'block';
+      renderTextBlock(elements.supportCanvas, task.support, {
+        height: 86,
+        fontSize: 20,
+        lineHeight: 28,
+        weight: 800
+      });
+      renderKeywords(task);
 
       elements.optionsGrid.innerHTML = '';
-      elements.optionsGrid.className = task.options.length <= 2 ? 'options-grid' : 'options-grid two';
       task.options.forEach((option, index) => {
         const button = document.createElement('button');
         button.type = 'button';
@@ -963,388 +615,198 @@
       });
 
       updateProgress();
-      setStatus(task.type === 'tf' ? 'Choose True or False' : 'Choose the correct word');
+      setStatus('Tap blue words for help');
       persistState();
     }
-
     function answerTask(selectedIndex) {
       if (answerLocked) return;
       const task = appState.tasks[appState.currentIndex];
       if (!task) return;
       answerLocked = true;
-      const buttons = [...elements.optionsGrid.querySelectorAll('.option-btn')];
       const isCorrect = selectedIndex === task.correctIndex;
       const latencyMs = Math.max(0, Date.now() - new Date(appState.currentTaskStartedAt || nowIso()).getTime());
       if (isCorrect) appState.score.correct += 1;
-      appState.results.push({ taskId: task.id, type: task.type, correct: isCorrect, latencyMs });
-
-      buttons.forEach((btn, idx) => {
-        btn.disabled = true;
-        btn.classList.toggle('correct', idx === task.correctIndex);
-        btn.classList.toggle('wrong', idx === selectedIndex && !isCorrect);
+      [...elements.optionsGrid.querySelectorAll('.option-btn')].forEach((btn, index) => {
         const canvas = btn.querySelector('canvas');
-        renderOptionCanvas(canvas, task.options[idx], idx, idx === task.correctIndex ? 'correct' : idx === selectedIndex && !isCorrect ? 'wrong' : 'idle');
+        const state = index === task.correctIndex ? 'correct' : (index === selectedIndex && !isCorrect ? 'wrong' : 'idle');
+        renderOptionCanvas(canvas, task.options[index], index, state);
+        btn.disabled = true;
       });
-
-      setStatus(isCorrect ? 'Correct' : 'Saved', isCorrect ? 'good' : 'bad');
-      if (appState.results.length >= CONFIG.totalTasks) {
-        persistState();
-        nextTimer = setTimeout(() => finishSession(), 700);
-        return;
-      }
-
-      appState.currentIndex = appState.results.length;
+      appState.results.push({
+        taskId: task.id,
+        baseId: task.baseId,
+        type: task.type,
+        correct: isCorrect,
+        selectedIndex,
+        latencyMs
+      });
+      if (!appState.usedTaskIds.includes(task.baseId)) appState.usedTaskIds.push(task.baseId);
       persistState();
-      updateProgress();
-      nextTimer = setTimeout(() => advanceTask(), 700);
-    }
+      setStatus(isCorrect ? 'Correct' : 'Wrong', isCorrect ? 'good' : 'bad');
 
-    function advanceTask() {
-      if (appState.results.length >= CONFIG.totalTasks) {
-        finishSession();
-        return;
-      }
-      appState.currentIndex = appState.results.length;
-      renderTask();
+      setTimeout(() => {
+        appState.currentIndex += 1;
+        if (appState.currentIndex >= CONFIG.totalTasks) {
+          appState.stage = 'finished';
+          persistState();
+          submitResultsOnce();
+          renderResult();
+          setScreen('result');
+        } else {
+          renderTask();
+        }
+      }, 600);
     }
-
     function replaceCurrentTask() {
       if (appState.stage !== 'running') return;
-      const oldTask = appState.tasks[appState.currentIndex];
-      const replacementSeed = randomSeed() + appState.currentIndex + appState.results.length;
-      const replacement = buildOneTask(replacementSeed, oldTask?.type === 'tf' ? 'tf' : 'definition');
+      const current = appState.tasks[appState.currentIndex];
+      if (!current) return;
+      const replacement = makeReplacementTask(current.type, appState.usedTaskIds);
       replacement.number = appState.currentIndex + 1;
-      if (oldTask) replacement.replacedFrom = oldTask.id;
       appState.tasks[appState.currentIndex] = replacement;
-      appState.lastVisibilityShuffleAt = nowIso();
       persistState();
-      renderTask();
-      showToast('Current task changed after leaving the page.');
+      if (document.visibilityState === 'visible') {
+        renderTask();
+        showToast('Task changed');
+      }
     }
-
-    function resultPayload() {
+    function renderResult() {
+      const correct = appState.score.correct;
+      const percent = Math.round((correct / CONFIG.totalTasks) * 100);
+      elements.scoreBig.textContent = `${correct} / ${CONFIG.totalTasks}`;
+      elements.resultName.textContent = appState.studentName || '—';
+      elements.resultGroup.textContent = appState.studentGroup || '—';
+      elements.resultCorrect.textContent = String(correct);
+      elements.resultPercent.textContent = `${percent}%`;
+    }
+    function buildPayload() {
+      const percent = Math.round((appState.score.correct / CONFIG.totalTasks) * 100);
       return {
+        appVersion: CONFIG.appVersion,
         sessionId: appState.sessionId,
-        version: CONFIG.appVersion,
-        student: appState.student,
+        name: appState.studentName,
+        group: appState.studentGroup,
         topic: CONFIG.topicValue,
-        startedAt: appState.startedAt,
-        completedAt: appState.completedAt,
-        summary: {
-          totalTasks: appState.results.length,
-          correct: appState.score.correct,
-          accuracy: appState.results.length ? Number(((appState.score.correct / appState.results.length) * 100).toFixed(2)) : 0
-        },
-        results: appState.results.map((r) => ({ taskId: r.taskId, type: r.type, correct: r.correct, latencyMs: r.latencyMs }))
+        totalTasks: CONFIG.totalTasks,
+        correct: appState.score.correct,
+        percent,
+        finishedAt: nowIso(),
+        results: appState.results.map((item, idx) => ({
+          n: idx + 1,
+          type: item.type,
+          correct: item.correct,
+          ms: item.latencyMs
+        }))
       };
     }
-
-    function finishSession() {
-      appState.stage = 'complete';
-      appState.completedAt = nowIso();
-      persistState();
-      setScreen('result');
-      renderResults();
-      submitResultsOnce().catch(() => null);
-    }
-
-    function escapeHtml(str) {
-      return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
-    }
-
-    function renderResults() {
-      const payload = resultPayload();
-      const accuracy = payload.summary.accuracy;
-      const { ctx, width, height } = useRetinaCanvas(elements.resultCanvas, 1400, 880);
-      ctx.clearRect(0, 0, width, height);
-      ctx.fillStyle = fillGradient(ctx, width, height, 'rgba(12,24,50,0.98)', 'rgba(6,16,36,0.98)');
-      roundedRect(ctx, 0, 0, width, height, 22);
-      ctx.fill();
-      ctx.strokeStyle = 'rgba(148,163,184,0.14)';
-      roundedRect(ctx, 0.5, 0.5, width - 1, height - 1, 22);
-      ctx.stroke();
-
-      ctx.fillStyle = 'rgba(34,211,238,0.14)';
-      roundedRect(ctx, 42, 36, 210, 38, 18);
-      ctx.fill();
-      ctx.strokeStyle = 'rgba(34,211,238,0.24)';
-      roundedRect(ctx, 42, 36, 210, 38, 18);
-      ctx.stroke();
-      ctx.fillStyle = '#7dd3fc';
-      ctx.font = '700 18px Inter, system-ui, sans-serif';
-      ctx.fillText('Final screenshot', 58, 61);
-
-      ctx.fillStyle = '#f8fafc';
-      ctx.font = '800 46px Inter, system-ui, sans-serif';
-      ctx.fillText('Person Description Practice', 42, 126);
-
-      ctx.fillStyle = '#a8b7d2';
-      ctx.font = '700 24px Inter, system-ui, sans-serif';
-      ctx.fillText(`Name: ${appState.student.name}`, 42, 184);
-      ctx.fillText(`Group: ${appState.student.group}`, 42, 222);
-      ctx.fillText(`Mode: 35 definition + 10 true/false`, 42, 260);
-      ctx.fillText(`Finished: ${appState.completedAt ? new Date(appState.completedAt).toLocaleString() : '—'}`, 42, 298);
-
-      const boxX = width - 360;
-      ctx.fillStyle = 'rgba(15,23,42,0.76)';
-      roundedRect(ctx, boxX, 52, 300, 190, 24);
-      ctx.fill();
-      ctx.strokeStyle = 'rgba(148,163,184,0.14)';
-      roundedRect(ctx, boxX, 52, 300, 190, 24);
-      ctx.stroke();
-      ctx.fillStyle = '#7dd3fc';
-      ctx.font = '700 22px Inter, system-ui, sans-serif';
-      ctx.fillText('Result', boxX + 28, 98);
-      ctx.fillStyle = '#f8fafc';
-      ctx.font = '800 72px Inter, system-ui, sans-serif';
-      ctx.fillText(`${Math.round(accuracy)}%`, boxX + 24, 176);
-      ctx.fillStyle = '#a8b7d2';
-      ctx.font = '700 24px Inter, system-ui, sans-serif';
-      ctx.fillText(`${appState.score.correct} / ${appState.results.length} correct`, boxX + 28, 214);
-
-      const stats = [
-        ['Tasks', String(appState.results.length)],
-        ['Correct', String(appState.score.correct)],
-        ['JSON', 'results only'],
-        ['Submit', appState.submission.sent ? 'sent once' : appState.submission.inFlight ? 'sending' : 'pending']
-      ];
-
-      let y = 370;
-      stats.forEach(([label, value], idx) => {
-        const x = idx % 2 === 0 ? 42 : 440;
-        const rowY = idx < 2 ? y : y + 160;
-        ctx.fillStyle = 'rgba(15,23,42,0.76)';
-        roundedRect(ctx, x, rowY, 340, 130, 22);
-        ctx.fill();
-        ctx.strokeStyle = 'rgba(148,163,184,0.14)';
-        roundedRect(ctx, x, rowY, 340, 130, 22);
-        ctx.stroke();
-        ctx.fillStyle = '#a8b7d2';
-        ctx.font = '700 22px Inter, system-ui, sans-serif';
-        ctx.fillText(label, x + 24, rowY + 42);
-        ctx.fillStyle = '#f8fafc';
-        ctx.font = '800 36px Inter, system-ui, sans-serif';
-        ctx.fillText(value, x + 24, rowY + 88);
-      });
-
-      elements.resultStats.innerHTML = '';
-      const rows = [
-        ['Name', appState.student.name],
-        ['Group', appState.student.group],
-        ['Correct', `${appState.score.correct} / ${appState.results.length}`],
-        ['Accuracy', `${Math.round(accuracy)}%`],
-        ['Submission', appState.submission.sent ? 'Sent once' : appState.submission.inFlight ? 'Sending…' : 'Pending']
-      ];
-      rows.forEach(([label, value]) => {
-        const row = document.createElement('div');
-        row.className = 'stat-row';
-        row.innerHTML = `<span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong>`;
-        elements.resultStats.appendChild(row);
-      });
-    }
-
-    function openGlossary(term, data, clientX, clientY) {
-      const emoji = data.emoji ? `${data.emoji} ` : '';
-      const popup = elements.glossaryPopup;
-      popup.innerHTML = `
-        <strong>${escapeHtml(term)}</strong>
-        <div class="muted">${escapeHtml((data.category || 'word'))}</div>
-        <div>${escapeHtml(`${emoji}${data.translation || ''}`)}</div>
-        ${data.example ? `<div class="muted">${escapeHtml(data.example)}</div>` : ''}
-      `;
-      popup.classList.add('visible');
-      const rect = popup.getBoundingClientRect();
-      const left = clamp(clientX + 10, 10, window.innerWidth - rect.width - 10);
-      const top = clamp(clientY + 10, 10, window.innerHeight - rect.height - 10);
-      popup.style.left = `${left}px`;
-      popup.style.top = `${top}px`;
-    }
-
-    function closeGlossary() { elements.glossaryPopup.classList.remove('visible'); }
-
-    function handleCanvasClick(event) {
-      const canvas = event.currentTarget;
-      const hits = canvasHits.get(canvas) || [];
-      if (!hits.length) return closeGlossary();
-      const rect = canvas.getBoundingClientRect();
-      const scaleX = ((canvas.width / (window.devicePixelRatio || 1)) || rect.width) / rect.width;
-      const scaleY = ((canvas.height / (window.devicePixelRatio || 1)) || rect.height) / rect.height;
-      const x = (event.clientX - rect.left) * scaleX;
-      const y = (event.clientY - rect.top) * scaleY;
-      const hit = hits.find((item) => x >= item.x && x <= item.x + item.width && y >= item.y && y <= item.y + item.height);
-      if (!hit) return closeGlossary();
-      openGlossary(hit.term, hit.data, event.clientX, event.clientY);
-    }
-
-    function showFirstGlossary() {
-      const hits = canvasHits.get(elements.promptCanvas) || [];
-      if (!hits.length) return showToast('No dictionary word here.');
-      const rect = elements.glossaryBtn.getBoundingClientRect();
-      openGlossary(hits[0].term, hits[0].data, rect.left + rect.width / 2, rect.top - 6);
-    }
-
-    function normalizeFormAction(url) {
-      if (!url) return '';
-      if (url.includes('/formResponse')) return url;
-      return url.replace('/viewform', '/formResponse').split('?')[0];
-    }
-
-    function alreadySubmitted(sessionId) {
-      return localStorage.getItem(`${CONFIG.storage.submittedPrefix}${sessionId}`) === '1';
-    }
-
-    async function submitResultsOnce() {
-      if (!appState.sessionId || appState.submission.sent || appState.submission.inFlight || alreadySubmitted(appState.sessionId)) {
-        appState.submission.sent = appState.submission.sent || alreadySubmitted(appState.sessionId);
+    function submitResultsOnce() {
+      if (appState.submitDone || !appState.sessionId) return;
+      const key = `${CONFIG.storage.submittedPrefix}${appState.sessionId}`;
+      if (localStorage.getItem(key) === '1') {
+        appState.submitDone = true;
         persistState();
-        renderResults();
         return;
       }
-      const action = normalizeFormAction(CONFIG.form.actionUrl);
-      const { name, group, topic, payload } = CONFIG.form.fields;
-      if (!action || !name || !group || !topic || !payload) return;
-
-      const finalPayload = JSON.stringify(resultPayload());
-      const body = new URLSearchParams();
-      body.set(name, appState.student.name);
-      body.set(group, appState.student.group);
-      body.set(topic, CONFIG.topicValue);
-      body.set(payload, finalPayload);
-
-      appState.submission.inFlight = true;
-      persistState();
-      renderResults();
-
+      const payload = buildPayload();
+      const formData = new URLSearchParams();
+      formData.set(CONFIG.form.fields.name, appState.studentName);
+      formData.set(CONFIG.form.fields.group, appState.studentGroup);
+      formData.set(CONFIG.form.fields.topic, CONFIG.topicValue);
+      formData.set(CONFIG.form.fields.payload, JSON.stringify(payload));
       try {
-        await fetch(action, {
-          method: 'POST',
-          mode: 'no-cors',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
-          body
-        });
-        localStorage.setItem(`${CONFIG.storage.submittedPrefix}${appState.sessionId}`, '1');
-        appState.submission.sent = true;
-        appState.submission.sentAt = nowIso();
-        appState.submission.message = 'sent once';
-      } catch (e) {
-        appState.submission.message = 'failed';
-      } finally {
-        appState.submission.inFlight = false;
-        persistState();
-        renderResults();
-      }
+        if (navigator.sendBeacon) {
+          const blob = new Blob([formData.toString()], { type: 'application/x-www-form-urlencoded;charset=UTF-8' });
+          navigator.sendBeacon(CONFIG.form.actionUrl, blob);
+        } else {
+          fetch(CONFIG.form.actionUrl, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+            body: formData.toString()
+          }).catch(() => {});
+        }
+      } catch (e) {}
+      localStorage.setItem(key, '1');
+      appState.submitDone = true;
+      persistState();
     }
-
-    function startSession() {
+    function startNewSession() {
       const name = elements.studentName.value.trim();
       const group = elements.studentGroup.value.trim();
-      if (!name || !group) return showToast('Enter name and group.');
-
-      clearTimeout(nextTimer);
-      appState = createEmptyState();
-      appState.sessionId = simpleId();
-      appState.seed = randomSeed();
-      appState.startedAt = nowIso();
-      appState.student = { name, group };
-      appState.tasks = createTaskSet(appState.seed);
+      if (!name || !group) {
+        showToast('Enter name and group');
+        return;
+      }
       appState.stage = 'running';
+      appState.studentName = name;
+      appState.studentGroup = group;
+      appState.sessionId = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2,8)}`;
+      appState.seed = randomSeed();
+      appState.currentIndex = 0;
+      appState.score = { correct: 0 };
+      appState.results = [];
+      appState.usedTaskIds = [];
+      appState.submitDone = false;
+      appState.tasks = buildInitialTasks(appState.seed);
       persistState();
       setScreen('practice');
       renderTask();
     }
-
-    function restoreOrInit() {
-      const saved = loadState();
-      const shuffleFlag = consumeShuffleFlag();
-      if (!saved) {
-        appState = createEmptyState();
-        setScreen('start');
-        return;
-      }
-      appState = saved;
-      elements.studentName.value = appState.student?.name || '';
-      elements.studentGroup.value = appState.student?.group || '';
-
-      if (appState.stage === 'complete') {
+    function restoreFromSaved(saved) {
+      Object.assign(appState, saved);
+      elements.studentName.value = appState.studentName || '';
+      elements.studentGroup.value = appState.studentGroup || '';
+      if (appState.stage === 'finished') {
+        renderResult();
         setScreen('result');
-        renderResults();
-        return;
-      }
-
-      if (appState.stage === 'running') {
+      } else if (appState.stage === 'running') {
         setScreen('practice');
-        if (shuffleFlag && shuffleFlag.sessionId === appState.sessionId) {
-          replaceCurrentTask();
-        } else {
-          renderTask();
-        }
-        return;
+        const flag = consumeShuffleFlag();
+        if (flag && flag.sessionId === appState.sessionId) replaceCurrentTask();
+        else renderTask();
+      } else {
+        setScreen('start');
       }
-
-      setScreen('start');
     }
-
     function registerServiceWorker() {
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./sw.js').catch(() => null);
-      }
+      if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(() => {});
     }
-
-    function bindAntiCopy() {
-      const stop = (e) => { e.preventDefault(); return false; };
-      ['contextmenu', 'copy', 'cut', 'dragstart', 'selectstart'].forEach((type) => document.addEventListener(type, stop));
+    function installProtection() {
+      document.addEventListener('contextmenu', (e) => e.preventDefault());
+      document.addEventListener('copy', (e) => e.preventDefault());
+      document.addEventListener('cut', (e) => e.preventDefault());
+      document.addEventListener('dragstart', (e) => e.preventDefault());
       document.addEventListener('keydown', (e) => {
         const key = e.key.toLowerCase();
-        if ((e.ctrlKey || e.metaKey) && ['c', 'x', 'a', 's', 'u', 'p'].includes(key)) e.preventDefault();
-        if (['f12'].includes(key)) e.preventDefault();
-      });
-    }
-
-    function bindGuards() {
+        if ((e.ctrlKey || e.metaKey) && ['c','x','s','u','p','a'].includes(key)) e.preventDefault();
+      }, true);
+      window.addEventListener('beforeunload', () => { if (appState.stage === 'running') setShuffleFlag('beforeunload'); });
       document.addEventListener('visibilitychange', () => {
-        if (document.visibilityState === 'hidden') {
-          setShuffleFlag('hidden');
-        } else if (document.visibilityState === 'visible' && appState.stage === 'running') {
-          const saved = loadState();
-          if (saved) appState = saved;
-          replaceCurrentTask();
+        if (document.visibilityState !== 'visible') {
+          if (appState.stage === 'running') setShuffleFlag('hidden');
+        } else {
+          const flag = consumeShuffleFlag();
+          if (flag && flag.sessionId === appState.sessionId && appState.stage === 'running') replaceCurrentTask();
         }
       });
-      window.addEventListener('pagehide', () => setShuffleFlag('pagehide'));
-      window.addEventListener('beforeunload', () => setShuffleFlag('beforeunload'));
-      window.addEventListener('offline', () => showToast('Offline. Progress is saved.'));
-      window.addEventListener('online', () => showToast('Online again.'));
+      window.addEventListener('offline', () => { persistState(); showToast('Offline mode'); });
+      window.addEventListener('online', () => showToast('Online'));
     }
 
-    function bindEvents() {
-      elements.startBtn.addEventListener('click', startSession);
-      elements.glossaryBtn.addEventListener('click', showFirstGlossary);
-      elements.promptCanvas.addEventListener('click', handleCanvasClick);
-      document.addEventListener('click', (e) => {
-        if (!elements.glossaryPopup.contains(e.target) && e.target !== elements.glossaryBtn && e.target !== elements.promptCanvas) closeGlossary();
-      });
-      window.addEventListener('resize', () => {
-        if (appState.stage === 'running') renderTask();
-        if (appState.stage === 'complete') renderResults();
-      });
-    }
+    bindCanvasClicks(elements.promptCanvas);
+    bindCanvasClicks(elements.supportCanvas);
+    elements.popupClose.addEventListener('click', closeDictionary);
+    elements.popup.addEventListener('click', (e) => { if (e.target === elements.popup) closeDictionary(); });
+    elements.startBtn.addEventListener('click', startNewSession);
 
-    async function init() {
-      bindAntiCopy();
-      bindGuards();
-      bindEvents();
-      registerServiceWorker();
+    (async function init() {
       await loadDictionary();
-      restoreOrInit();
-    }
-
-    init();
+      registerServiceWorker();
+      installProtection();
+      const saved = loadState();
+      if (saved && saved.sessionId && saved.stage && Array.isArray(saved.tasks)) restoreFromSaved(saved);
+      else setScreen('start');
+    })();
   </script>
-
 </body>
 </html>

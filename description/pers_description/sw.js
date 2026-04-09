@@ -1,24 +1,30 @@
-const CACHE = 'person-description-practice-v3';
-const ASSETS = ['./', './index.html', './words.json', './sw.js'];
+const CACHE_NAME = 'person-description-practice-v31';
+const ASSETS = ['./', './index.html', './words.json'];
 
 self.addEventListener('install', (event) => {
-  event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(ASSETS)).then(() => self.skipWaiting()));
+  event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS)).catch(() => {}));
+  self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((keys) => Promise.all(keys.filter((key) => key !== CACHE).map((key) => caches.delete(key)))).then(() => self.clients.claim())
+    caches.keys().then((keys) => Promise.all(keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))))
   );
+  self.clients.claim();
 });
 
 self.addEventListener('fetch', (event) => {
-  const req = event.request;
-  if (req.method !== 'GET') return;
+  if (event.request.method !== 'GET') return;
   event.respondWith(
-    fetch(req).then((response) => {
-      const copy = response.clone();
-      caches.open(CACHE).then((cache) => cache.put(req, copy)).catch(() => null);
-      return response;
-    }).catch(() => caches.match(req).then((cached) => cached || caches.match('./index.html')))
+    caches.match(event.request).then((cached) => {
+      const network = fetch(event.request)
+        .then((response) => {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone)).catch(() => {});
+          return response;
+        })
+        .catch(() => cached);
+      return cached || network;
+    })
   );
 });
