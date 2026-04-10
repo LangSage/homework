@@ -20,6 +20,7 @@
     invalidate: 'hotel_practice_invalidate_v1',
     submitted: 'hotel_practice_submitted_v1',
     pending: 'hotel_practice_pending_v1',
+    resultLock: 'hotel_practice_result_lock_v1',
   };
 
   const dom = {
@@ -83,6 +84,7 @@
     finished: false,
     submitted: false,
     submitState: 'Waiting',
+    resultSummary: null,
   };
 
   document.documentElement.setAttribute('translate', 'no');
@@ -98,12 +100,6 @@
   });
 
   dom.startBtn.addEventListener('click', startSessionFromInputs);
-  if (dom.newSetBtn) {
-    dom.newSetBtn.addEventListener('click', () => {
-      resetInvalidation();
-      startNewSet(true);
-    });
-  }
   dom.dictClose.addEventListener('click', hideDictionary);
   window.addEventListener('resize', throttle(renderPractice, 60));
   document.addEventListener('visibilitychange', handleVisibilityChange, { passive: true });
@@ -203,6 +199,10 @@
   }
 
   function startSessionFromInputs() {
+    if (restoreLockedResult()) {
+      render();
+      return;
+    }
     const name = cleanInput(dom.studentName.value, 80);
     const group = cleanInput(dom.studentGroup.value, 50);
 
@@ -216,6 +216,10 @@
   }
 
   function startNewSet(forceWithSavedProfile) {
+    if (restoreLockedResult()) {
+      render();
+      return;
+    }
     const profile = safeRead(STORAGE_KEYS.profile, {});
 
     state.name = cleanInput(forceWithSavedProfile ? (profile.name || dom.studentName.value) : dom.studentName.value, 80);
@@ -307,8 +311,16 @@
       if (state.sessionId && !state.finished && !state.currentStartedAt) {
         state.currentStartedAt = Date.now();
       }
+      if (state.finished) {
+        state.resultSummary = snapshot.resultSummary || buildResultSummary();
+        saveLockedResult();
+        persistSnapshot();
+      }
       resetInvalidation();
+      return;
     }
+
+    hydrateFromLockedResult(profile);
   }
 
 
@@ -441,25 +453,78 @@
     state.finished = true;
     state.finishedAt = Date.now();
     state.submitState = formReady() ? 'Sending…' : 'Not configured';
+    state.resultSummary = buildResultSummary();
     persistSnapshot();
+    saveLockedResult();
     render();
     submitOnce(buildPayload());
   }
 
   function renderResult() {
-    const total = state.questions.length;
-    const correct = state.answers.filter(Boolean).filter((row) => row.ok).length;
+    const summary = state.resultSummary || buildResultSummary();
+    state.resultSummary = summary;
+
+    dom.resultScore.textContent = `${summary.correct} / ${summary.total}`;
+    dom.resultPercent.textContent = `${summary.percent}%`;
+    dom.resultName.textContent = summary.name || '—';
+    dom.resultGroup.textContent = summary.group || '—';
+    dom.resultTime.textContent = formatDuration(summary.durationSec);
+    dom.resultSession.textContent = summary.sessionId || '—';
+    dom.resultBadge.textContent = summary.badge;
+    dom.submissionState.textContent = summary.submitState || state.submitState;
+  }
+
+  function buildResultSummary() {
+    const total = Array.isArray(state.questions) ? state.questions.length : 0;
+    const correct = Array.isArray(state.answers) ? state.answers.filter(Boolean).filter((row) => row.ok).length : 0;
     const percent = total ? Math.round((correct / total) * 100) : 0;
     const durationSec = Math.max(1, Math.round(((state.finishedAt || Date.now()) - state.startedAt) / 1000));
 
-    dom.resultScore.textContent = `${correct} / ${total}`;
-    dom.resultPercent.textContent = `${percent}%`;
-    dom.resultName.textContent = state.name || '—';
-    dom.resultGroup.textContent = state.group || '—';
-    dom.resultTime.textContent = formatDuration(durationSec);
-    dom.resultSession.textContent = state.sessionId || '—';
-    dom.resultBadge.textContent = percent >= 85 ? 'Excellent' : percent >= 65 ? 'Good' : 'Completed';
-    dom.submissionState.textContent = state.submitState;
+    return {
+      sessionId: state.sessionId || '',
+      name: state.name || '',
+      group: state.group || '',
+      topic: state.topic || TOPIC_TITLE,
+      correct,
+      total,
+      percent,
+      durationSec,
+      submitState: state.submitState || 'Waiting',
+      badge: percent >= 85 ? 'Excellent' : percent >= 65 ? 'Good' : 'Completed',
+      finishedAt: state.finishedAt || Date.now(),
+    };
+  }
+
+  function saveLockedResult() {
+    if (!state.finished) return;
+    state.resultSummary = buildResultSummary();
+    safeWrite(STORAGE_KEYS.resultLock, state.resultSummary);
+  }
+
+  function hydrateFromLockedResult(profile) {
+    const locked = safeRead(STORAGE_KEYS.resultLock, null);
+    if (!locked) return false;
+
+    state.sessionId = locked.sessionId || '';
+    state.name = locked.name || profile?.name || '';
+    state.group = locked.group || profile?.group || '';
+    state.topic = locked.topic || TOPIC_TITLE;
+    state.questions = [];
+    state.currentIndex = 0;
+    state.answers = [];
+    state.startedAt = locked.finishedAt ? Math.max(0, Number(locked.finishedAt) - Number(locked.durationSec || 0) * 1000) : Date.now();
+    state.currentStartedAt = 0;
+    state.finishedAt = Number(locked.finishedAt) || Date.now();
+    state.finished = true;
+    state.submitted = ['Sent', 'Already sent'].includes(locked.submitState);
+    state.submitState = locked.submitState || 'Waiting';
+    state.resultSummary = locked;
+    return true;
+  }
+
+  function restoreLockedResult() {
+    if (!state.finished) return hydrateFromLockedResult(safeRead(STORAGE_KEYS.profile, null));
+    return true;
   }
 
   function buildPayload() {
@@ -490,6 +555,7 @@
   async function submitOnce(payload) {
     if (!formReady()) {
       state.submitState = 'Not configured';
+      saveLockedResult();
       persistSnapshot();
       renderResult();
       return;
@@ -499,6 +565,7 @@
     if (submittedMap[state.sessionId]) {
       state.submitted = true;
       state.submitState = 'Already sent';
+      saveLockedResult();
       persistSnapshot();
       renderResult();
       return;
@@ -537,6 +604,7 @@
       safeWrite(STORAGE_KEYS.pending, null);
       state.submitted = true;
       state.submitState = 'Sent';
+      saveLockedResult();
       persistSnapshot();
       renderResult();
     } catch (error) {
@@ -547,6 +615,7 @@
         at: Date.now(),
       });
       state.submitState = 'Queued';
+      saveLockedResult();
       persistSnapshot();
       renderResult();
     }
@@ -579,6 +648,7 @@
       if (pending.sessionId === state.sessionId) {
         state.submitted = true;
         state.submitState = 'Sent';
+        saveLockedResult();
         persistSnapshot();
         renderResult();
       }
@@ -763,6 +833,7 @@
       finished: state.finished,
       submitted: state.submitted,
       submitState: state.submitState,
+      resultSummary: state.resultSummary,
     };
     safeWrite(STORAGE_KEYS.snapshot, snap);
     writeCookie('hotel_practice_live', JSON.stringify({

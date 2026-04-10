@@ -32,3 +32,9 @@ The form receives:
 - final JSON payload with summary only
   (score, percent, total time, per-item result + time)
 No question text or answer text is submitted.
+
+
+Locked-result update:
+- completed students now reopen directly to the saved result screen
+- no New set / retry button
+- result survives from saved cache and cookie data
