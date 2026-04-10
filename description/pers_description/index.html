@@ -1,812 +1,663 @@
 <!DOCTYPE html>
-<html lang="en" translate="no" class="notranslate">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="google" content="notranslate" />
-  <meta name="robots" content="noindex,nofollow,noarchive" />
-  <title>Person Description Practice</title>
-  <style>
-    :root{
-      --bg:#eaf1f7;
-      --panel:#ffffff;
-      --panel-2:#f6f9fc;
-      --line:#d7e1ec;
-      --text:#17324d;
-      --muted:#5f768d;
-      --accent:#3aa0ff;
-      --accent-2:#1783e6;
-      --good:#1fa971;
-      --bad:#d4546a;
-      --ink:#14314e;
-      --chip:#e5f2ff;
-      --chip-text:#1568b8;
-    }
-    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-    html,body{
-      margin:0;
-      min-height:100%;
-      background:var(--bg);
-      color:var(--text);
-      font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-      user-select:none;
-      -webkit-user-select:none;
-      -webkit-touch-callout:none;
-    }
-    body *{user-select:none;-webkit-user-select:none;}
-    button,input{font:inherit;}
-    .app{min-height:100vh;padding:14px;display:grid;place-items:center;}
-    .shell{width:min(860px,100%);background:var(--panel);border:1px solid var(--line);border-radius:24px;overflow:hidden;}
-    .screen{display:none;}
-    .screen.active{display:block;}
-    .start-screen,.practice-screen,.result-screen{padding:18px;display:grid;gap:14px;}
-    .title{margin:0;text-align:center;font-size:clamp(1.5rem,3.5vw,2.3rem);font-weight:900;letter-spacing:-0.03em;color:var(--ink);}
-    .subtitle{margin:0;text-align:center;color:var(--muted);font-size:.98rem;}
-    .fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}
-    .field-wrap{display:grid;gap:6px;}
-    .label{color:var(--muted);font-size:.9rem;}
-    .field{width:100%;border:1px solid var(--line);border-radius:16px;padding:14px 15px;background:#fff;color:var(--ink);outline:none;}
-    .field:focus{border-color:#8bc6ff;}
-    .btn{border:0;border-radius:16px;min-height:52px;padding:14px 18px;font-weight:800;cursor:pointer;background:var(--accent);color:#fff;}
-    .header-row{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;color:var(--muted);font-size:.95rem;}
-    .progress-track{width:100%;height:12px;background:#dde8f2;border-radius:999px;overflow:hidden;border:1px solid #d2dde9;}
-    .progress-fill{width:0%;height:100%;background:var(--accent);transition:width .2s ease;}
-    .panel{border:1px solid var(--line);border-radius:20px;background:var(--panel-2);overflow:hidden;}
-    canvas{display:block;width:100%;max-width:100%;image-rendering:-webkit-optimize-contrast;image-rendering:crisp-edges;}
-    .chip-row{display:flex;flex-wrap:wrap;gap:8px;}
-    .chip{border:1px solid #cfe3f7;background:var(--chip);color:var(--chip-text);border-radius:999px;padding:8px 12px;font-weight:700;cursor:pointer;}
-    .options-grid{display:grid;gap:10px;grid-template-columns:repeat(2,minmax(0,1fr));}
-    .option-btn{padding:0;border:1px solid var(--line);border-radius:18px;overflow:hidden;background:#fff;cursor:pointer;}
-    .status-line{min-height:24px;color:var(--muted);font-size:.95rem;}
-    .status.good{color:var(--good);font-weight:800;}
-    .status.bad{color:var(--bad);font-weight:800;}
-    .result-box{border:2px solid var(--accent);border-radius:22px;background:#fff;padding:22px;display:grid;gap:12px;}
-    .result-title{margin:0;text-align:center;font-size:1.8rem;font-weight:900;color:var(--ink);}
-    .score-big{text-align:center;font-size:3rem;font-weight:900;color:var(--accent-2);line-height:1;}
-    .result-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}
-    .result-item{border:1px solid var(--line);border-radius:16px;background:var(--panel-2);padding:12px;display:grid;gap:4px;}
-    .result-item .k{font-size:.85rem;color:var(--muted);}
-    .result-item .v{font-size:1.05rem;font-weight:800;color:var(--ink);}
-    .popup{position:fixed;inset:auto 12px 12px 12px;z-index:30;display:none;}
-    .popup.show{display:block;}
-    .popup-card{width:min(520px,100%);margin-left:auto;margin-right:auto;background:#fff;border:1px solid var(--line);border-radius:18px;padding:14px;display:grid;gap:8px;}
-    .popup-top{display:flex;justify-content:space-between;align-items:start;gap:10px;}
-    .popup-title{font-size:1.1rem;font-weight:900;color:var(--ink);}
-    .popup-sub{color:var(--muted);line-height:1.35;}
-    .popup-close{border:0;background:#eef4fa;color:var(--ink);width:34px;height:34px;border-radius:10px;cursor:pointer;font-size:1rem;font-weight:900;}
-    .toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%) translateY(20px);background:#17324d;color:#fff;padding:10px 14px;border-radius:999px;opacity:0;pointer-events:none;transition:opacity .18s ease, transform .18s ease;z-index:40;font-weight:700;}
-    .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
-    @media (max-width:720px){
-      .fields,.result-grid,.options-grid{grid-template-columns:1fr;}
-      .start-screen,.practice-screen,.result-screen{padding:14px;}
-      .app{padding:10px;}
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="google" content="notranslate" />
+<title>Person Description Practice</title>
+<style>
+  :root {
+    --bg:#eef4ff;
+    --panel:#ffffff;
+    --panel-2:#f7faff;
+    --line:#dbe6f5;
+    --text:#17324d;
+    --muted:#6f85a0;
+    --blue:#4a8df6;
+    --blue-2:#ddebff;
+    --shadow:0 8px 24px rgba(36,76,140,.08);
+    --radius:22px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:Inter,Arial,sans-serif;min-height:100%}
+  body{user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+  img,svg{pointer-events:none;-webkit-user-drag:none}
+  button,input,select,textarea{font:inherit}
+  input{outline:none;border:none;background:transparent;color:var(--text);width:100%}
+  #app{min-height:100vh}
+  .shell{max-width:1180px;margin:0 auto;padding:18px}
+  .card{background:var(--panel);border:2px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+  .flat-btn{border:none;border-radius:18px;background:var(--blue);color:#fff;padding:14px 18px;font-weight:700;cursor:pointer}
+  .flat-btn.alt{background:var(--blue-2);color:var(--text)}
+  .flat-btn.ghost{background:#fff;border:2px solid var(--line);color:var(--text)}
+  .flat-btn:disabled{opacity:.45;cursor:not-allowed}
+  .row{display:flex;gap:14px;align-items:center}
+  .top-title{font-size:34px;line-height:1.05;font-weight:900;margin:0}
+  .small{font-size:13px;color:var(--muted)}
+  .pill{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:var(--blue-2);color:#285ca7;font-weight:800;font-size:13px}
+  .progress{height:12px;border-radius:999px;background:#dfe9f7;overflow:hidden}
+  .progress > span{display:block;height:100%;background:var(--blue);border-radius:999px}
+  .quiz-grid{display:grid;grid-template-columns:1.02fr .98fr;gap:18px}
+  .art-wrap{padding:18px}
+  .art-box{min-height:420px;border-radius:22px;background:var(--panel-2);border:2px solid var(--line);display:flex;align-items:center;justify-content:center;overflow:hidden}
+  .task-wrap{padding:18px}
+  .canvas-wrap{background:var(--panel-2);border:2px solid var(--line);border-radius:20px;padding:16px;min-height:110px}
+  .text-canvas{display:block;max-width:100%;height:auto}
+  .option-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+  .option-btn{position:relative;background:var(--panel);border:2px solid var(--line);border-radius:18px;padding:14px 16px;cursor:pointer;min-height:74px;display:flex;align-items:center;gap:10px;text-align:left}
+  .option-btn:hover{border-color:#b7d0f6;transform:translateY(-1px)}
+  .option-btn.active{background:var(--blue-2);border-color:var(--blue)}
+  .option-btn .letter{width:28px;height:28px;border-radius:50%;background:var(--panel-2);border:2px solid var(--line);display:grid;place-items:center;font-size:13px;font-weight:800;flex:0 0 28px}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+  .chip{border:none;border-radius:999px;padding:9px 12px;background:#fff;border:2px solid var(--line);color:#25528f;font-weight:700;cursor:pointer}
+  .chip:hover{background:var(--blue-2)}
+  .subline{display:flex;justify-content:space-between;gap:12px;align-items:center;margin:14px 0 10px}
+  .helper{font-size:12px;color:var(--muted)}
+  .popup{position:fixed;left:50%;bottom:16px;transform:translateX(-50%) translateY(18px);width:min(92vw,420px);background:#fff;border:2px solid var(--line);border-radius:20px;box-shadow:var(--shadow);padding:14px 16px;opacity:0;pointer-events:none;transition:.18s ease;z-index:50}
+  .popup.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .start-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .field{padding:14px 16px;border:2px solid var(--line);border-radius:18px;background:var(--panel-2)}
+  .result-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:16px}
+  .result-stat{padding:18px;border-radius:18px;background:var(--panel-2);border:2px solid var(--line);text-align:center}
+  .screenshot{padding:22px}
+  .badge{display:inline-flex;align-items:center;justify-content:center;min-width:40px;padding:8px 12px;border-radius:999px;font-weight:800;font-size:13px;background:var(--blue-2);color:#25528f}
+  .muted-block{padding:14px;border-radius:18px;background:var(--panel-2);border:2px dashed var(--line);color:var(--muted)}
+  @media (max-width:900px){
+    .quiz-grid{grid-template-columns:1fr}
+    .art-box{min-height:320px}
+  }
+  @media (max-width:640px){
+    .shell{padding:12px}
+    .top-title{font-size:28px}
+    .option-grid{grid-template-columns:1fr}
+    .start-grid,.result-grid{grid-template-columns:1fr}
+    .task-wrap,.art-wrap{padding:14px}
+    .canvas-wrap{min-height:96px}
+  }
+</style>
 </head>
-<body>
-  <div class="app">
+<body class="notranslate" translate="no">
+<div id="app"></div>
+<div id="dictPopup" class="popup">
+  <div style="display:flex;align-items:flex-start;gap:12px">
+    <div id="dictEmoji" style="font-size:30px;line-height:1">📘</div>
+    <div style="flex:1;min-width:0">
+      <div id="dictWord" style="font-weight:800;color:#25528f"></div>
+      <div id="dictTranslation" style="margin-top:4px"></div>
+    </div>
+    <button id="closePopup" class="flat-btn alt" style="padding:8px 12px">×</button>
+  </div>
+</div>
+
+<script>
+const CONFIG = {
+  totalQuestions: 20,
+  storageKey: "person_practice_flat_v3",
+  cookieKey: "ppfv3",
+  profileKey: "person_practice_profile_v3",
+  topic: "topic",
+  form: {
+    action: "",
+    fieldName: "",
+    fieldGroup: "",
+    fieldTopic: "",
+    fieldJson: ""
+  }
+};
+
+const CHARACTER_DB = {"ava": {"name": "Ava", "hairColor": "brown", "hairStyle": "straight", "hairLength": "long", "lips": "full", "height": "tall", "body": "strong", "outfit": "#6366f1", "skin": "#f2c7a7"}, "ben": {"name": "Ben", "hairColor": "blond", "hairStyle": "messy", "hairLength": "short", "lips": "thin", "height": "short", "body": "slim", "outfit": "#10b981", "skin": "#efc3a0"}, "lara": {"name": "Lara", "hairColor": "black", "hairStyle": "wavy", "hairLength": "medium-length", "lips": "full", "height": "average", "body": "athletic", "outfit": "#f97316", "skin": "#d8a07b"}, "max": {"name": "Max", "hairColor": "none", "hairStyle": "bald", "hairLength": "short", "lips": "thin", "height": "tall", "body": "strong", "outfit": "#ef4444", "skin": "#e2b28f"}, "nina": {"name": "Nina", "hairColor": "red", "hairStyle": "curly", "hairLength": "long", "lips": "full", "height": "short", "body": "chubby", "outfit": "#ec4899", "skin": "#f3c2a6"}, "omar": {"name": "Omar", "hairColor": "black", "hairStyle": "curly", "hairLength": "short", "lips": "full", "height": "average", "body": "athletic", "outfit": "#22c55e", "skin": "#9f6b49"}, "sara": {"name": "Sara", "hairColor": "brown", "hairStyle": "straight", "hairLength": "medium-length", "lips": "thin", "height": "tall", "body": "slim", "outfit": "#8b5cf6", "skin": "#ecc3a4"}, "leo": {"name": "Leo", "hairColor": "blond", "hairStyle": "wavy", "hairLength": "long", "lips": "thin", "height": "average", "body": "thin", "outfit": "#06b6d4", "skin": "#e5b48f"}, "mia": {"name": "Mia", "hairColor": "black", "hairStyle": "straight", "hairLength": "short", "lips": "full", "height": "average", "body": "average", "outfit": "#f59e0b", "skin": "#f0c4a5"}, "jack": {"name": "Jack", "hairColor": "brown", "hairStyle": "wavy", "hairLength": "short", "lips": "thin", "height": "tall", "body": "athletic", "outfit": "#3b82f6", "skin": "#ddb089"}};
+const TASK_BANK = [{"id": "t1", "type": "who", "prompt": "Who has long brown straight hair?", "art": {"kind": "lineup", "ids": ["ava", "ben", "nina", "sara"]}, "options": ["Ava", "Ben", "Nina", "Sara"], "focusWords": ["long", "brown", "straight", "hair"], "answer": "Ava"}, {"id": "t2", "type": "who", "prompt": "Who is bald and strong?", "art": {"kind": "lineup", "ids": ["max", "jack", "omar", "leo"]}, "options": ["Max", "Jack", "Omar", "Leo"], "focusWords": ["bald", "strong"], "answer": "Max"}, {"id": "t3", "type": "who", "prompt": "Who has long red curly hair?", "art": {"kind": "lineup", "ids": ["nina", "mia", "ava", "lara"]}, "options": ["Nina", "Mia", "Ava", "Lara"], "focusWords": ["long", "red", "curly", "hair"], "answer": "Nina"}, {"id": "t4", "type": "who", "prompt": "Who has short blond messy hair?", "art": {"kind": "lineup", "ids": ["ben", "leo", "jack", "mia"]}, "options": ["Ben", "Leo", "Jack", "Mia"], "focusWords": ["short", "blond", "messy", "hair"], "answer": "Ben"}, {"id": "t5", "type": "who", "prompt": "Who has medium-length brown straight hair and thin lips?", "art": {"kind": "lineup", "ids": ["sara", "ava", "lara", "nina"]}, "options": ["Sara", "Ava", "Lara", "Nina"], "focusWords": ["medium-length", "brown", "straight", "thin", "lips"], "answer": "Sara"}, {"id": "t6", "type": "who", "prompt": "Who has short black curly hair and an athletic body?", "art": {"kind": "lineup", "ids": ["omar", "jack", "max", "ben"]}, "options": ["Omar", "Jack", "Max", "Ben"], "focusWords": ["short", "black", "curly", "athletic", "body"], "answer": "Omar"}, {"id": "t7", "type": "who", "prompt": "Who has short black straight hair and full lips?", "art": {"kind": "lineup", "ids": ["mia", "sara", "lara", "ava"]}, "options": ["Mia", "Sara", "Lara", "Ava"], "focusWords": ["short", "black", "straight", "full", "lips"], "answer": "Mia"}, {"id": "t8", "type": "who", "prompt": "Who has short brown wavy hair and is tall?", "art": {"kind": "lineup", "ids": ["jack", "ben", "leo", "omar"]}, "options": ["Jack", "Ben", "Leo", "Omar"], "focusWords": ["short", "brown", "wavy", "tall"], "answer": "Jack"}, {"id": "t9", "type": "pick2", "prompt": "Choose 2 words for Ava.", "art": {"kind": "single", "id": "ava"}, "options": ["long", "straight", "bald", "chubby", "thin", "red"], "focusWords": ["long", "straight", "bald", "chubby"], "answers": ["long", "straight"]}, {"id": "t10", "type": "pick2", "prompt": "Choose 2 words for Nina.", "art": {"kind": "single", "id": "nina"}, "options": ["curly", "chubby", "bald", "thin", "messy", "athletic"], "focusWords": ["curly", "chubby", "bald", "thin"], "answers": ["curly", "chubby"]}, {"id": "t11", "type": "pick2", "prompt": "Choose 2 words for Max.", "art": {"kind": "single", "id": "max"}, "options": ["bald", "strong", "wavy", "slim", "full", "long"], "focusWords": ["bald", "strong", "wavy", "slim"], "answers": ["bald", "strong"]}, {"id": "t12", "type": "pick2", "prompt": "Choose 2 words for Sara.", "art": {"kind": "single", "id": "sara"}, "options": ["tall", "thin", "curly", "red", "full", "messy"], "focusWords": ["tall", "thin", "curly", "red"], "answers": ["tall", "thin"]}, {"id": "t13", "type": "pick2", "prompt": "Choose 2 words for Omar.", "art": {"kind": "single", "id": "omar"}, "options": ["black", "athletic", "blond", "messy", "short", "chubby"], "focusWords": ["black", "athletic", "blond", "messy"], "answers": ["black", "athletic"]}, {"id": "t14", "type": "pick2", "prompt": "Choose 2 words for Leo.", "art": {"kind": "single", "id": "leo"}, "options": ["long", "wavy", "chubby", "brown", "bald", "strong"], "focusWords": ["long", "wavy", "chubby", "brown"], "answers": ["long", "wavy"]}, {"id": "t15", "type": "fill", "prompt": "Ben has ___ hair.", "art": {"kind": "single", "id": "ben"}, "options": ["messy", "curly", "long", "bald"], "focusWords": ["messy", "curly", "long", "bald"], "answer": "messy"}, {"id": "t16", "type": "fill", "prompt": "Ava is ___.", "art": {"kind": "single", "id": "ava"}, "options": ["tall", "short", "wavy", "full"], "focusWords": ["tall", "short"], "answer": "tall"}, {"id": "t17", "type": "fill", "prompt": "Lara has ___ lips.", "art": {"kind": "single", "id": "lara"}, "options": ["full", "thin", "long", "black"], "focusWords": ["full", "thin", "lips"], "answer": "full"}, {"id": "t18", "type": "fill", "prompt": "Jack has an ___ body.", "art": {"kind": "single", "id": "jack"}, "options": ["athletic", "chubby", "bald", "wavy"], "focusWords": ["athletic", "chubby", "body"], "answer": "athletic"}, {"id": "t19", "type": "fill", "prompt": "Mia has ___ hair.", "art": {"kind": "single", "id": "mia"}, "options": ["straight", "curly", "wavy", "bald"], "focusWords": ["straight", "curly", "wavy"], "answer": "straight"}, {"id": "t20", "type": "fill", "prompt": "Leo is ___.", "art": {"kind": "single", "id": "leo"}, "options": ["thin", "full", "brown", "curly"], "focusWords": ["thin", "full"], "answer": "thin"}, {"id": "t21", "type": "wrong", "prompt": "Choose the wrong sentence for Nina.", "art": {"kind": "single", "id": "nina"}, "options": ["Nina has long hair.", "Nina has curly hair.", "Nina is tall.", "Nina has full lips."], "focusWords": ["long", "curly", "tall", "full"], "answer": "Nina is tall."}, {"id": "t22", "type": "wrong", "prompt": "Choose the wrong sentence for Max.", "art": {"kind": "single", "id": "max"}, "options": ["Max is bald.", "Max is strong.", "Max has long hair.", "Max is tall."], "focusWords": ["bald", "strong", "long", "hair", "tall"], "answer": "Max has long hair."}, {"id": "t23", "type": "wrong", "prompt": "Choose the wrong sentence for Sara.", "art": {"kind": "single", "id": "sara"}, "options": ["Sara is tall.", "Sara has straight hair.", "Sara has full lips.", "Sara has brown hair."], "focusWords": ["tall", "straight", "full", "brown"], "answer": "Sara has full lips."}, {"id": "t24", "type": "wrong", "prompt": "Choose the wrong sentence for Omar.", "art": {"kind": "single", "id": "omar"}, "options": ["Omar has black hair.", "Omar is athletic.", "Omar is blond.", "Omar has full lips."], "focusWords": ["black", "athletic", "blond", "full"], "answer": "Omar is blond."}, {"id": "t25", "type": "wrong", "prompt": "Choose the wrong sentence for Ben.", "art": {"kind": "single", "id": "ben"}, "options": ["Ben has short hair.", "Ben has messy hair.", "Ben has full lips.", "Ben is short."], "focusWords": ["short", "messy", "full", "lips"], "answer": "Ben has full lips."}, {"id": "t26", "type": "wrong", "prompt": "Choose the wrong sentence for Jack.", "art": {"kind": "single", "id": "jack"}, "options": ["Jack is tall.", "Jack has brown hair.", "Jack is short.", "Jack has wavy hair."], "focusWords": ["tall", "brown", "short", "wavy"], "answer": "Jack is short."}, {"id": "t27", "type": "meaning", "prompt": "Which word means hair with soft waves?", "art": {"kind": "trait", "trait": "wavy"}, "options": ["wavy", "straight", "bald", "chubby"], "focusWords": ["wavy", "straight", "bald", "chubby"], "answer": "wavy"}, {"id": "t28", "type": "meaning", "prompt": "Which word means no hair?", "art": {"kind": "trait", "trait": "bald"}, "options": ["bald", "long", "full", "athletic"], "focusWords": ["bald", "long", "full", "athletic"], "answer": "bald"}, {"id": "t29", "type": "meaning", "prompt": "Which word means body with muscles?", "art": {"kind": "trait", "trait": "strong"}, "options": ["strong", "slim", "wavy", "medium-length"], "focusWords": ["strong", "slim", "wavy", "medium-length"], "answer": "strong"}, {"id": "t30", "type": "meaning", "prompt": "Which word means lips with more shape?", "art": {"kind": "trait", "trait": "full"}, "options": ["full", "thin", "brown", "short"], "focusWords": ["full", "thin", "brown", "short"], "answer": "full"}, {"id": "t31", "type": "meaning", "prompt": "Which word means not tall?", "art": {"kind": "trait", "trait": "short"}, "options": ["short", "long", "straight", "athletic"], "focusWords": ["short", "long", "straight", "athletic"], "answer": "short"}, {"id": "t32", "type": "meaning", "prompt": "Which word means hair to the shoulders?", "art": {"kind": "trait", "trait": "medium-length"}, "options": ["medium-length", "long", "strong", "full"], "focusWords": ["medium-length", "long", "strong", "full"], "answer": "medium-length"}];
+const CORE_WORDS = [{"Word": "hair", "Translation": "волосы", "Emoji": "💇"}, {"Word": "lips", "Translation": "губы", "Emoji": "👄"}, {"Word": "body", "Translation": "телосложение", "Emoji": "🧍"}, {"Word": "short", "Translation": "короткий / низкий", "Emoji": "📏"}, {"Word": "medium-length", "Translation": "средней длины", "Emoji": "↔️"}, {"Word": "long", "Translation": "длинный", "Emoji": "📏"}, {"Word": "straight", "Translation": "прямой", "Emoji": "📏"}, {"Word": "wavy", "Translation": "волнистый", "Emoji": "〰️"}, {"Word": "curly", "Translation": "кудрявый", "Emoji": "🌀"}, {"Word": "messy", "Translation": "растрёпанный", "Emoji": "💨"}, {"Word": "bald", "Translation": "лысый", "Emoji": "🧑‍🦲"}, {"Word": "brown", "Translation": "каштановый / коричневый", "Emoji": "🤎"}, {"Word": "blond", "Translation": "светлый / блонд", "Emoji": "💛"}, {"Word": "black", "Translation": "чёрный", "Emoji": "🖤"}, {"Word": "red", "Translation": "рыжий / красный", "Emoji": "🧡"}, {"Word": "thin", "Translation": "тонкий / худой", "Emoji": "➖"}, {"Word": "full", "Translation": "полный / пухлый", "Emoji": "⭕"}, {"Word": "tall", "Translation": "высокий", "Emoji": "📏"}, {"Word": "slim", "Translation": "стройный", "Emoji": "🧍"}, {"Word": "athletic", "Translation": "спортивный", "Emoji": "💪"}, {"Word": "strong", "Translation": "сильный", "Emoji": "🏋️"}, {"Word": "chubby", "Translation": "полноватый", "Emoji": "🙂"}, {"Word": "average", "Translation": "обычный / средний", "Emoji": "⚪"}, {"Word": "person", "Translation": "человек", "Emoji": "🧑"}, {"Word": "choose", "Translation": "выбери", "Emoji": "✅"}, {"Word": "wrong", "Translation": "неверный", "Emoji": "❌"}, {"Word": "sentence", "Translation": "предложение", "Emoji": "💬"}];
+let dictionaryMap = new Map();
+let state = null;
+let popupTimer = null;
+
+function normalizeWord(v) {
+  return String(v || "").toLowerCase().replace(/[’]/g,"'").replace(/[^a-z0-9'\- ]+/g," ").replace(/\s+/g," ").trim();
+}
+function seedDictionary() {
+  dictionaryMap = new Map();
+  CORE_WORDS.forEach(row => {
+    const key = normalizeWord(row.Word);
+    if (key) dictionaryMap.set(key, row);
+  });
+}
+async function loadDictionary() {
+  seedDictionary();
+  try {
+    const res = await fetch("words.json", {cache:"no-store"});
+    if (res.ok) {
+      const rows = await res.json();
+      rows.forEach(row => {
+        const key = normalizeWord(row.Word);
+        if (key) dictionaryMap.set(key, row);
+      });
+    }
+  } catch(e) {}
+  if (state && !state.done) render();
+}
+function findWord(word) { return dictionaryMap.get(normalizeWord(word)); }
+function showPopup(word) {
+  const row = findWord(word);
+  if (!row) return;
+  document.getElementById("dictEmoji").textContent = row.Emoji || "📘";
+  document.getElementById("dictWord").textContent = row.Word;
+  document.getElementById("dictTranslation").textContent = row.Translation;
+  const el = document.getElementById("dictPopup");
+  el.classList.add("show");
+  clearTimeout(popupTimer);
+  popupTimer = setTimeout(() => el.classList.remove("show"), 2500);
+}
+function hidePopup() { document.getElementById("dictPopup").classList.remove("show"); }
+
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+function now() { return Date.now(); }
+function encodeSafe(str) { return btoa(unescape(encodeURIComponent(str))); }
+function decodeSafe(str) { return decodeURIComponent(escape(atob(str))); }
+function setCookie(name, value, days=7) {
+  const expires = new Date(Date.now() + days*86400000).toUTCString();
+  document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/; SameSite=Lax`;
+}
+function getCookie(name) {
+  const key = name + "=";
+  const match = document.cookie.split(";").map(s => s.trim()).find(s => s.startsWith(key));
+  return match ? match.slice(key.length) : null;
+}
+function getProfile() {
+  try {
+    const raw = localStorage.getItem(CONFIG.profileKey);
+    if (raw) return JSON.parse(raw);
+  } catch(e) {}
+  return {name:"", group:""};
+}
+function saveProfile(name, group) {
+  const profile = {name:(name||"").trim(), group:(group||"").trim()};
+  try { localStorage.setItem(CONFIG.profileKey, JSON.stringify(profile)); } catch(e) {}
+  return profile;
+}
+function saveState() {
+  if (!state) return;
+  const raw = JSON.stringify(state);
+  try { localStorage.setItem(CONFIG.storageKey, raw); } catch(e) {}
+  try { setCookie(CONFIG.cookieKey, encodeSafe(raw)); } catch(e) {}
+}
+function loadState() {
+  try {
+    const raw = localStorage.getItem(CONFIG.storageKey);
+    if (raw) return JSON.parse(raw);
+  } catch(e) {}
+  try {
+    const raw = getCookie(CONFIG.cookieKey);
+    if (raw) return JSON.parse(decodeSafe(raw));
+  } catch(e) {}
+  return null;
+}
+function clearState() {
+  try { localStorage.removeItem(CONFIG.storageKey); } catch(e) {}
+  document.cookie = `${CONFIG.cookieKey}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`;
+  state = null;
+}
+function chooseSessionDeck() {
+  const shuffled = shuffle(TASK_BANK);
+  return {
+    deck: shuffled.slice(0, CONFIG.totalQuestions),
+    reserve: shuffled.slice(CONFIG.totalQuestions)
+  };
+}
+function startQuiz() {
+  const profile = getProfile();
+  const chosen = chooseSessionDeck();
+  state = {
+    version: 3,
+    active: true,
+    done: false,
+    sent: false,
+    current: 0,
+    correct: 0,
+    leaveCount: 0,
+    startedAt: now(),
+    finishedAt: null,
+    profile,
+    deck: chosen.deck,
+    reserve: chosen.reserve,
+    selection: [],
+    answers: [],
+    resultJson: ""
+  };
+  saveState();
+  render();
+}
+function currentTask() { return state?.deck?.[state.current] || null; }
+function replaceCurrentTask() {
+  if (!state || state.done) return;
+  const current = currentTask();
+  if (!current) return;
+  let next = null;
+  if (state.reserve.length) next = state.reserve.shift();
+  else {
+    const used = new Set([...state.deck.map(t => t.id), ...state.answers.filter(Boolean).map(a => a.taskId)]);
+    const candidates = TASK_BANK.filter(t => t.id !== current.id && !used.has(t.id));
+    next = shuffle(candidates)[0] || shuffle(TASK_BANK.filter(t => t.id !== current.id))[0];
+  }
+  if (next) {
+    state.deck[state.current] = next;
+    state.selection = [];
+  }
+}
+function applyLeavePenalty() {
+  if (!state || state.done || !state.active) return;
+  const t = now();
+  if (t - (state.lastPenaltyAt || 0) < 1200) return;
+  state.lastPenaltyAt = t;
+  state.leaveCount += 1;
+  replaceCurrentTask();
+  saveState();
+}
+function makeResult() {
+  const end = state.finishedAt || now();
+  return {
+    topic: CONFIG.topic,
+    name: state.profile.name || "",
+    group: state.profile.group || "",
+    total: state.deck.length,
+    correct: state.correct,
+    wrong: state.deck.length - state.correct,
+    scorePercent: Math.round((state.correct / state.deck.length) * 100),
+    leaveCount: state.leaveCount,
+    minutes: Math.max(1, Math.round((end - state.startedAt)/60000)),
+    startedAt: new Date(state.startedAt).toISOString(),
+    finishedAt: new Date(end).toISOString(),
+    version: state.version
+  };
+}
+function submitOnce() {
+  if (!state || !state.done || state.sent) return;
+  const cfg = CONFIG.form;
+  if (!cfg.action || !cfg.fieldName || !cfg.fieldGroup || !cfg.fieldTopic || !cfg.fieldJson) return;
+  const data = makeResult();
+  const form = document.createElement("form");
+  const frame = document.createElement("iframe");
+  frame.name = "submit_" + Date.now();
+  frame.style.display = "none";
+  form.action = cfg.action;
+  form.method = "POST";
+  form.target = frame.name;
+  form.style.display = "none";
+  const fields = {
+    [cfg.fieldName]: data.name,
+    [cfg.fieldGroup]: data.group,
+    [cfg.fieldTopic]: CONFIG.topic,
+    [cfg.fieldJson]: JSON.stringify(data)
+  };
+  Object.entries(fields).forEach(([name, value]) => {
+    const input = document.createElement("input");
+    input.type = "hidden";
+    input.name = name;
+    input.value = value;
+    form.appendChild(input);
+  });
+  document.body.appendChild(frame);
+  document.body.appendChild(form);
+  try {
+    form.submit();
+    state.sent = true;
+    saveState();
+  } catch(e) {}
+  setTimeout(() => { try { form.remove(); frame.remove(); } catch(e) {} }, 4000);
+}
+function finishQuiz() {
+  state.done = true;
+  state.active = false;
+  state.finishedAt = now();
+  state.resultJson = JSON.stringify(makeResult(), null, 2);
+  saveState();
+  submitOnce();
+  render();
+}
+function moveNext() {
+  if (state.current >= state.deck.length - 1) finishQuiz();
+  else {
+    state.current += 1;
+    state.selection = [];
+    saveState();
+    render();
+  }
+}
+function checkSingleAnswer(choice) {
+  const task = currentTask();
+  const correct = choice === task.answer;
+  state.answers[state.current] = {taskId:task.id, choice, correct};
+  if (correct) state.correct += 1;
+  moveNext();
+}
+function toggleChoice(idx) {
+  const set = new Set(state.selection || []);
+  if (set.has(idx)) set.delete(idx); else if (set.size < 2) set.add(idx);
+  state.selection = [...set].sort((a,b)=>a-b);
+  saveState();
+  render();
+}
+function checkPick2() {
+  const task = currentTask();
+  const selected = state.selection.map(i => task.options[i]).sort();
+  const expected = task.answers.slice().sort();
+  const correct = JSON.stringify(selected) === JSON.stringify(expected);
+  state.answers[state.current] = {taskId:task.id, choice:selected, correct};
+  if (correct) state.correct += 1;
+  moveNext();
+}
+function drawCanvasText(canvas, text, size=28, weight=800, color="#17324d", maxWidth=null) {
+  if (!canvas) return;
+  const ratio = window.devicePixelRatio || 1;
+  const measure = document.createElement("canvas").getContext("2d");
+  const font = `${weight} ${size}px Inter, Arial, sans-serif`;
+  measure.font = font;
+  const width = maxWidth || Math.max(180, (canvas.parentElement?.clientWidth || 300) - 2);
+  const words = String(text || "").split(/\s+/);
+  const lines = [];
+  let line = "";
+  words.forEach(word => {
+    const next = line ? line + " " + word : word;
+    if (line && measure.measureText(next).width > width) {
+      lines.push(line);
+      line = word;
+    } else line = next;
+  });
+  if (line) lines.push(line);
+  const lh = Math.round(size * 1.28);
+  const cssW = width;
+  const cssH = Math.max(lh + 4, lines.length * lh + 4);
+  canvas.width = cssW * ratio;
+  canvas.height = cssH * ratio;
+  canvas.style.width = cssW + "px";
+  canvas.style.height = cssH + "px";
+  const ctx = canvas.getContext("2d");
+  ctx.setTransform(1,0,0,1,0,0);
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.scale(ratio, ratio);
+  ctx.font = font;
+  ctx.fillStyle = color;
+  ctx.textBaseline = "top";
+  lines.forEach((ln, i) => ctx.fillText(ln, 0, i * lh));
+}
+function renderTextCanvases() {
+  const task = currentTask();
+  if (!task) return;
+  const promptCanvas = document.getElementById("promptCanvas");
+  if (promptCanvas) drawCanvasText(promptCanvas, task.prompt, window.innerWidth < 640 ? 24 : 30, 900);
+  document.querySelectorAll(".option-canvas").forEach((canvas, i) => {
+    drawCanvasText(canvas, task.options[i], window.innerWidth < 640 ? 18 : 20, 800);
+  });
+}
+function hairColorFill(color) {
+  return {brown:"#6b4d33", blond:"#e2c15d", black:"#1f2937", red:"#c96a3b", none:"#00000000"}[color] || "#6b4d33";
+}
+function avatarMarkup(id, small=false) {
+  const p = CHARACTER_DB[id];
+  const w = small ? 170 : 360;
+  const h = small ? 210 : 400;
+  const cx = w/2;
+  const groundY = h - 44;
+  const tall = p.height === "tall" ? 1.08 : p.height === "short" ? 0.92 : 1;
+  const shoulder = {thin:50,slim:56,average:62,athletic:70,strong:76,chubby:84}[p.body] || 62;
+  const torsoH = Math.round((small ? 58 : 112) * tall);
+  const legH = Math.round((small ? 52 : 104) * tall);
+  const headR = small ? 28 : 52;
+  const headCy = groundY - legH - torsoH - headR + 8;
+  const bodyTop = headCy + headR + 14;
+  const torsoW = shoulder;
+  const neckX = cx - 11;
+  const mouthW = p.lips === "full" ? (small ? 18 : 30) : (small ? 13 : 22);
+  const mouthH = p.lips === "full" ? (small ? 4 : 6) : (small ? 2 : 3);
+  const hc = hairColorFill(p.hairColor);
+  let hair = "";
+  if (p.hairStyle !== "bald") {
+    if (p.hairStyle === "straight") {
+      const ext = p.hairLength === "long" ? (small ? 36 : 72) : p.hairLength === "medium-length" ? (small ? 18 : 38) : (small ? 4 : 10);
+      hair = `<path d="M ${cx-headR-8} ${headCy-6} Q ${cx} ${headCy-headR-18} ${cx+headR+8} ${headCy-6} L ${cx+headR+2} ${headCy+ext} Q ${cx} ${headCy+headR*0.28} ${cx-headR+2} ${headCy+ext} Z" fill="${hc}"/>`;
+    } else if (p.hairStyle === "wavy") {
+      const ext = p.hairLength === "long" ? (small ? 38 : 74) : p.hairLength === "medium-length" ? (small ? 20 : 42) : (small ? 8 : 16);
+      const amp = small ? 6 : 10;
+      hair = `<path d="M ${cx-headR-10} ${headCy-4} Q ${cx-headR*0.6} ${headCy-headR-10} ${cx} ${headCy-headR-16} Q ${cx+headR*0.6} ${headCy-headR-10} ${cx+headR+10} ${headCy-4} L ${cx+headR-2} ${headCy+ext} Q ${cx+headR-12} ${headCy+ext-amp} ${cx+headR-16} ${headCy+ext} Q ${cx+6} ${headCy+ext+amp} ${cx} ${headCy+ext-4} Q ${cx-8} ${headCy+ext+amp} ${cx-headR+16} ${headCy+ext} Q ${cx-headR+12} ${headCy+ext-amp} ${cx-headR+2} ${headCy+ext} Z" fill="${hc}"/>`;
+    } else if (p.hairStyle === "curly") {
+      const count = small ? 8 : 12;
+      const r = small ? 9 : 14;
+      const curls = [];
+      for (let i=0;i<count;i++) {
+        const angle = -Math.PI + (i/(count-1))*Math.PI;
+        const rx = cx + Math.cos(angle)*(headR+2);
+        const ry = headCy + Math.sin(angle)*(headR*0.8) - (small?2:4);
+        curls.push(`<circle cx="${rx.toFixed(1)}" cy="${ry.toFixed(1)}" r="${r}" fill="${hc}"/>`);
+      }
+      if (p.hairLength === "long") {
+        curls.push(`<circle cx="${cx-headR+6}" cy="${headCy+headR+20}" r="${r}" fill="${hc}"/>`);
+        curls.push(`<circle cx="${cx+headR-6}" cy="${headCy+headR+20}" r="${r}" fill="${hc}"/>`);
+      }
+      hair = curls.join("");
+    } else if (p.hairStyle === "messy") {
+      const ext = p.hairLength === "short" ? (small ? 8 : 14) : (small ? 16 : 26);
+      hair = `<path d="M ${cx-headR-10} ${headCy-2} L ${cx-headR+2} ${headCy-headR-12} L ${cx-18} ${headCy-headR-3} L ${cx-2} ${headCy-headR-18} L ${cx+12} ${headCy-headR-5} L ${cx+headR-2} ${headCy-headR-14} L ${cx+headR+12} ${headCy} L ${cx+headR} ${headCy+ext} Q ${cx} ${headCy+headR*0.3} ${cx-headR} ${headCy+ext} Z" fill="${hc}"/>`;
+    }
+  }
+  const labelY = h - 36;
+  return `
+  <svg viewBox="0 0 ${w} ${h}" width="100%" height="100%" aria-hidden="true">
+    <rect x="0" y="0" width="${w}" height="${h}" rx="${small ? 18 : 28}" fill="#f7faff"/>
+    <rect x="${small ? 12 : 18}" y="${small ? 12 : 18}" width="${w-(small?24:36)}" height="${h-(small?24:36)}" rx="${small ? 14 : 22}" fill="#ffffff" stroke="#dbe6f5" stroke-width="2"/>
+    <ellipse cx="${cx}" cy="${groundY+6}" rx="${small ? 44 : 86}" ry="${small ? 10 : 16}" fill="#ddebff"/>
+    <g>
+      ${hair}
+      <circle cx="${cx}" cy="${headCy}" r="${headR}" fill="${p.skin}"/>
+      <rect x="${neckX}" y="${headCy+headR-2}" width="22" height="${small ? 18 : 24}" rx="9" fill="${p.skin}"/>
+      <path d="M ${cx-torsoW/2} ${bodyTop} Q ${cx} ${bodyTop-8} ${cx+torsoW/2} ${bodyTop} L ${cx+torsoW*0.36} ${bodyTop+torsoH} Q ${cx} ${bodyTop+torsoH+10} ${cx-torsoW*0.36} ${bodyTop+torsoH} Z" fill="${p.outfit}"/>
+      <rect x="${cx-torsoW*0.42}" y="${bodyTop+torsoH-6}" width="${torsoW*0.84}" height="16" rx="8" fill="#17324d" opacity=".08"/>
+      <rect x="${cx-torsoW*0.58}" y="${bodyTop+18}" width="${small ? 10 : 16}" height="${small ? 40 : 72}" rx="8" fill="${p.skin}"/>
+      <rect x="${cx+torsoW*0.48}" y="${bodyTop+18}" width="${small ? 10 : 16}" height="${small ? 40 : 72}" rx="8" fill="${p.skin}"/>
+      <rect x="${cx-26}" y="${bodyTop+torsoH}" width="18" height="${legH}" rx="8" fill="#2f4f6f"/>
+      <rect x="${cx+8}" y="${bodyTop+torsoH}" width="18" height="${legH}" rx="8" fill="#2f4f6f"/>
+      <rect x="${cx-34}" y="${bodyTop+torsoH+legH-6}" width="34" height="12" rx="6" fill="#1f2937"/>
+      <rect x="${cx+8}" y="${bodyTop+torsoH+legH-6}" width="34" height="12" rx="6" fill="#1f2937"/>
+      <circle cx="${cx-headR*0.36}" cy="${headCy-4}" r="${small ? 2.5 : 4}" fill="#17324d"/>
+      <circle cx="${cx+headR*0.36}" cy="${headCy-4}" r="${small ? 2.5 : 4}" fill="#17324d"/>
+      <rect x="${cx-mouthW/2}" y="${headCy+headR*0.42}" width="${mouthW}" height="${mouthH}" rx="${mouthH/2}" fill="#d86477"/>
+    </g>
+    <rect x="${small ? 22 : 28}" y="${labelY-12}" width="${w-(small?44:56)}" height="${small ? 24 : 28}" rx="12" fill="#ddebff"/>
+    <text x="${cx}" y="${labelY+6}" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="${small ? 13 : 18}" font-weight="800" fill="#25528f">${p.name}</text>
+  </svg>`;
+}
+function traitMarkup(trait) {
+  const map = {
+    "wavy": `<svg viewBox="0 0 360 400" width="100%" height="100%"><rect width="360" height="400" rx="28" fill="#f7faff"/><rect x="20" y="20" width="320" height="360" rx="24" fill="#fff" stroke="#dbe6f5" stroke-width="2"/><circle cx="180" cy="154" r="74" fill="#f1c7a7"/><path d="M 92 148 Q 120 82 180 74 Q 240 82 268 148 L 256 224 Q 220 194 180 196 Q 140 194 104 224 Z" fill="#6b4d33"/><path d="M 104 205 Q 122 190 136 210 Q 154 228 170 210 Q 186 192 204 212 Q 222 232 238 210 Q 250 194 256 206" fill="none" stroke="#6b4d33" stroke-width="14" stroke-linecap="round"/><text x="180" y="330" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="30" font-weight="900" fill="#25528f">wavy</text></svg>`,
+    "bald": `<svg viewBox="0 0 360 400" width="100%" height="100%"><rect width="360" height="400" rx="28" fill="#f7faff"/><rect x="20" y="20" width="320" height="360" rx="24" fill="#fff" stroke="#dbe6f5" stroke-width="2"/><circle cx="180" cy="154" r="78" fill="#e2b28f"/><rect x="150" y="126" width="18" height="10" rx="5" fill="#17324d"/><rect x="192" y="126" width="18" height="10" rx="5" fill="#17324d"/><rect x="162" y="196" width="36" height="8" rx="4" fill="#d86477"/><text x="180" y="330" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="30" font-weight="900" fill="#25528f">bald</text></svg>`,
+    "strong": `<svg viewBox="0 0 360 400" width="100%" height="100%"><rect width="360" height="400" rx="28" fill="#f7faff"/><rect x="20" y="20" width="320" height="360" rx="24" fill="#fff" stroke="#dbe6f5" stroke-width="2"/><circle cx="180" cy="106" r="48" fill="#efc3a0"/><path d="M 104 186 Q 180 150 256 186 L 230 292 Q 180 318 130 292 Z" fill="#4a8df6"/><rect x="72" y="184" width="48" height="108" rx="22" fill="#efc3a0"/><rect x="240" y="184" width="48" height="108" rx="22" fill="#efc3a0"/><circle cx="82" cy="282" r="26" fill="#efc3a0"/><circle cx="278" cy="282" r="26" fill="#efc3a0"/><text x="180" y="338" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="30" font-weight="900" fill="#25528f">strong</text></svg>`,
+    "full": `<svg viewBox="0 0 360 400" width="100%" height="100%"><rect width="360" height="400" rx="28" fill="#f7faff"/><rect x="20" y="20" width="320" height="360" rx="24" fill="#fff" stroke="#dbe6f5" stroke-width="2"/><circle cx="180" cy="154" r="78" fill="#f1c7a7"/><rect x="150" y="128" width="18" height="10" rx="5" fill="#17324d"/><rect x="192" y="128" width="18" height="10" rx="5" fill="#17324d"/><rect x="140" y="206" width="80" height="18" rx="9" fill="#d86477"/><text x="180" y="330" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="30" font-weight="900" fill="#25528f">full</text></svg>`,
+    "short": `<svg viewBox="0 0 360 400" width="100%" height="100%"><rect width="360" height="400" rx="28" fill="#f7faff"/><rect x="20" y="20" width="320" height="360" rx="24" fill="#fff" stroke="#dbe6f5" stroke-width="2"/><line x1="126" y1="120" x2="126" y2="266" stroke="#4a8df6" stroke-width="12" stroke-linecap="round"/><line x1="234" y1="92" x2="234" y2="294" stroke="#9bbaf0" stroke-width="12" stroke-linecap="round"/><polygon points="126,120 112,140 140,140" fill="#4a8df6"/><polygon points="126,266 112,246 140,246" fill="#4a8df6"/><polygon points="234,92 220,112 248,112" fill="#9bbaf0"/><polygon points="234,294 220,274 248,274" fill="#9bbaf0"/><text x="180" y="338" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="30" font-weight="900" fill="#25528f">short</text></svg>`,
+    "medium-length": `<svg viewBox="0 0 360 400" width="100%" height="100%"><rect width="360" height="400" rx="28" fill="#f7faff"/><rect x="20" y="20" width="320" height="360" rx="24" fill="#fff" stroke="#dbe6f5" stroke-width="2"/><circle cx="180" cy="154" r="78" fill="#f1c7a7"/><path d="M 96 148 Q 118 84 180 72 Q 242 84 264 148 L 246 210 Q 180 182 114 210 Z" fill="#6b4d33"/><line x1="90" y1="300" x2="270" y2="300" stroke="#9bbaf0" stroke-width="12" stroke-linecap="round"/><line x1="104" y1="300" x2="160" y2="300" stroke="#4a8df6" stroke-width="12" stroke-linecap="round"/><text x="180" y="338" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="26" font-weight="900" fill="#25528f">medium-length</text></svg>`
+  };
+  return map[trait] || avatarMarkup("ava", false);
+}
+function artHtml(art) {
+  if (!art) return "";
+  if (art.kind === "single") return avatarMarkup(art.id, false);
+  if (art.kind === "trait") return traitMarkup(art.trait);
+  if (art.kind === "lineup") {
+    return `<div style="display:flex;gap:10px;width:100%;padding:14px">${art.ids.map(id => `<div style="flex:1;min-width:0">${avatarMarkup(id, true)}</div>`).join("")}</div>`;
+  }
+  return "";
+}
+function renderStart(saved) {
+  const profile = getProfile();
+  document.getElementById("app").innerHTML = `
     <div class="shell">
-      <section id="startScreen" class="screen start-screen active">
-        <h1 class="title">Person description practice</h1>
-        <p class="subtitle">20 simple tasks</p>
-        <div class="fields">
-          <div class="field-wrap">
-            <label class="label" for="studentName">Name</label>
-            <input id="studentName" class="field" type="text" autocomplete="off" spellcheck="false" />
+      <div class="card" style="padding:24px">
+        <div class="row" style="justify-content:space-between;align-items:flex-start;gap:18px;flex-wrap:wrap">
+          <div>
+            <div class="pill">👤 Person description</div>
+            <h1 class="top-title" style="margin-top:14px">20 smart tasks</h1>
+            <div class="small" style="margin-top:8px">Interesting tasks • flat design • image cards • simple English</div>
           </div>
-          <div class="field-wrap">
-            <label class="label" for="studentGroup">Group</label>
-            <input id="studentGroup" class="field" type="text" autocomplete="off" spellcheck="false" />
-          </div>
+          <div class="badge">${CONFIG.totalQuestions} tasks</div>
         </div>
-        <button id="startBtn" class="btn" type="button">Start</button>
-      </section>
-
-      <section id="practiceScreen" class="screen practice-screen">
-        <div class="header-row">
-          <div id="progressText">1 / 20</div>
-          <div id="scoreText">0 correct</div>
+        <div class="start-grid" style="margin-top:22px">
+          <div class="field"><div class="small">Name</div><input id="nameInput" value="${(profile.name||"").replace(/"/g,'&quot;')}" placeholder="Name" /></div>
+          <div class="field"><div class="small">Group</div><input id="groupInput" value="${(profile.group||"").replace(/"/g,'&quot;')}" placeholder="Group" /></div>
         </div>
-        <div class="progress-track"><div id="progressFill" class="progress-fill"></div></div>
-
-        <div class="panel"><canvas id="promptCanvas" width="1200" height="220"></canvas></div>
-        <div id="chipsRow" class="chip-row"></div>
-        <div id="supportWrap" class="panel" style="display:none;"><canvas id="supportCanvas" width="1200" height="96"></canvas></div>
-        <div id="optionsGrid" class="options-grid"></div>
-        <div id="statusLine" class="status-line"></div>
-      </section>
-
-      <section id="resultScreen" class="screen result-screen">
-        <div class="result-box">
-          <h2 class="result-title">Finished</h2>
-          <div id="scoreBig" class="score-big">0 / 20</div>
-          <div class="result-grid">
-            <div class="result-item"><div class="k">Name</div><div id="resultName" class="v">—</div></div>
-            <div class="result-item"><div class="k">Group</div><div id="resultGroup" class="v">—</div></div>
-            <div class="result-item"><div class="k">Correct</div><div id="resultCorrect" class="v">0</div></div>
-            <div class="result-item"><div class="k">Percent</div><div id="resultPercent" class="v">0%</div></div>
-          </div>
-          <div class="subtitle">Take a screenshot now.</div>
+        <div class="muted-block" style="margin-top:16px">Progress is saved in local storage and cookie. If the student leaves the page, the current task changes, but finished answers stay.</div>
+        <div class="row" style="margin-top:18px;justify-content:flex-start;flex-wrap:wrap">
+          <button id="startBtn" class="flat-btn">Start</button>
+          ${saved ? `<button id="continueBtn" class="flat-btn alt">${saved.done ? "Open result" : "Continue"}</button>` : ``}
         </div>
-      </section>
-    </div>
-  </div>
-
-  <div id="popup" class="popup">
-    <div class="popup-card">
-      <div class="popup-top">
-        <div>
-          <div id="popupTitle" class="popup-title">word</div>
-          <div id="popupBody" class="popup-sub"></div>
-        </div>
-        <button id="popupClose" class="popup-close" type="button">×</button>
       </div>
+    </div>`;
+  document.getElementById("startBtn").onclick = () => {
+    const name = document.getElementById("nameInput").value.trim();
+    const group = document.getElementById("groupInput").value.trim();
+    saveProfile(name, group);
+    startQuiz();
+  };
+  if (saved) {
+    document.getElementById("continueBtn").onclick = () => { state = saved; render(); };
+  }
+}
+function renderFocusWords(task) {
+  const unique = [...new Set((task.focusWords || []).filter(Boolean))];
+  if (!unique.length) return "";
+  return `<div class="chips">${unique.map(w => {
+    const row = findWord(w);
+    const label = row ? `${row.Emoji || "📘"} ${row.Word}` : w;
+    return `<button class="chip" data-word="${w}">${label}</button>`;
+  }).join("")}</div>`;
+}
+function renderOptions(task) {
+  return `
+    <div class="option-grid">
+      ${task.options.map((opt, i) => {
+        const active = (state.selection || []).includes(i) ? " active" : "";
+        return `<button class="option-btn${active}" data-index="${i}"><span class="letter">${String.fromCharCode(65+i)}</span><canvas class="text-canvas option-canvas"></canvas></button>`;
+      }).join("")}
     </div>
-  </div>
-
-  <div id="toast" class="toast"></div>
-
-  <script>
-    const CONFIG = {
-      appVersion: '3.1.0',
-      totalTasks: 20,
-      topicValue: 'topic',
-      topicDisplay: 'Description of a person',
-      storage: {
-        state: 'personDescriptionPracticeStateV31',
-        shuffle: 'personDescriptionPracticeShuffleV31',
-        submittedPrefix: 'personDescriptionPracticeSubmittedV31:'
-      },
-      form: {
-        actionUrl: 'https://docs.google.com/forms/d/e/1FAIpQLSeUzYUvQbbzo_1r81AacP6Kj7HlKDzEVfa93Dam39LiVjcItA/formResponse',
-        fields: {
-          name: 'entry.1582931880',
-          group: 'entry.1222434157',
-          topic: 'entry.371289786',
-          payload: 'entry.679064514'
-        }
-      }
+    ${task.type === "pick2" ? `<button id="okPick2" class="flat-btn" style="margin-top:14px" ${(state.selection||[]).length===2 ? "" : "disabled"}>OK</button>` : ""}`;
+}
+function renderQuiz() {
+  if (state.done) return renderResult();
+  const task = currentTask();
+  const progress = Math.round((state.current / state.deck.length) * 100);
+  const labelMap = {who:"Who is it?", pick2:"Choose 2", fill:"Fill", wrong:"Pick the wrong one", meaning:"Word meaning"};
+  document.getElementById("app").innerHTML = `
+    <div class="shell">
+      <div class="card">
+        <div style="padding:18px 18px 8px 18px">
+          <div class="row" style="justify-content:space-between;flex-wrap:wrap">
+            <div class="row" style="flex-wrap:wrap">
+              <div class="pill">Task ${state.current + 1} / ${state.deck.length}</div>
+              <div class="badge">${state.correct} correct</div>
+              <div class="badge">${state.leaveCount} changes</div>
+            </div>
+            <div class="small">${state.profile.name ? state.profile.name + " • " : ""}${state.profile.group || ""}</div>
+          </div>
+          <div class="progress" style="margin-top:14px"><span style="width:${progress}%"></span></div>
+        </div>
+        <div class="quiz-grid">
+          <div class="art-wrap"><div class="art-box">${artHtml(task.art)}</div></div>
+          <div class="task-wrap" translate="no">
+            <div class="subline"><div class="pill">${labelMap[task.type] || "Task"}</div><div class="helper">Tap blue chips for RU help</div></div>
+            <div class="canvas-wrap"><canvas id="promptCanvas" class="text-canvas"></canvas></div>
+            ${renderFocusWords(task)}
+            ${renderOptions(task)}
+          </div>
+        </div>
+      </div>
+    </div>`;
+  renderTextCanvases();
+  document.querySelectorAll(".chip[data-word]").forEach(btn => btn.onclick = e => { e.preventDefault(); showPopup(btn.dataset.word); });
+  document.querySelectorAll(".option-btn").forEach(btn => {
+    btn.onclick = () => {
+      const i = Number(btn.dataset.index);
+      if (task.type === "pick2") toggleChoice(i);
+      else checkSingleAnswer(task.options[i]);
     };
-
-    const elements = {
-      startScreen: document.getElementById('startScreen'),
-      practiceScreen: document.getElementById('practiceScreen'),
-      resultScreen: document.getElementById('resultScreen'),
-      studentName: document.getElementById('studentName'),
-      studentGroup: document.getElementById('studentGroup'),
-      startBtn: document.getElementById('startBtn'),
-      progressText: document.getElementById('progressText'),
-      scoreText: document.getElementById('scoreText'),
-      progressFill: document.getElementById('progressFill'),
-      promptCanvas: document.getElementById('promptCanvas'),
-      supportCanvas: document.getElementById('supportCanvas'),
-      supportWrap: document.getElementById('supportWrap'),
-      chipsRow: document.getElementById('chipsRow'),
-      optionsGrid: document.getElementById('optionsGrid'),
-      statusLine: document.getElementById('statusLine'),
-      resultName: document.getElementById('resultName'),
-      resultGroup: document.getElementById('resultGroup'),
-      resultCorrect: document.getElementById('resultCorrect'),
-      resultPercent: document.getElementById('resultPercent'),
-      scoreBig: document.getElementById('scoreBig'),
-      popup: document.getElementById('popup'),
-      popupTitle: document.getElementById('popupTitle'),
-      popupBody: document.getElementById('popupBody'),
-      popupClose: document.getElementById('popupClose'),
-      toast: document.getElementById('toast')
-    };
-
-    let dictionary = {};
-    const canvasHits = new WeakMap();
-    let toastTimer = null;
-    let answerLocked = false;
-
-    const appState = {
-      stage: 'start',
-      studentName: '',
-      studentGroup: '',
-      sessionId: '',
-      seed: 0,
-      currentIndex: 0,
-      score: { correct: 0 },
-      results: [],
-      tasks: [],
-      usedTaskIds: [],
-      submitDone: false,
-      currentTaskStartedAt: null,
-      autosavedAt: null
-    };
-
-    const DEFINITION_BANK = [
-      { id:'def-wavy', prompt:'Which word means: hair with waves?', options:['wavy','straight','curly','bald'], answer:'wavy', terms:['which','word','means','hair','waves','wavy','straight','curly','bald'] },
-      { id:'def-curly', prompt:'Which word means: hair in small circles?', options:['curly','wavy','straight','messy'], answer:'curly', terms:['which','word','means','hair','small','circles','curly','wavy','straight','messy'] },
-      { id:'def-straight', prompt:'Which word means: hair with no waves?', options:['straight','wavy','curly','messy'], answer:'straight', terms:['which','word','means','hair','no','waves','straight','wavy','curly','messy'] },
-      { id:'def-bald', prompt:'Which word means: no hair?', options:['bald','long','short','curly'], answer:'bald', terms:['which','word','means','no','hair','bald','long','short','curly'] },
-      { id:'def-messy', prompt:'Which word means: hair not neat?', options:['messy','straight','full','tall'], answer:'messy', terms:['which','word','means','hair','not','neat','messy','straight','full','tall'] },
-      { id:'def-full', prompt:'Which word means: big lips?', options:['full','thin','long','average'], answer:'full', terms:['which','word','means','big','lips','full','thin','long','average'] },
-      { id:'def-thin', prompt:'Which word means: small lips?', options:['thin','full','strong','short'], answer:'thin', terms:['which','word','means','small','lips','thin','full','strong','short'] },
-      { id:'def-tall', prompt:'Which word means: high height?', options:['tall','short','slim','wavy'], answer:'tall', terms:['which','word','means','high','height','tall','short','slim','wavy'] },
-      { id:'def-athletic', prompt:'Which word means: body good for sport?', options:['athletic','chubby','average','thin'], answer:'athletic', terms:['which','word','means','body','good','sport','athletic','chubby','average','thin'] },
-      { id:'def-strong', prompt:'Which word means: body with muscles?', options:['strong','slim','average','messy'], answer:'strong', terms:['which','word','means','body','muscles','strong','slim','average','messy'] },
-      { id:'def-chubby', prompt:'Which word means: body a little fat?', options:['chubby','athletic','thin','straight'], answer:'chubby', terms:['which','word','means','body','little','fat','chubby','athletic','thin','straight'] },
-      { id:'def-average', prompt:'Which word means: normal body?', options:['average','strong','bald','full'], answer:'average', terms:['which','word','means','normal','body','average','strong','bald','full'] },
-      { id:'def-long', prompt:'Which word means: not short hair?', options:['long','bald','thin','full'], answer:'long', terms:['which','word','means','not','short','hair','long','bald','thin','full'] },
-      { id:'def-short', prompt:'Which word means: not tall?', options:['short','tall','curly','strong'], answer:'short', terms:['which','word','means','not','tall','short','curly','strong'] },
-      { id:'def-slim', prompt:'Which word means: body thin and nice?', options:['slim','chubby','strong','messy'], answer:'slim', terms:['which','word','means','body','thin','nice','slim','chubby','strong','messy'] }
-    ];
-
-    const TRUE_FALSE_BANK = [
-      { id:'tf1', statement:'Long means not short.', answer:true, terms:['true','false','long','means','not','short'] },
-      { id:'tf2', statement:'Thin lips are big lips.', answer:false, terms:['true','false','thin','lips','big','full'] },
-      { id:'tf3', statement:'Bald means no hair.', answer:true, terms:['true','false','bald','means','no','hair'] },
-      { id:'tf4', statement:'Athletic is a body type.', answer:true, terms:['true','false','athletic','body','type'] },
-      { id:'tf5', statement:'Curly hair is straight hair.', answer:false, terms:['true','false','curly','hair','straight'] },
-      { id:'tf6', statement:'Tall is the opposite of short.', answer:true, terms:['true','false','tall','opposite','short'] },
-      { id:'tf7', statement:'Messy hair is very neat hair.', answer:false, terms:['true','false','messy','hair','neat'] },
-      { id:'tf8', statement:'Chubby means very slim.', answer:false, terms:['true','false','chubby','slim'] },
-      { id:'tf9', statement:'Full lips are not thin lips.', answer:true, terms:['true','false','full','lips','thin'] },
-      { id:'tf10', statement:'Wavy hair has waves.', answer:true, terms:['true','false','wavy','hair','waves'] },
-      { id:'tf11', statement:'Average body means normal body.', answer:true, terms:['true','false','average','body','normal'] },
-      { id:'tf12', statement:'Strong body means weak body.', answer:false, terms:['true','false','strong','body','weak'] },
-      { id:'tf13', statement:'Short can talk about height.', answer:true, terms:['true','false','short','height'] },
-      { id:'tf14', statement:'Slim means a little fat.', answer:false, terms:['true','false','slim','little','fat'] },
-      { id:'tf15', statement:'Straight hair has no waves.', answer:true, terms:['true','false','straight','hair','waves'] }
-    ];
-
-    function nowIso() { return new Date().toISOString(); }
-    function randomSeed() { return Math.floor(Date.now() + Math.random() * 1000000); }
-    function normalizeKey(value) {
-      return String(value || '')
-        .toLowerCase()
-        .replace(/[“”"'.,!?;:()]/g, '')
-        .replace(/-/g, ' ')
-        .replace(/\s+/g, ' ')
-        .trim();
+  });
+  const ok = document.getElementById("okPick2");
+  if (ok) ok.onclick = checkPick2;
+}
+function renderResult() {
+  const result = makeResult();
+  document.getElementById("app").innerHTML = `
+    <div class="shell">
+      <div class="card screenshot">
+        <div class="row" style="justify-content:space-between;flex-wrap:wrap">
+          <div><div class="pill">✅ Finished</div><h1 class="top-title" style="margin-top:14px">Result screen</h1><div class="small" style="margin-top:8px">Made for screenshot</div></div>
+          <div class="badge">${result.scorePercent}%</div>
+        </div>
+        <div class="result-grid">
+          <div class="result-stat"><div class="small">Name</div><div style="font-weight:900;font-size:24px;margin-top:8px">${result.name || "—"}</div></div>
+          <div class="result-stat"><div class="small">Group</div><div style="font-weight:900;font-size:24px;margin-top:8px">${result.group || "—"}</div></div>
+          <div class="result-stat"><div class="small">Correct</div><div style="font-weight:900;font-size:24px;margin-top:8px">${result.correct} / ${result.total}</div></div>
+          <div class="result-stat"><div class="small">Changes</div><div style="font-weight:900;font-size:24px;margin-top:8px">${result.leaveCount}</div></div>
+        </div>
+        <div class="card" style="margin-top:16px;padding:16px;background:var(--panel-2)">
+          <pre style="margin:0;white-space:pre-wrap;word-break:break-word;color:#25528f;font-weight:700">${state.resultJson || JSON.stringify(result, null, 2)}</pre>
+        </div>
+        <div class="row" style="margin-top:18px;flex-wrap:wrap">
+          <button id="restartBtn" class="flat-btn">Restart</button>
+          <button id="backStartBtn" class="flat-btn ghost">Start screen</button>
+        </div>
+      </div>
+    </div>`;
+  document.getElementById("restartBtn").onclick = () => { clearState(); startQuiz(); };
+  document.getElementById("backStartBtn").onclick = () => { clearState(); render(); };
+}
+function render() {
+  const saved = loadState();
+  if (!state && saved) state = saved;
+  if (!state) return renderStart(saved);
+  if (state.done && !state.sent) submitOnce();
+  renderQuiz();
+}
+function blockActions() {
+  ["copy","cut","paste","contextmenu","selectstart","dragstart"].forEach(type => {
+    document.addEventListener(type, e => { e.preventDefault(); }, {passive:false});
+  });
+  document.addEventListener("keydown", e => {
+    const k = (e.key || "").toLowerCase();
+    const combo = e.ctrlKey || e.metaKey;
+    if ((combo && ["a","c","x","v","u","s","p"].includes(k)) || k === "f12" || (combo && e.shiftKey && ["i","j","c","s"].includes(k))) {
+      e.preventDefault();
+      e.stopPropagation();
     }
-    function mulberry32(seed) {
-      let a = seed >>> 0;
-      return function() {
-        a |= 0;
-        a = (a + 0x6D2B79F5) | 0;
-        let t = Math.imul(a ^ (a >>> 15), 1 | a);
-        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-      };
-    }
-    function shuffle(list, rnd) {
-      const arr = [...list];
-      for (let i = arr.length - 1; i > 0; i -= 1) {
-        const j = Math.floor(rnd() * (i + 1));
-        [arr[i], arr[j]] = [arr[j], arr[i]];
-      }
-      return arr;
-    }
-    function useRetinaCanvas(canvas, logicalWidth, logicalHeight) {
-      const ratio = Math.max(window.devicePixelRatio || 1, 1);
-      canvas.width = Math.round(logicalWidth * ratio);
-      canvas.height = Math.round(logicalHeight * ratio);
-      const ctx = canvas.getContext('2d');
-      ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
-      return { ctx, width: logicalWidth, height: logicalHeight };
-    }
-    function roundedRect(ctx, x, y, w, h, r) {
-      ctx.beginPath();
-      ctx.moveTo(x + r, y);
-      ctx.arcTo(x + w, y, x + w, y + h, r);
-      ctx.arcTo(x + w, y + h, x, y + h, r);
-      ctx.arcTo(x, y + h, x, y, r);
-      ctx.arcTo(x, y, x + w, y, r);
-      ctx.closePath();
-    }
-    function wrapLines(ctx, text, maxWidth) {
-      const words = String(text).split(/\s+/).filter(Boolean);
-      const lines = [];
-      let line = '';
-      for (const word of words) {
-        const test = line ? `${line} ${word}` : word;
-        if (ctx.measureText(test).width > maxWidth && line) {
-          lines.push(line);
-          line = word;
-        } else {
-          line = test;
-        }
-      }
-      if (line) lines.push(line);
-      return lines;
-    }
-    function normalizeDictionary(raw) {
-      const out = {};
-      const addItem = (key, value) => {
-        const clean = normalizeKey(key);
-        if (!clean) return;
-        out[clean] = {
-          translation: value.translation || value.Translation || value.hint || '',
-          emoji: value.emoji || value.Emoji || '',
-          example: value.example || value.Example || ''
-        };
-      };
-      if (Array.isArray(raw)) {
-        raw.forEach((item) => addItem(item.Word || item.word || item.term, item));
-      } else if (raw && typeof raw === 'object') {
-        Object.entries(raw).forEach(([key, value]) => {
-          if (typeof value === 'string') addItem(key, { translation: value });
-          else addItem(key, value || {});
-        });
-      }
-      return out;
-    }
-    async function loadDictionary() {
-      try {
-        const response = await fetch('words.json', { cache: 'no-store' });
-        if (!response.ok) throw new Error('no words');
-        dictionary = normalizeDictionary(await response.json());
-      } catch (e) {
-        dictionary = {};
-      }
-    }
-    function storeHits(canvas, hits) { canvasHits.set(canvas, hits || []); }
-    function renderTextBlock(canvas, text, options = {}) {
-      const height = options.height || 180;
-      const { ctx, width } = useRetinaCanvas(canvas, 1200, height);
-      const hits = [];
-      ctx.clearRect(0, 0, width, height);
-      ctx.fillStyle = '#f6f9fc';
-      roundedRect(ctx, 0, 0, width, height, 20);
-      ctx.fill();
-      ctx.strokeStyle = '#d7e1ec';
-      roundedRect(ctx, 0.5, 0.5, width - 1, height - 1, 20);
-      ctx.stroke();
-
-      const padX = 26;
-      let y = 42;
-      if (options.badge) {
-        ctx.fillStyle = '#e5f2ff';
-        roundedRect(ctx, padX, 16, 126, 32, 16);
-        ctx.fill();
-        ctx.fillStyle = '#1568b8';
-        ctx.font = '800 18px Inter, system-ui, sans-serif';
-        ctx.fillText(options.badge, padX + 14, 37);
-        y = 78;
-      }
-
-      ctx.fillStyle = '#14314e';
-      ctx.font = `${options.weight || 900} ${options.fontSize || 24}px Inter, system-ui, sans-serif`;
-      const lineHeight = options.lineHeight || 34;
-      const lines = wrapLines(ctx, text, width - padX * 2);
-      const boxHeight = (options.fontSize || 24) + 14;
-      lines.forEach((line) => {
-        let x = padX;
-        const words = line.split(/\s+/).filter(Boolean);
-        const space = ctx.measureText(' ').width;
-        words.forEach((word) => {
-          const normalized = normalizeKey(word);
-          const dictItem = dictionary[normalized];
-          const wordWidth = ctx.measureText(word).width;
-          ctx.fillStyle = dictItem ? '#1976d2' : '#14314e';
-          ctx.fillText(word, x, y);
-          if (dictItem) {
-            ctx.strokeStyle = '#1976d2';
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.moveTo(x, y + 5);
-            ctx.lineTo(x + wordWidth, y + 5);
-            ctx.stroke();
-            hits.push({ term: normalized, data: dictItem, x, y: y - boxHeight + 2, width: wordWidth, height: boxHeight + 8 });
-          }
-          x += wordWidth + space;
-        });
-        y += lineHeight;
-      });
-      storeHits(canvas, hits);
-    }
-    function renderOptionCanvas(canvas, option, index, state='idle') {
-      const height = 92;
-      const { ctx, width } = useRetinaCanvas(canvas, 900, height);
-      ctx.clearRect(0, 0, width, height);
-      const fill = state === 'correct' ? '#e7f8f1' : state === 'wrong' ? '#fff0f3' : '#ffffff';
-      const border = state === 'correct' ? '#9ddbbf' : state === 'wrong' ? '#efb2be' : '#d7e1ec';
-      const labelFill = state === 'correct' ? '#1fa971' : state === 'wrong' ? '#d4546a' : '#e5f2ff';
-      const labelText = state === 'correct' || state === 'wrong' ? '#ffffff' : '#1568b8';
-      roundedRect(ctx, 0, 0, width, height, 18);
-      ctx.fillStyle = fill;
-      ctx.fill();
-      ctx.strokeStyle = border;
-      roundedRect(ctx, 0.5, 0.5, width - 1, height - 1, 18);
-      ctx.stroke();
-
-      ctx.fillStyle = labelFill;
-      roundedRect(ctx, 18, 21, 42, 42, 14);
-      ctx.fill();
-      ctx.fillStyle = labelText;
-      ctx.font = '800 22px Inter, system-ui, sans-serif';
-      ctx.fillText(String.fromCharCode(65 + index), 32, 48);
-
-      ctx.fillStyle = '#14314e';
-      ctx.font = '900 28px Inter, system-ui, sans-serif';
-      const lines = wrapLines(ctx, option, width - 100);
-      let y = height / 2 - ((lines.length - 1) * 16);
-      lines.forEach((line) => {
-        ctx.fillText(line, 82, y);
-        y += 32;
-      });
-      storeHits(canvas, []);
-    }
-    function setScreen(name) {
-      elements.startScreen.classList.toggle('active', name === 'start');
-      elements.practiceScreen.classList.toggle('active', name === 'practice');
-      elements.resultScreen.classList.toggle('active', name === 'result');
-    }
-    function showToast(text) {
-      elements.toast.textContent = text;
-      elements.toast.classList.add('show');
-      clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => elements.toast.classList.remove('show'), 1800);
-    }
-    function setStatus(text, kind='') {
-      elements.statusLine.innerHTML = '';
-      const span = document.createElement('span');
-      span.className = `status ${kind}`.trim();
-      span.textContent = text;
-      elements.statusLine.appendChild(span);
-    }
-    function buildInitialTasks(seed) {
-      const rnd = mulberry32(seed);
-      const defs = shuffle(DEFINITION_BANK, rnd).slice(0, 10).map((item) => ({
-        id: item.id,
-        baseId: item.id,
-        type: 'definition',
-        prompt: item.prompt,
-        options: shuffle(item.options, rnd),
-        answer: item.answer,
-        terms: item.terms,
-        support: 'Choose one word.'
-      }));
-      const tfs = shuffle(TRUE_FALSE_BANK, rnd).slice(0, 10).map((item) => ({
-        id: item.id,
-        baseId: item.id,
-        type: 'truefalse',
-        prompt: `True or False: ${item.statement}`,
-        options: ['True', 'False'],
-        answer: item.answer ? 'True' : 'False',
-        terms: item.terms,
-        support: 'Read and check the meaning.'
-      }));
-      return shuffle([...defs, ...tfs], rnd).map((task, index) => ({
-        ...task,
-        number: index + 1,
-        correctIndex: task.options.indexOf(task.answer)
-      }));
-    }
-    function availableBankForType(type) {
-      return type === 'definition' ? DEFINITION_BANK : TRUE_FALSE_BANK;
-    }
-    function makeReplacementTask(type, usedBaseIds) {
-      const bank = availableBankForType(type);
-      const free = bank.filter((item) => !usedBaseIds.includes(item.id));
-      const source = free.length ? free[Math.floor(Math.random() * free.length)] : bank[Math.floor(Math.random() * bank.length)];
-      const rnd = mulberry32(randomSeed());
-      const options = type === 'definition' ? shuffle(source.options, rnd) : ['True', 'False'];
-      const answer = type === 'definition' ? source.answer : (source.answer ? 'True' : 'False');
-      return {
-        id: `${source.id}-r-${Date.now().toString(36)}`,
-        baseId: source.id,
-        type,
-        prompt: type === 'definition' ? source.prompt : `True or False: ${source.statement}`,
-        options,
-        answer,
-        terms: source.terms,
-        support: type === 'definition' ? 'Choose one word.' : 'Read and check the meaning.',
-        correctIndex: options.indexOf(answer)
-      };
-    }
-    function persistState() {
-      appState.autosavedAt = nowIso();
-      localStorage.setItem(CONFIG.storage.state, JSON.stringify(appState));
-    }
-    function loadState() {
-      try {
-        const raw = localStorage.getItem(CONFIG.storage.state);
-        return raw ? JSON.parse(raw) : null;
-      } catch (e) {
-        return null;
-      }
-    }
-    function setShuffleFlag(reason) {
-      if (appState.stage !== 'running') return;
-      localStorage.setItem(CONFIG.storage.shuffle, JSON.stringify({
-        sessionId: appState.sessionId,
-        index: appState.currentIndex,
-        reason,
-        at: nowIso()
-      }));
-      persistState();
-    }
-    function consumeShuffleFlag() {
-      try {
-        const raw = localStorage.getItem(CONFIG.storage.shuffle);
-        if (!raw) return null;
-        localStorage.removeItem(CONFIG.storage.shuffle);
-        return JSON.parse(raw);
-      } catch (e) {
-        localStorage.removeItem(CONFIG.storage.shuffle);
-        return null;
-      }
-    }
-    function deriveKeywords(task) {
-      const set = new Set((task.terms || []).map(normalizeKey).filter(Boolean));
-      task.options.forEach((item) => {
-        const clean = normalizeKey(item);
-        if (clean && dictionary[clean]) set.add(clean);
-      });
-      return [...set].filter((item) => dictionary[item]);
-    }
-    function renderKeywords(task) {
-      elements.chipsRow.innerHTML = '';
-      deriveKeywords(task).forEach((term) => {
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'chip';
-        btn.textContent = term;
-        btn.addEventListener('click', () => openDictionary(term, dictionary[term]));
-        elements.chipsRow.appendChild(btn);
-      });
-    }
-    function openDictionary(term, entry) {
-      if (!entry) return;
-      const parts = [];
-      if (entry.emoji) parts.push(entry.emoji);
-      if (entry.translation) parts.push(entry.translation);
-      if (entry.example) parts.push(entry.example);
-      elements.popupTitle.textContent = term;
-      elements.popupBody.textContent = parts.join('  •  ') || 'No note';
-      elements.popup.classList.add('show');
-    }
-    function closeDictionary() { elements.popup.classList.remove('show'); }
-    function bindCanvasClicks(canvas) {
-      canvas.addEventListener('click', (event) => {
-        const hits = canvasHits.get(canvas) || [];
-        if (!hits.length) return;
-        const rect = canvas.getBoundingClientRect();
-        const scaleX = (canvas.width / (window.devicePixelRatio || 1)) / rect.width;
-        const scaleY = (canvas.height / (window.devicePixelRatio || 1)) / rect.height;
-        const x = (event.clientX - rect.left) * scaleX;
-        const y = (event.clientY - rect.top) * scaleY;
-        const hit = hits.find((item) => x >= item.x && x <= item.x + item.width && y >= item.y && y <= item.y + item.height);
-        if (hit) openDictionary(hit.term, hit.data);
-      });
-    }
-    function updateProgress() {
-      const done = appState.results.length;
-      elements.progressText.textContent = `${Math.min(appState.currentIndex + 1, CONFIG.totalTasks)} / ${CONFIG.totalTasks}`;
-      elements.scoreText.textContent = `${appState.score.correct} correct`;
-      const pct = Math.round((done / CONFIG.totalTasks) * 100);
-      elements.progressFill.style.width = `${pct}%`;
-    }
-    function renderTask() {
-      const task = appState.tasks[appState.currentIndex];
-      if (!task) return;
-      answerLocked = false;
-      appState.currentTaskStartedAt = nowIso();
-      renderTextBlock(elements.promptCanvas, task.prompt, {
-        badge: task.type === 'definition' ? 'Definition' : 'True / False',
-        height: 180,
-        fontSize: 24,
-        lineHeight: 34
-      });
-      elements.supportWrap.style.display = 'block';
-      renderTextBlock(elements.supportCanvas, task.support, {
-        height: 86,
-        fontSize: 20,
-        lineHeight: 28,
-        weight: 800
-      });
-      renderKeywords(task);
-
-      elements.optionsGrid.innerHTML = '';
-      task.options.forEach((option, index) => {
-        const button = document.createElement('button');
-        button.type = 'button';
-        button.className = 'option-btn';
-        const canvas = document.createElement('canvas');
-        button.appendChild(canvas);
-        button.addEventListener('click', () => answerTask(index));
-        elements.optionsGrid.appendChild(button);
-        renderOptionCanvas(canvas, option, index, 'idle');
-      });
-
-      updateProgress();
-      setStatus('Tap blue words for help');
-      persistState();
-    }
-    function answerTask(selectedIndex) {
-      if (answerLocked) return;
-      const task = appState.tasks[appState.currentIndex];
-      if (!task) return;
-      answerLocked = true;
-      const isCorrect = selectedIndex === task.correctIndex;
-      const latencyMs = Math.max(0, Date.now() - new Date(appState.currentTaskStartedAt || nowIso()).getTime());
-      if (isCorrect) appState.score.correct += 1;
-      [...elements.optionsGrid.querySelectorAll('.option-btn')].forEach((btn, index) => {
-        const canvas = btn.querySelector('canvas');
-        const state = index === task.correctIndex ? 'correct' : (index === selectedIndex && !isCorrect ? 'wrong' : 'idle');
-        renderOptionCanvas(canvas, task.options[index], index, state);
-        btn.disabled = true;
-      });
-      appState.results.push({
-        taskId: task.id,
-        baseId: task.baseId,
-        type: task.type,
-        correct: isCorrect,
-        selectedIndex,
-        latencyMs
-      });
-      if (!appState.usedTaskIds.includes(task.baseId)) appState.usedTaskIds.push(task.baseId);
-      persistState();
-      setStatus(isCorrect ? 'Correct' : 'Wrong', isCorrect ? 'good' : 'bad');
-
-      setTimeout(() => {
-        appState.currentIndex += 1;
-        if (appState.currentIndex >= CONFIG.totalTasks) {
-          appState.stage = 'finished';
-          persistState();
-          submitResultsOnce();
-          renderResult();
-          setScreen('result');
-        } else {
-          renderTask();
-        }
-      }, 600);
-    }
-    function replaceCurrentTask() {
-      if (appState.stage !== 'running') return;
-      const current = appState.tasks[appState.currentIndex];
-      if (!current) return;
-      const replacement = makeReplacementTask(current.type, appState.usedTaskIds);
-      replacement.number = appState.currentIndex + 1;
-      appState.tasks[appState.currentIndex] = replacement;
-      persistState();
-      if (document.visibilityState === 'visible') {
-        renderTask();
-        showToast('Task changed');
-      }
-    }
-    function renderResult() {
-      const correct = appState.score.correct;
-      const percent = Math.round((correct / CONFIG.totalTasks) * 100);
-      elements.scoreBig.textContent = `${correct} / ${CONFIG.totalTasks}`;
-      elements.resultName.textContent = appState.studentName || '—';
-      elements.resultGroup.textContent = appState.studentGroup || '—';
-      elements.resultCorrect.textContent = String(correct);
-      elements.resultPercent.textContent = `${percent}%`;
-    }
-    function buildPayload() {
-      const percent = Math.round((appState.score.correct / CONFIG.totalTasks) * 100);
-      return {
-        appVersion: CONFIG.appVersion,
-        sessionId: appState.sessionId,
-        name: appState.studentName,
-        group: appState.studentGroup,
-        topic: CONFIG.topicValue,
-        totalTasks: CONFIG.totalTasks,
-        correct: appState.score.correct,
-        percent,
-        finishedAt: nowIso(),
-        results: appState.results.map((item, idx) => ({
-          n: idx + 1,
-          type: item.type,
-          correct: item.correct,
-          ms: item.latencyMs
-        }))
-      };
-    }
-    function submitResultsOnce() {
-      if (appState.submitDone || !appState.sessionId) return;
-      const key = `${CONFIG.storage.submittedPrefix}${appState.sessionId}`;
-      if (localStorage.getItem(key) === '1') {
-        appState.submitDone = true;
-        persistState();
-        return;
-      }
-      const payload = buildPayload();
-      const formData = new URLSearchParams();
-      formData.set(CONFIG.form.fields.name, appState.studentName);
-      formData.set(CONFIG.form.fields.group, appState.studentGroup);
-      formData.set(CONFIG.form.fields.topic, CONFIG.topicValue);
-      formData.set(CONFIG.form.fields.payload, JSON.stringify(payload));
-      try {
-        if (navigator.sendBeacon) {
-          const blob = new Blob([formData.toString()], { type: 'application/x-www-form-urlencoded;charset=UTF-8' });
-          navigator.sendBeacon(CONFIG.form.actionUrl, blob);
-        } else {
-          fetch(CONFIG.form.actionUrl, {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
-            body: formData.toString()
-          }).catch(() => {});
-        }
-      } catch (e) {}
-      localStorage.setItem(key, '1');
-      appState.submitDone = true;
-      persistState();
-    }
-    function startNewSession() {
-      const name = elements.studentName.value.trim();
-      const group = elements.studentGroup.value.trim();
-      if (!name || !group) {
-        showToast('Enter name and group');
-        return;
-      }
-      appState.stage = 'running';
-      appState.studentName = name;
-      appState.studentGroup = group;
-      appState.sessionId = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2,8)}`;
-      appState.seed = randomSeed();
-      appState.currentIndex = 0;
-      appState.score = { correct: 0 };
-      appState.results = [];
-      appState.usedTaskIds = [];
-      appState.submitDone = false;
-      appState.tasks = buildInitialTasks(appState.seed);
-      persistState();
-      setScreen('practice');
-      renderTask();
-    }
-    function restoreFromSaved(saved) {
-      Object.assign(appState, saved);
-      elements.studentName.value = appState.studentName || '';
-      elements.studentGroup.value = appState.studentGroup || '';
-      if (appState.stage === 'finished') {
-        renderResult();
-        setScreen('result');
-      } else if (appState.stage === 'running') {
-        setScreen('practice');
-        const flag = consumeShuffleFlag();
-        if (flag && flag.sessionId === appState.sessionId) replaceCurrentTask();
-        else renderTask();
-      } else {
-        setScreen('start');
-      }
-    }
-    function registerServiceWorker() {
-      if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(() => {});
-    }
-    function installProtection() {
-      document.addEventListener('contextmenu', (e) => e.preventDefault());
-      document.addEventListener('copy', (e) => e.preventDefault());
-      document.addEventListener('cut', (e) => e.preventDefault());
-      document.addEventListener('dragstart', (e) => e.preventDefault());
-      document.addEventListener('keydown', (e) => {
-        const key = e.key.toLowerCase();
-        if ((e.ctrlKey || e.metaKey) && ['c','x','s','u','p','a'].includes(key)) e.preventDefault();
-      }, true);
-      window.addEventListener('beforeunload', () => { if (appState.stage === 'running') setShuffleFlag('beforeunload'); });
-      document.addEventListener('visibilitychange', () => {
-        if (document.visibilityState !== 'visible') {
-          if (appState.stage === 'running') setShuffleFlag('hidden');
-        } else {
-          const flag = consumeShuffleFlag();
-          if (flag && flag.sessionId === appState.sessionId && appState.stage === 'running') replaceCurrentTask();
-        }
-      });
-      window.addEventListener('offline', () => { persistState(); showToast('Offline mode'); });
-      window.addEventListener('online', () => showToast('Online'));
-    }
-
-    bindCanvasClicks(elements.promptCanvas);
-    bindCanvasClicks(elements.supportCanvas);
-    elements.popupClose.addEventListener('click', closeDictionary);
-    elements.popup.addEventListener('click', (e) => { if (e.target === elements.popup) closeDictionary(); });
-    elements.startBtn.addEventListener('click', startNewSession);
-
-    (async function init() {
-      await loadDictionary();
-      registerServiceWorker();
-      installProtection();
-      const saved = loadState();
-      if (saved && saved.sessionId && saved.stage && Array.isArray(saved.tasks)) restoreFromSaved(saved);
-      else setScreen('start');
-    })();
-  </script>
+  }, {passive:false});
+}
+function registerSW() {
+  if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
+}
+document.getElementById("closePopup").onclick = hidePopup;
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) applyLeavePenalty();
+  else render();
+});
+window.addEventListener("pagehide", applyLeavePenalty);
+window.addEventListener("blur", () => {
+  if (document.visibilityState === "visible") applyLeavePenalty();
+});
+window.addEventListener("resize", () => {
+  clearTimeout(window.__ppResize);
+  window.__ppResize = setTimeout(() => {
+    if (state && !state.done) renderTextCanvases();
+  }, 120);
+});
+seedDictionary();
+loadDictionary();
+blockActions();
+state = loadState();
+registerSW();
+render();
+</script>
 </body>
 </html>
