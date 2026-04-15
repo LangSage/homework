@@ -1,4 +1,4 @@
-const CACHE='person-practice-flat-v4';
+const CACHE='person-practice-flat-v6';
 const ASSETS=['./','./index.html','./sw.js','./words.json'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting()));

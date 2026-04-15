@@ -124,9 +124,10 @@
 <script>
 const CONFIG = {
   totalQuestions: 35,
-  storageKey: "person_practice_flat_v3",
-  cookieKey: "ppfv3",
+  storageKey: "person_practice_flat_v4",
+  cookieKey: "ppfv4",
   profileKey: "person_practice_profile_v3",
+  version: 4,
   topic: "topic",
   form: {
     action: "",
@@ -223,11 +224,17 @@ function saveState() {
 function loadState() {
   try {
     const raw = localStorage.getItem(CONFIG.storageKey);
-    if (raw) return JSON.parse(raw);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed && parsed.version === CONFIG.version) return parsed;
+    }
   } catch(e) {}
   try {
     const raw = getCookie(CONFIG.cookieKey);
-    if (raw) return JSON.parse(decodeSafe(raw));
+    if (raw) {
+      const parsed = JSON.parse(decodeSafe(raw));
+      if (parsed && parsed.version === CONFIG.version) return parsed;
+    }
   } catch(e) {}
   return null;
 }
@@ -236,8 +243,17 @@ function clearState() {
   document.cookie = `${CONFIG.cookieKey}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`;
   state = null;
 }
+function randomizeTask(task) {
+  const copy = {
+    ...task,
+    options: Array.isArray(task.options) ? shuffle(task.options) : task.options,
+    focusWords: Array.isArray(task.focusWords) ? task.focusWords.slice() : task.focusWords,
+    answers: Array.isArray(task.answers) ? task.answers.slice() : task.answers
+  };
+  return copy;
+}
 function chooseSessionDeck() {
-  const shuffled = shuffle(TASK_BANK);
+  const shuffled = shuffle(TASK_BANK).map(randomizeTask);
   return {
     deck: shuffled.slice(0, CONFIG.totalQuestions),
     reserve: shuffled.slice(CONFIG.totalQuestions)
@@ -247,7 +263,7 @@ function startQuiz() {
   const profile = getProfile();
   const chosen = chooseSessionDeck();
   state = {
-    version: 3,
+    version: CONFIG.version,
     active: true,
     done: false,
     sent: false,
@@ -276,9 +292,10 @@ function replaceCurrentTask() {
   else {
     const used = new Set([...state.deck.map(t => t.id), ...state.answers.filter(Boolean).map(a => a.taskId)]);
     const candidates = TASK_BANK.filter(t => t.id !== current.id && !used.has(t.id));
-    next = shuffle(candidates)[0] || shuffle(TASK_BANK.filter(t => t.id !== current.id))[0];
+    next = randomizeTask(shuffle(candidates)[0] || shuffle(TASK_BANK.filter(t => t.id !== current.id))[0]);
   }
   if (next) {
+    next = randomizeTask(next);
     state.deck[state.current] = next;
     state.selection = [];
   }
