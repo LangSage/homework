@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en" translate="no" class="notranslate">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="google" content="notranslate" />
+  <meta name="theme-color" content="#f5f2ea" />
+  <title>Shopping Homework</title>
+  <link rel="stylesheet" href="./styles.css" />
+  <script defer src="./app.js"></script>
+</head>
+<body class="notranslate" translate="no">
+  <div class="app-shell" id="app">
+    <div class="vpn-warning" id="vpnWarning">VPN OFF! Turn VPN off before starting.</div>
+
+    <section class="screen start-screen" id="startScreen">
+      <div class="start-layout">
+        <div class="start-image">
+          <img src="./assets/images/market_scene.png" alt="" draggable="false" />
+        </div>
+
+        <div class="start-panel">
+          <div class="label-row">
+            <span class="topic-chip">Shopping</span>
+            <span class="topic-chip alt">HOMEFORK_TG25</span>
+          </div>
+
+          <h1>Market Mission</h1>
+          <p class="lead">Answer the tasks, listen to the short shop clips, and finish with one automatic send.</p>
+
+          <div class="field-grid">
+            <label class="field">
+              <span>Name</span>
+              <input id="studentName" autocomplete="name" spellcheck="false" maxlength="80" />
+            </label>
+            <label class="field">
+              <span>Group</span>
+              <input id="studentGroup" autocomplete="off" spellcheck="false" maxlength="50" />
+            </label>
+          </div>
+
+          <div class="start-actions">
+            <button class="primary-btn" id="startBtn" type="button">Start</button>
+            <button class="ghost-btn hidden" id="resumeBtn" type="button">Resume</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen practice-screen hidden" id="practiceScreen">
+      <header class="practice-header">
+        <div class="header-main">
+          <span class="topic-chip">Shopping Homework</span>
+          <span class="student-chip" id="studentMeta">Saved</span>
+        </div>
+        <div class="header-side">
+          <span class="progress-chip" id="progressText">1 / 24</span>
+          <span class="score-chip" id="scoreText">0</span>
+        </div>
+      </header>
+
+      <div class="progress-track" aria-hidden="true">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+
+      <main class="exercise-area">
+        <div class="media-panel hidden" id="imagePanel">
+          <img id="questionImage" alt="" draggable="false" />
+        </div>
+
+        <div class="question-panel">
+          <canvas id="questionCanvas"></canvas>
+        </div>
+
+        <div class="audio-row hidden" id="audioRow">
+          <button class="icon-btn" id="playAudioBtn" type="button" aria-label="Play audio">▶</button>
+          <div class="audio-meter" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+          <audio id="taskAudio" preload="auto"></audio>
+        </div>
+
+        <div class="options-list" id="optionsList"></div>
+
+        <div class="feedback-panel hidden" id="feedbackPanel">
+          <canvas id="feedbackCanvas"></canvas>
+        </div>
+
+        <div class="nav-row">
+          <button class="ghost-btn" id="saveBtn" type="button">Save</button>
+          <button class="primary-btn" id="nextBtn" type="button" disabled>Next</button>
+        </div>
+      </main>
+    </section>
+
+    <section class="screen result-screen hidden" id="resultScreen">
+      <div class="result-layout">
+        <div class="result-image">
+          <img src="./assets/images/basket_receipt.png" alt="" draggable="false" />
+        </div>
+
+        <div class="result-panel">
+          <div class="label-row">
+            <span class="topic-chip">Completed</span>
+            <span class="topic-chip alt" id="submitState">Waiting</span>
+          </div>
+          <h1 id="resultTitle">Result</h1>
+          <div class="result-score" id="resultScore">0 / 24</div>
+          <div class="result-percent" id="resultPercent">0%</div>
+          <div class="result-stats">
+            <div><span>Name</span><strong id="resultName">-</strong></div>
+            <div><span>Group</span><strong id="resultGroup">-</strong></div>
+            <div><span>Time</span><strong id="resultTime">-</strong></div>
+            <div><span>Session</span><strong id="resultSession">-</strong></div>
+          </div>
+          <div class="result-actions">
+            <button class="primary-btn" id="retrySendBtn" type="button">Send again</button>
+            <a class="ghost-link" id="formFallback" target="_blank" rel="noopener">Open form</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="toast hidden" id="toast"></div>
+</body>
+</html>
