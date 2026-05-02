@@ -4,7 +4,6 @@
   const TOPIC = 'Shopping Homework: Market Mission';
   const ASSIGNMENT_CODE = 'HOMEFORK_TG25';
   const FORM_ID = '1FAIpQLSeUzYUvQbbzo_1r81AacP6Kj7HlKDzEVfa93Dam39LiVjcItA';
-  const FORM_VIEW_URL = `https://docs.google.com/forms/d/e/${FORM_ID}/viewform?usp=pp_url`;
   const FORM_ACTION_URL = `https://docs.google.com/forms/d/e/${FORM_ID}/formResponse`;
   const FORM_FIELDS = {
     name: 'entry.1582931880',
@@ -266,7 +265,6 @@
     resultSession: document.getElementById('resultSession'),
     submitState: document.getElementById('submitState'),
     retrySendBtn: document.getElementById('retrySendBtn'),
-    formFallback: document.getElementById('formFallback'),
     toast: document.getElementById('toast'),
     dictPopover: document.getElementById('dictPopover'),
     dictClose: document.getElementById('dictClose'),
@@ -592,7 +590,6 @@
     dom.resultTime.textContent = formatDuration(payload.durationSec);
     dom.resultSession.textContent = payload.sessionId || '-';
     dom.submitState.textContent = state.submitState || 'Waiting';
-    dom.formFallback.href = buildPrefilledLink(payload);
   }
 
   function buildPayload() {
@@ -728,14 +725,6 @@
     body.set(FORM_FIELDS.code, ASSIGNMENT_CODE);
     body.set(FORM_FIELDS.payload, JSON.stringify(payload));
     return body;
-  }
-
-  function buildPrefilledLink(payload) {
-    const url = new URL(FORM_VIEW_URL);
-    url.searchParams.set(FORM_FIELDS.name, payload.name || '');
-    url.searchParams.set(FORM_FIELDS.code, ASSIGNMENT_CODE);
-    url.searchParams.set(FORM_FIELDS.payload, JSON.stringify(payload));
-    return url.toString();
   }
 
   function playCurrentAudio() {
