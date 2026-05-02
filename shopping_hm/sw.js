@@ -1,12 +1,16 @@
-const CACHE_NAME = 'shopping-hm-v1';
+const CACHE_NAME = 'shopping-hm-v2';
 const ASSETS = [
   './',
   './index.html',
   './styles.css',
   './app.js',
+  './words.json',
   './assets/images/market_scene.png',
   './assets/images/store_map.png',
   './assets/images/basket_receipt.png',
+  './assets/audio/clip_rice.mp3',
+  './assets/audio/clip_basket.mp3',
+  './assets/audio/clip_water.mp3',
   './assets/audio/clip_rice.wav',
   './assets/audio/clip_basket.wav',
   './assets/audio/clip_water.wav',

@@ -177,29 +177,27 @@ New-Bitmap (Join-Path $img 'basket_receipt.png') 1200 675 {{
 def generate_audio() -> None:
     AUDIO_DIR.mkdir(parents=True, exist_ok=True)
     lines = {
-        "clip_rice.wav": "Excuse me, where is the rice, please?",
-        "clip_basket.wav": "There are two oranges and one apple in my basket.",
-        "clip_water.wav": "The bottle of water is too expensive.",
+        "clip_rice.mp3": "Excuse me, where is the rice, please?",
+        "clip_basket.mp3": "There are two oranges and one apple in my basket.",
+        "clip_water.mp3": "The bottle of water is too expensive.",
     }
-    entries = ",\n".join(
-        f"@{{ Path = {ps_quote(str(AUDIO_DIR / name))}; Text = {ps_quote(text)} }}" for name, text in lines.items()
-    )
-    script = rf"""
-Add-Type -AssemblyName System.Speech
-$ErrorActionPreference = 'Stop'
-$items = @(
-{entries}
-)
-foreach ($item in $items) {{
-  $speaker = New-Object System.Speech.Synthesis.SpeechSynthesizer
-  $speaker.Rate = -1
-  $speaker.Volume = 95
-  $speaker.SetOutputToWaveFile($item.Path)
-  $speaker.Speak($item.Text)
-  $speaker.Dispose()
-}}
-"""
-    run_powershell(script)
+    for name, text in lines.items():
+        subprocess.run(
+            [
+                "python",
+                "-m",
+                "edge_tts",
+                "-v",
+                "en-US-JennyNeural",
+                "--rate=-5%",
+                "--text",
+                text,
+                "--write-media",
+                str(AUDIO_DIR / name),
+            ],
+            cwd=str(ROOT),
+            check=True,
+        )
 
 
 if __name__ == "__main__":

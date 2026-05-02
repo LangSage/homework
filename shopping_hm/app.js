@@ -166,7 +166,7 @@
       prompt: 'Listen to the customer. What is the customer looking for?',
       choices: ['rice', 'bread', 'oranges', 'the cashier'],
       answer: 0,
-      audio: './assets/audio/clip_rice.wav',
+      audio: './assets/audio/clip_rice.mp3',
       feedback: 'The customer asks where the rice is.',
     },
     {
@@ -175,7 +175,7 @@
       prompt: 'Listen to the customer. What is in the basket?',
       choices: ['two oranges and one apple', 'two apples and one orange', 'bread and rice only', 'water and cheese'],
       answer: 0,
-      audio: './assets/audio/clip_basket.wav',
+      audio: './assets/audio/clip_basket.mp3',
       feedback: 'The basket has two oranges and one apple.',
     },
     {
@@ -184,7 +184,7 @@
       prompt: 'Listen to the customer. Why does the customer not take the water?',
       choices: ['It is too expensive.', 'It is too cold.', 'It is open.', 'It is near the door.'],
       answer: 0,
-      audio: './assets/audio/clip_water.wav',
+      audio: './assets/audio/clip_water.mp3',
       feedback: 'The bottle of water is too expensive.',
     },
     {
@@ -253,6 +253,8 @@
     optionsList: document.getElementById('optionsList'),
     feedbackPanel: document.getElementById('feedbackPanel'),
     feedbackCanvas: document.getElementById('feedbackCanvas'),
+    questionWordLayer: document.getElementById('questionWordLayer'),
+    feedbackWordLayer: document.getElementById('feedbackWordLayer'),
     saveBtn: document.getElementById('saveBtn'),
     nextBtn: document.getElementById('nextBtn'),
     resultTitle: document.getElementById('resultTitle'),
@@ -266,6 +268,11 @@
     retrySendBtn: document.getElementById('retrySendBtn'),
     formFallback: document.getElementById('formFallback'),
     toast: document.getElementById('toast'),
+    dictPopover: document.getElementById('dictPopover'),
+    dictClose: document.getElementById('dictClose'),
+    dictEmoji: document.getElementById('dictEmoji'),
+    dictWord: document.getElementById('dictWord'),
+    dictTranslation: document.getElementById('dictTranslation'),
   };
 
   const colors = {
@@ -292,8 +299,11 @@
   };
 
   let toastTimer = 0;
+  let dictTimer = 0;
   let resizeTimer = 0;
   let hiddenDuringTask = false;
+  const dictionary = new Map();
+  let dictionaryReady = false;
 
   init();
 
@@ -326,6 +336,12 @@
     dom.nextBtn.addEventListener('click', goNext);
     dom.playAudioBtn.addEventListener('click', playCurrentAudio);
     dom.retrySendBtn.addEventListener('click', () => submitOnce(buildPayload(), true));
+    dom.dictClose.addEventListener('click', hideDictionary);
+    document.addEventListener('click', (event) => {
+      if (dom.dictPopover.classList.contains('hidden')) return;
+      if (dom.dictPopover.contains(event.target) || event.target.classList.contains('word-hit')) return;
+      hideDictionary();
+    });
     window.addEventListener('resize', handleResize, { passive: true });
     window.addEventListener('pagehide', persistIfActive, { passive: true });
     window.addEventListener('beforeunload', persistIfActive, { passive: true });
@@ -333,6 +349,7 @@
     document.addEventListener('visibilitychange', handleVisibilityChange, { passive: true });
 
     render();
+    loadDictionary().then(() => render());
     tryPendingSubmission();
   }
 
@@ -453,16 +470,23 @@
       minHeight: 116,
       color: colors.ink,
       strongFirstLine: true,
-    });
+    }, dom.questionWordLayer);
 
     dom.optionsList.innerHTML = '';
     question.options.forEach((option, index) => {
-      const card = document.createElement('button');
-      card.type = 'button';
+      const card = document.createElement('div');
       card.className = 'option-card';
+      card.setAttribute('role', 'button');
+      card.tabIndex = answered ? -1 : 0;
       card.setAttribute('aria-label', `Option ${index + 1}`);
+      const wrap = document.createElement('div');
+      wrap.className = 'canvas-wrap';
       const canvas = document.createElement('canvas');
-      card.appendChild(canvas);
+      const wordLayer = document.createElement('div');
+      wordLayer.className = 'word-layer';
+      wrap.appendChild(canvas);
+      wrap.appendChild(wordLayer);
+      card.appendChild(wrap);
       dom.optionsList.appendChild(card);
 
       const prefix = `${String.fromCharCode(65 + index)}. `;
@@ -473,7 +497,7 @@
         paddingY: 13,
         minHeight: 52,
         color: colors.ink,
-      });
+      }, wordLayer);
 
       if (answered) {
         card.classList.add('locked');
@@ -482,6 +506,11 @@
         if (index === answered.choiceIndex && !answered.correct) card.classList.add('wrong');
       } else {
         card.addEventListener('click', () => answerCurrent(index));
+        card.addEventListener('keydown', (event) => {
+          if (event.key !== 'Enter' && event.key !== ' ') return;
+          event.preventDefault();
+          answerCurrent(index);
+        });
       }
     });
 
@@ -497,11 +526,12 @@
         paddingY: 14,
         minHeight: 78,
         color: answered.correct ? colors.green : colors.red,
-      });
+      }, dom.feedbackWordLayer);
       dom.nextBtn.disabled = false;
       dom.nextBtn.textContent = state.currentIndex >= total - 1 ? 'Finish' : 'Next';
     } else {
       dom.feedbackPanel.classList.add('hidden');
+      if (dom.feedbackWordLayer) dom.feedbackWordLayer.innerHTML = '';
       dom.nextBtn.disabled = true;
       dom.nextBtn.textContent = 'Next';
     }
@@ -854,7 +884,29 @@
     }, 90);
   }
 
-  function renderTextCanvas(canvas, text, cfg) {
+  async function loadDictionary() {
+    try {
+      const response = await fetch('./words.json', { cache: 'force-cache' });
+      if (!response.ok) throw new Error('Dictionary not found');
+      const rows = await response.json();
+      if (!Array.isArray(rows)) throw new Error('Dictionary is not an array');
+      rows.forEach((row) => {
+        if (!row || !row.Word || !row.Translation) return;
+        const key = normalizeDictKey(row.Word);
+        if (!key) return;
+        dictionary.set(key, {
+          word: String(row.Word),
+          translation: String(row.Translation),
+          emoji: String(row.Emoji || '📘'),
+        });
+      });
+      dictionaryReady = true;
+    } catch (error) {
+      dictionaryReady = false;
+    }
+  }
+
+  function renderTextCanvas(canvas, text, cfg, wordLayer) {
     const frame = canvas.parentElement;
     const width = Math.max(260, Math.floor((frame && frame.clientWidth) || canvas.clientWidth || 320));
     const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
@@ -872,20 +924,22 @@
     String(text || '').replace(/\r/g, '').split('\n').forEach((paragraph) => {
       const words = paragraph.trim().split(/\s+/).filter(Boolean);
       if (!words.length) {
-        lines.push('');
+        lines.push({ tokens: [], text: '' });
         return;
       }
-      let line = '';
+      let lineTokens = [];
       words.forEach((word) => {
-        const next = line ? `${line} ${word}` : word;
-        if (probe.measureText(next).width <= maxWidth || !line) {
-          line = next;
+        const token = { raw: word };
+        const nextTokens = lineTokens.concat(token);
+        const next = nextTokens.map((item) => item.raw).join(' ');
+        if (probe.measureText(next).width <= maxWidth || !lineTokens.length) {
+          lineTokens = nextTokens;
         } else {
-          lines.push(line);
-          line = word;
+          lines.push({ tokens: lineTokens, text: lineTokens.map((item) => item.raw).join(' ') });
+          lineTokens = [token];
         }
       });
-      if (line) lines.push(line);
+      if (lineTokens.length) lines.push({ tokens: lineTokens, text: lineTokens.map((item) => item.raw).join(' ') });
     });
 
     const height = Math.max(cfg.minHeight || 52, paddingY * 2 + lines.length * lineHeight);
@@ -902,8 +956,97 @@
     lines.forEach((line, index) => {
       ctx.font = cfg.strongFirstLine && index === 0 ? font : normalFont;
       ctx.fillStyle = index === 0 && cfg.strongFirstLine ? colors.green : (cfg.color || colors.ink);
-      ctx.fillText(line, paddingX, paddingY + index * lineHeight);
+      ctx.fillText(line.text, paddingX, paddingY + index * lineHeight);
+      let x = paddingX;
+      const space = ctx.measureText(' ').width;
+      line.tokens.forEach((token) => {
+        const tokenWidth = ctx.measureText(token.raw).width;
+        token.x = x;
+        token.y = paddingY + index * lineHeight;
+        token.width = tokenWidth;
+        token.height = lineHeight;
+        x += tokenWidth + space;
+      });
     });
+
+    renderWordLayer(wordLayer, lines, width, height);
+  }
+
+  function renderWordLayer(layer, lines, width, height) {
+    if (!layer) return;
+    layer.innerHTML = '';
+    layer.style.width = `${width}px`;
+    layer.style.height = `${height}px`;
+    if (!dictionaryReady || !dictionary.size) return;
+
+    const fragment = document.createDocumentFragment();
+    lines.forEach((line) => {
+      line.tokens.forEach((token) => {
+        const entry = findDictionaryEntry(token.raw);
+        if (!entry) return;
+        const hit = document.createElement('span');
+        hit.className = 'word-hit';
+        hit.setAttribute('role', 'button');
+        hit.tabIndex = 0;
+        hit.setAttribute('aria-label', `Translate ${token.raw}`);
+        hit.style.left = `${token.x}px`;
+        hit.style.top = `${token.y}px`;
+        hit.style.width = `${Math.max(12, token.width)}px`;
+        hit.style.height = `${Math.max(18, token.height)}px`;
+        hit.addEventListener('click', (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          showDictionary(entry, token.raw);
+        });
+        hit.addEventListener('keydown', (event) => {
+          if (event.key !== 'Enter' && event.key !== ' ') return;
+          event.preventDefault();
+          event.stopPropagation();
+          showDictionary(entry, token.raw);
+        });
+        fragment.appendChild(hit);
+      });
+    });
+    layer.appendChild(fragment);
+  }
+
+  function findDictionaryEntry(rawToken) {
+    const key = normalizeDictKey(rawToken);
+    if (!key) return null;
+    const candidates = [key];
+    if (key.endsWith("'s")) candidates.push(key.slice(0, -2));
+    if (key.endsWith('ies') && key.length > 4) candidates.push(`${key.slice(0, -3)}y`);
+    if (key.endsWith('es') && key.length > 3) candidates.push(key.slice(0, -2));
+    if (key.endsWith('s') && key.length > 3) candidates.push(key.slice(0, -1));
+    if (key.endsWith('ing') && key.length > 5) candidates.push(key.slice(0, -3), `${key.slice(0, -3)}e`);
+    if (key.endsWith('ed') && key.length > 4) candidates.push(key.slice(0, -2), `${key.slice(0, -1)}`);
+
+    for (const item of candidates) {
+      if (dictionary.has(item)) return dictionary.get(item);
+    }
+    return null;
+  }
+
+  function normalizeDictKey(value) {
+    return String(value || '')
+      .toLowerCase()
+      .replace(/[’‘]/g, "'")
+      .replace(/^[^a-z0-9']+|[^a-z0-9']+$/g, '')
+      .replace(/[^a-z0-9']/g, '');
+  }
+
+  function showDictionary(entry, rawToken) {
+    clearTimeout(dictTimer);
+    dom.dictEmoji.textContent = entry.emoji || '📘';
+    dom.dictWord.textContent = String(rawToken || entry.word || '').replace(/^[^a-z0-9']+|[^a-z0-9']+$/gi, '') || entry.word || '';
+    dom.dictTranslation.textContent = entry.translation || '';
+    dom.dictPopover.classList.remove('hidden');
+    dictTimer = window.setTimeout(hideDictionary, 3600);
+  }
+
+  function hideDictionary() {
+    clearTimeout(dictTimer);
+    dom.dictPopover.classList.add('hidden');
   }
 
   function attachProtection() {

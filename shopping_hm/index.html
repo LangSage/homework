@@ -70,6 +70,7 @@
 
         <div class="question-panel">
           <canvas id="questionCanvas"></canvas>
+          <div class="word-layer" id="questionWordLayer"></div>
         </div>
 
         <div class="audio-row hidden" id="audioRow">
@@ -82,6 +83,7 @@
 
         <div class="feedback-panel hidden" id="feedbackPanel">
           <canvas id="feedbackCanvas"></canvas>
+          <div class="word-layer" id="feedbackWordLayer"></div>
         </div>
 
         <div class="nav-row">
@@ -121,5 +123,11 @@
   </div>
 
   <div class="toast hidden" id="toast"></div>
+  <div class="dict-popover hidden" id="dictPopover" role="dialog" aria-live="polite">
+    <button class="dict-close" id="dictClose" type="button" aria-label="Close">×</button>
+    <div class="dict-emoji" id="dictEmoji">📘</div>
+    <div class="dict-word" id="dictWord">word</div>
+    <div class="dict-translation" id="dictTranslation">translation</div>
+  </div>
 </body>
 </html>
