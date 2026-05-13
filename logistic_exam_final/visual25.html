@@ -1,0 +1,1472 @@
+<!DOCTYPE html>
+<html lang="en" translate="no" class="notranslate">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="google" content="notranslate">
+  <meta name="robots" content="noindex">
+  <title>Logistics Visual 25 Exam</title>
+  <style>
+    :root {
+      --ink: #142126;
+      --soft: #eff5f0;
+      --paper: #fffdf8;
+      --line: #d7ded8;
+      --muted: #64716d;
+      --green: #136f63;
+      --blue: #2c5f87;
+      --clay: #b65d35;
+      --danger: #a33428;
+      --ok: #16784f;
+      --shadow: 0 16px 38px rgba(28, 42, 39, .16);
+    }
+
+    * { box-sizing: border-box; }
+
+    html,
+    body {
+      min-height: 100%;
+      margin: 0;
+      color: var(--ink);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.82), rgba(255,255,255,0) 340px),
+        var(--soft);
+      font-family: Arial, Helvetica, sans-serif;
+      -webkit-text-size-adjust: 100%;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+      overscroll-behavior-y: contain;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    input {
+      user-select: text;
+      -webkit-user-select: text;
+    }
+
+    img {
+      pointer-events: none;
+      -webkit-user-drag: none;
+    }
+
+    .app {
+      width: min(100%, 820px);
+      min-height: 100svh;
+      margin: 0 auto;
+      padding: max(12px, env(safe-area-inset-top)) 12px max(22px, env(safe-area-inset-bottom));
+    }
+
+    .start,
+    .finished {
+      min-height: calc(100svh - 36px);
+      display: grid;
+      align-content: center;
+      gap: 14px;
+    }
+
+    .start-panel,
+    .finish-panel {
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+
+    .start-art {
+      min-height: 178px;
+      display: grid;
+      align-content: end;
+      padding: 18px;
+      color: #fff;
+      background:
+        linear-gradient(180deg, rgba(11, 37, 35, .08), rgba(11, 37, 35, .78)),
+        url("../logistic_exam/images/logistics/warehouse_scene_3.jpg") center / cover;
+    }
+
+    .start-art h1,
+    .finish-panel h1 {
+      margin: 0;
+      font-size: clamp(30px, 9vw, 48px);
+      line-height: .98;
+      letter-spacing: 0;
+    }
+
+    .start-art p,
+    .finish-panel p {
+      margin: 10px 0 0;
+      font-size: 15px;
+      line-height: 1.45;
+    }
+
+    .start-form,
+    .finish-body {
+      display: grid;
+      gap: 13px;
+      padding: 16px;
+    }
+
+    .warning {
+      border: 1px solid #efc184;
+      border-radius: 8px;
+      padding: 12px;
+      background: #fff4df;
+      color: #593900;
+      font-size: 14px;
+      line-height: 1.4;
+      font-weight: 800;
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+    }
+
+    .field label,
+    .checkrow {
+      font-size: 14px;
+      line-height: 1.35;
+      font-weight: 900;
+    }
+
+    .field input {
+      width: 100%;
+      min-height: 48px;
+      padding: 12px;
+      border: 1px solid #b9c9c3;
+      border-radius: 8px;
+      background: #fff;
+      color: var(--ink);
+      outline: none;
+    }
+
+    .field input:focus {
+      border-color: var(--green);
+      box-shadow: 0 0 0 3px rgba(19, 111, 99, .15);
+    }
+
+    .checkrow {
+      display: grid;
+      grid-template-columns: 22px 1fr;
+      gap: 9px;
+      align-items: start;
+    }
+
+    .checkrow input {
+      width: 20px;
+      height: 20px;
+      margin: 0;
+      accent-color: var(--green);
+    }
+
+    .primary {
+      min-height: 48px;
+      border: 0;
+      border-radius: 8px;
+      padding: 12px 16px;
+      background: var(--green);
+      color: #fff;
+      font-weight: 900;
+      letter-spacing: 0;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 8;
+      display: grid;
+      gap: 8px;
+      padding: 9px 0 11px;
+      background: linear-gradient(180deg, var(--soft) 76%, rgba(239,245,240,0));
+    }
+
+    .toprow {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .title {
+      margin: 0;
+      font-size: 16px;
+      line-height: 1.1;
+      font-weight: 900;
+    }
+
+    .counter {
+      flex: 0 0 auto;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .progress {
+      height: 8px;
+      overflow: hidden;
+      border: 1px solid #c7d5ce;
+      border-radius: 999px;
+      background: #dbe8e2;
+    }
+
+    .progress span {
+      display: block;
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, var(--green), var(--blue), var(--clay));
+      transition: width .2s ease;
+    }
+
+    .task-shell {
+      display: grid;
+      gap: 12px;
+    }
+
+    .visual-card {
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+
+    .photo {
+      position: relative;
+      min-height: 202px;
+      background: #ccd8d2;
+    }
+
+    .photo img {
+      display: block;
+      width: 100%;
+      height: 230px;
+      object-fit: cover;
+    }
+
+    .photo-band {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 10px 12px;
+      background: linear-gradient(180deg, rgba(9, 26, 23, 0), rgba(9, 26, 23, .82));
+      color: #fff;
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .task-content {
+      display: grid;
+      gap: 10px;
+      padding: 14px;
+    }
+
+    .task-content h2 {
+      margin: 0;
+      font-size: clamp(22px, 6.2vw, 32px);
+      line-height: 1.05;
+      letter-spacing: 0;
+    }
+
+    .prompt {
+      display: grid;
+      gap: 7px;
+      color: #233137;
+      font-size: 16px;
+      line-height: 1.42;
+    }
+
+    .prompt-line {
+      overflow-wrap: anywhere;
+    }
+
+    .prompt-line.is-label {
+      color: var(--green);
+      font-weight: 900;
+    }
+
+    .dict-hit {
+      display: inline;
+      border-bottom: 1px dashed rgba(19, 111, 99, .62);
+      color: #0c665b;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .answer-zone {
+      display: grid;
+      gap: 10px;
+      border-top: 1px solid #e0e8e3;
+      padding-top: 2px;
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.35;
+      font-weight: 900;
+    }
+
+    .choice-list,
+    .multi-board {
+      display: grid;
+      gap: 8px;
+    }
+
+    .choice {
+      width: 100%;
+      min-height: 48px;
+      border: 1px solid #b6cac4;
+      border-radius: 8px;
+      padding: 12px;
+      background: #fff;
+      color: var(--ink);
+      text-align: left;
+      font-weight: 900;
+      line-height: 1.25;
+      box-shadow: 0 2px 0 rgba(19, 111, 99, .08);
+    }
+
+    .choice:active,
+    .choice.is-working,
+    .mini-choice.is-selected {
+      border-color: var(--green);
+      background: #e2f4ef;
+      transform: translateY(1px);
+    }
+
+    .choice:disabled,
+    .mini-choice:disabled {
+      opacity: .78;
+    }
+
+    .multi-row {
+      display: grid;
+      gap: 7px;
+      padding: 9px;
+      border: 1px solid #d0ddd7;
+      border-radius: 8px;
+      background: #fbfefd;
+    }
+
+    .multi-label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .mini-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(86px, 1fr));
+      gap: 7px;
+    }
+
+    .mini-choice {
+      min-height: 42px;
+      border: 1px solid #b8ccc6;
+      border-radius: 8px;
+      padding: 8px 9px;
+      background: #fff;
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 900;
+      line-height: 1.18;
+    }
+
+    .status {
+      min-height: 20px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 900;
+      line-height: 1.35;
+    }
+
+    .status.warn { color: var(--danger); }
+    .status.ok { color: var(--ok); }
+
+    .dictionary {
+      position: fixed;
+      z-index: 20;
+      left: 12px;
+      right: 12px;
+      bottom: max(12px, env(safe-area-inset-bottom));
+      display: none;
+      padding: 12px;
+      border: 1px solid #bfd0cb;
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: 0 16px 38px rgba(12, 28, 24, .22);
+    }
+
+    .dictionary.is-open { display: block; }
+
+    .dict-word {
+      color: var(--green);
+      font-size: 17px;
+      font-weight: 900;
+    }
+
+    .dict-meaning {
+      margin-top: 5px;
+      font-size: 15px;
+      line-height: 1.35;
+    }
+
+    .dict-note {
+      margin-top: 7px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    @media (min-width: 720px) {
+      .visual-card {
+        display: grid;
+        grid-template-columns: minmax(260px, 42%) 1fr;
+      }
+
+      .photo,
+      .photo img {
+        height: 100%;
+        min-height: 560px;
+      }
+
+      .task-content {
+        align-content: start;
+        padding: 18px;
+      }
+    }
+  </style>
+</head>
+<body class="notranslate" translate="no">
+  <main id="app" class="app" aria-live="polite"></main>
+  <div id="dictionary" class="dictionary" role="status">
+    <div id="dictWord" class="dict-word"></div>
+    <div id="dictMeaning" class="dict-meaning"></div>
+    <div class="dict-note">Tap another marked word to change dictionary.</div>
+  </div>
+
+  <script>
+    "use strict";
+
+    const VERSION = "logistics_visual25_2026_05_13_v2";
+    const TOTAL = 25;
+    const STORAGE_KEY = VERSION + "_state";
+    const LOCK_KEY = VERSION + "_locked";
+    const FORM_ACTION = "https://docs.google.com/forms/d/e/1FAIpQLSeUzYUvQbbzo_1r81AacP6Kj7HlKDzEVfa93Dam39LiVjcItA/formResponse";
+    const ENTRY_NAME = "entry.1582931880";
+    const ENTRY_GROUP = "entry.1222434157";
+    const ENTRY_EXAM = "entry.371289786";
+    const ENTRY_JSON = "entry.679064514";
+    const EXAM_CODE = "visual_25_logistics_exam";
+    const CHECKPOINTS = [10, 20, 25];
+
+    const TASKS = [
+      {
+        source: 2,
+        title: "Warehouse Words",
+        tag: "Warm-up",
+        image: "../logistic_exam/images/logistics/warehouse_scene_3.jpg",
+        lines: [
+          "Choose the correct logistics words.",
+          "A place where goods are stored is a ______.",
+          "A paper or sticker on a box is a ______.",
+          "A code that workers scan is a ______.",
+          "A flat base for boxes is a ______."
+        ],
+        type: "single",
+        choices: [
+          ["warehouse, label, barcode, pallet", true],
+          ["taxi, bus, refund, receipt"],
+          ["password, smell, street, claim"],
+          ["dock, music, coffee, sofa"]
+        ]
+      },
+      {
+        source: 12,
+        title: "Correct Order Process",
+        tag: "Order flow",
+        image: "../logistic_exam/images/logistics_page2/order_picking_scene.jpg",
+        lines: [
+          "Put the actions in the best order.",
+          "Pick items, count items, compare with the packing list, report a problem, confirm the order."
+        ],
+        type: "single",
+        choices: [
+          ["Pick -> Count -> Compare -> Report problem -> Confirm order", true],
+          ["Confirm order -> Pick -> Report -> Count -> Compare"],
+          ["Report problem -> Confirm order -> Pick -> Send"],
+          ["Send first -> Count later -> Hide shortage"]
+        ]
+      },
+      {
+        source: 17,
+        title: "Missing Item",
+        tag: "Quantity",
+        image: "../logistic_exam/images/logistics_page2/missing_items_scene.jpg",
+        lines: [
+          "The packing list says 8 items.",
+          "Tom counts the box and finds 7 items.",
+          "What is the problem and what should Tom do?"
+        ],
+        type: "single",
+        choices: [
+          ["There is a shortage. Tom should report it and not confirm now.", true],
+          ["There is extra quantity. Tom should hide one item."],
+          ["The order is correct. Tom should send it now."],
+          ["The label is missing. Tom should ignore quantity."]
+        ]
+      },
+      {
+        source: 19,
+        title: "Shortage, Extra, Correct",
+        tag: "Many taps",
+        image: "../logistic_exam/images/logistics_page2/count_table_scene.jpg",
+        lines: [
+          "Tap shortage, extra, or correct for each line.",
+          "1. List: 5. Real: 5.",
+          "2. List: 10. Real: 9.",
+          "3. List: 4. Real: 6.",
+          "4. List: 20. Real: 19.",
+          "5. List: 7. Real: 7.",
+          "6. List: 15. Real: 17.",
+          "7. List: 2. Real: 1.",
+          "8. List: 30. Real: 30."
+        ],
+        type: "multiRow",
+        options: ["shortage", "extra", "correct"],
+        correct: ["correct", "shortage", "extra", "shortage", "correct", "extra", "shortage", "correct"]
+      },
+      {
+        source: 22,
+        title: "Find The Mistake",
+        tag: "Quantity",
+        image: "../logistic_exam/images/logistics_page2/report_shortage_scene.jpg",
+        lines: [
+          "The packing list says 8 boxes.",
+          "The worker counts 7 boxes.",
+          "He confirms the order and sends it.",
+          "What is wrong?"
+        ],
+        type: "single",
+        choices: [
+          ["One box is missing. Confirming and sending is wrong.", true],
+          ["There is no problem. Sending is correct."],
+          ["There are extra boxes. He should hide them."],
+          ["Only the barcode matters, not quantity."]
+        ]
+      },
+      {
+        source: 24,
+        title: "Shortage Dialogue",
+        tag: "Supervisor talk",
+        image: "../logistic_exam/images/logistics_page2/shortage_supervisor_scene.jpg",
+        lines: [
+          "Worker: The packing list says 10 items.",
+          "Supervisor: How many items do you count?",
+          "Worker: I count ______ items.",
+          "Supervisor: So, we have a ______.",
+          "Supervisor: Please ______ it in the system."
+        ],
+        type: "single",
+        choices: [
+          ["9, shortage, report", true],
+          ["10, correct, hide"],
+          ["12, extra, ignore"],
+          ["8, label, deliver"]
+        ]
+      },
+      {
+        source: 26,
+        title: "Box 3 Problem",
+        tag: "Delivery",
+        image: "../logistic_exam/images/logistics_page2/check_label_scene.jpg",
+        lines: [
+          "You have 3 boxes for 2 customers.",
+          "Box 3 says Customer A, address River Road 5, barcode does not scan.",
+          "What should you do?"
+        ],
+        type: "single",
+        choices: [
+          ["Stop, check the address and barcode, call supervisor if needed.", true],
+          ["Deliver Box 3 immediately because it says Customer A."],
+          ["Ignore the barcode and leave all boxes at River Road 5."],
+          ["Change the label without checking anything."]
+        ]
+      },
+      {
+        source: 28,
+        title: "What Must Leo Check?",
+        tag: "Delivery",
+        image: "../logistic_exam/images/logistics/scanner_barcode_scene.jpg",
+        lines: [
+          "Leo delivered boxes to the wrong customers.",
+          "Choose exactly 4 things he must check next time."
+        ],
+        type: "multiSelect",
+        max: 4,
+        options: ["address", "label", "coffee", "barcode", "phone game", "customer name", "music"],
+        correct: ["address", "label", "barcode", "customer name"]
+      },
+      {
+        source: 31,
+        title: "Fix A Wrong Delivery",
+        tag: "Delivery",
+        image: "../logistic_exam/images/logistics/truck_loading_scene.jpg",
+        lines: [
+          "The customer got the wrong boxes.",
+          "Choose the best solution order."
+        ],
+        type: "single",
+        choices: [
+          ["Say sorry -> Check labels -> Call supervisor -> Take wrong boxes back -> Bring right boxes", true],
+          ["Bring right boxes -> Leave wrong boxes -> Do not call anyone"],
+          ["Say nothing -> Drive away -> Check later"],
+          ["Tell the customer it is their problem"]
+        ]
+      },
+      {
+        source: 33,
+        title: "Hotel North And Hotel River",
+        tag: "Story",
+        image: "../logistic_exam/images/logistics_page2/warehouse_order_scene_2.jpg",
+        lines: [
+          "A driver has four boxes.",
+          "Two boxes are for Hotel North and two are for Hotel River.",
+          "He checks only the first label and leaves three boxes at Hotel North.",
+          "Hotel River calls: one box is missing.",
+          "What is the main lesson?"
+        ],
+        type: "single",
+        choices: [
+          ["Check every label before leaving boxes.", true],
+          ["Checking the first label is enough."],
+          ["Hotel River should not call."],
+          ["A driver should hurry and not compare boxes."]
+        ]
+      },
+      {
+        source: 36,
+        title: "Damaged Cargo Actions",
+        tag: "Packing",
+        image: "../logistic_exam/images/logistics/damaged_goods_scene.jpg",
+        lines: [
+          "Choose the best action for each problem.",
+          "1. The carton is torn.",
+          "2. The label is missing.",
+          "3. The item is fragile.",
+          "4. The box is open."
+        ],
+        type: "multiRow",
+        options: ["ignore/send", "fix/check", "throw/drop"],
+        correct: ["fix/check", "fix/check", "fix/check", "fix/check"]
+      },
+      {
+        source: 38,
+        title: "Torn Carton, Fragile Item",
+        tag: "Packing",
+        image: "../logistic_exam/images/logistics/inspection_scene.jpg",
+        lines: [
+          "A worker sees a torn carton.",
+          "The item inside is fragile.",
+          "The label is correct.",
+          "The customer needs the order today.",
+          "What is the best answer?"
+        ],
+        type: "single",
+        choices: [
+          ["Repack or seal first, then check the label again. Safety is more important than speed.", true],
+          ["Ship it fast because the customer needs it today."],
+          ["Remove the label and send the box."],
+          ["Ignore the torn carton if the label is correct."]
+        ]
+      },
+      {
+        source: 41,
+        title: "Best Packing Principle",
+        tag: "Decision",
+        image: "../logistic_exam/images/logistics_page3/box_work_scene.jpg",
+        lines: [
+          "Which principle is better?",
+          "A. Ship damaged cargo quickly.",
+          "B. Check and fix damaged cargo before shipping.",
+          "C. Do not tell anyone about damaged cargo."
+        ],
+        type: "single",
+        choices: [
+          ["B. Check and fix damaged cargo before shipping.", true],
+          ["A. Ship damaged cargo quickly."],
+          ["C. Do not tell anyone about damaged cargo."],
+          ["Speed is always more important than safety."]
+        ]
+      },
+      {
+        source: 43,
+        title: "Mila Does Not Send Immediately",
+        tag: "Packing story",
+        image: "../logistic_exam/images/logistics/packing_station_scene.jpg",
+        lines: [
+          "Mila prepares an order with 6 items.",
+          "One carton is open and the pallet wrap is loose.",
+          "She seals the carton, wraps the pallet again, checks the label, and tells the supervisor.",
+          "Is Mila careful?"
+        ],
+        type: "single",
+        choices: [
+          ["Yes. She fixes packing, checks the label, and tells the supervisor.", true],
+          ["No. She should send the order immediately."],
+          ["No. She should hide the loose wrap."],
+          ["Yes, but only because the truck is small."]
+        ]
+      },
+      {
+        source: 45,
+        title: "Dangerous Cargo Choices",
+        tag: "Safety",
+        image: "../logistic_exam/images/logistics/spill_scene.jpg",
+        lines: [
+          "Choose the safe action for each situation.",
+          "1. A drum is wet and smells strong.",
+          "2. There is liquid on the floor.",
+          "3. Cargo may be leaking.",
+          "4. Cargo is unsafe."
+        ],
+        type: "multiRow",
+        options: ["unsafe action", "stop/report", "mark/quarantine"],
+        correct: ["stop/report", "mark/quarantine", "mark/quarantine", "stop/report"]
+      },
+      {
+        source: 49,
+        title: "Wet Drum",
+        tag: "Safety",
+        image: "../logistic_exam/images/logistics/drum.jpg",
+        lines: [
+          "A worker sees liquid near a drum.",
+          "The drum is wet and there is a strong smell.",
+          "He stops other workers and calls the supervisor.",
+          "Is he right?"
+        ],
+        type: "single",
+        choices: [
+          ["Yes. He should stop movement, report it, and move the drum to quarantine if instructed.", true],
+          ["No. He should load the drum fast."],
+          ["No. A strong smell is never a warning."],
+          ["Yes, but he should hide the liquid first."]
+        ]
+      },
+      {
+        source: 52,
+        title: "Pavel At 9:15",
+        tag: "Safety story",
+        image: "../logistic_exam/images/logistics/quarantine_scene.jpg",
+        lines: [
+          "At 9:15 Pavel sees a wet drum near the loading dock.",
+          "There is liquid on the floor and a strong smell.",
+          "The label is partly wet.",
+          "He stops workers, marks the area, and informs the supervisor.",
+          "What is the best summary?"
+        ],
+        type: "single",
+        choices: [
+          ["Pavel handles dangerous cargo correctly: stop, mark, inform, use spill kit, quarantine.", true],
+          ["Pavel should move the drum first and report later."],
+          ["The wet label means the cargo is safe."],
+          ["He should put the drum with normal boxes."]
+        ]
+      },
+      {
+        source: 58,
+        title: "Cold Cargo Problem",
+        tag: "Special cargo",
+        image: "../logistic_exam/images/logistics/temperature_sticker.jpg",
+        lines: [
+          "The temperature sticker shows a problem.",
+          "The truck is ready.",
+          "The order is urgent.",
+          "What should you do?"
+        ],
+        type: "single",
+        choices: [
+          ["Do not load immediately. Report and check the temperature problem.", true],
+          ["Load it fast because the truck is ready."],
+          ["Remove the temperature sticker."],
+          ["Put heavy cargo on top."]
+        ]
+      },
+      {
+        source: 59,
+        title: "Battery Label Missing",
+        tag: "Special cargo",
+        image: "../logistic_exam/images/logistics/battery.jpg",
+        lines: [
+          "You see battery cargo.",
+          "The label is missing.",
+          "Choose the safest 3 actions."
+        ],
+        type: "single",
+        choices: [
+          ["Stop and check. Report the missing label. Add correct label or ask supervisor before loading.", true],
+          ["Load it without a label."],
+          ["Hide it behind other cargo."],
+          ["Remove all labels from the pallet."]
+        ]
+      },
+      {
+        source: 63,
+        title: "Return Process",
+        tag: "Returns",
+        image: "../logistic_exam/images/logistics_page3/returns_warehouse_scene.jpg",
+        lines: [
+          "Choose the best return process order."
+        ],
+        type: "single",
+        choices: [
+          ["Ask reason -> Ask receipt -> Open package -> Compare item -> Confirm return -> Offer refund/replacement", true],
+          ["Offer refund -> Ask reason -> Open package -> Forget receipt"],
+          ["Confirm return before checking the item."],
+          ["Refuse every customer without looking."]
+        ]
+      },
+      {
+        source: 67,
+        title: "Damaged Return With Receipt",
+        tag: "Returns",
+        image: "../logistic_exam/images/logistics_page3/customer_receipt_scene.jpg",
+        lines: [
+          "A customer wants to return a package.",
+          "The customer has a receipt.",
+          "The receipt code is A100 and the box code is A100.",
+          "The box is damaged.",
+          "What can the worker do?"
+        ],
+        type: "single",
+        choices: [
+          ["Confirm the return and offer refund or replacement after asking the reason.", true],
+          ["Refuse immediately because the box is damaged."],
+          ["Ignore the receipt and close the desk."],
+          ["Give money without comparing codes."]
+        ]
+      },
+      {
+        source: 70,
+        title: "Wrong Item Inside",
+        tag: "Returns story",
+        image: "../logistic_exam/images/logistics_page3/claim_form_scene.jpg",
+        lines: [
+          "Receipt says Item B205.",
+          "The box label says Item B205.",
+          "Inside the box is Item A100.",
+          "The customer says: I got the wrong item.",
+          "What kind of return is this?"
+        ],
+        type: "single",
+        choices: [
+          ["Problem return. The inside item is different, so the worker should compare and call supervisor.", true],
+          ["Simple return. Everything matches."],
+          ["No return. The customer has no receipt."],
+          ["Delivery problem only, not a return problem."]
+        ]
+      },
+      {
+        source: 73,
+        title: "Lost Phone In A Taxi",
+        tag: "Transport",
+        image: "../logistic_exam/images/logistics_page3/people_scene.jpg",
+        lines: [
+          "Dan loses his phone in a taxi.",
+          "He cannot use his map app or ticket app.",
+          "He calls the bank and blocks his card.",
+          "Why is the phone important for transport?"
+        ],
+        type: "single",
+        choices: [
+          ["Because it can have map, ticket, taxi, and bank apps.", true],
+          ["Because a phone is a pallet."],
+          ["Because the warehouse is closed."],
+          ["Because barcodes do not scan in taxis."]
+        ]
+      },
+      {
+        source: 79,
+        title: "Lost Phone Plan",
+        tag: "Transport",
+        image: "../logistic_exam/images/logistics_page3/decision_scene.jpg",
+        lines: [
+          "Situation: You lost your phone in a taxi.",
+          "Choose the best plan."
+        ],
+        type: "single",
+        choices: [
+          ["Contact taxi driver/company, block card, ask for directions or use backup plan, fill report form.", true],
+          ["Do nothing and walk randomly."],
+          ["Give your password to a stranger."],
+          ["Forget your address and delete the app."]
+        ]
+      },
+      {
+        source: 80,
+        title: "Transport Problem Check",
+        tag: "Final taps",
+        image: "../logistic_exam/images/logistics_page3/desk_papers_scene.jpg",
+        lines: [
+          "Tap True or False for each sentence.",
+          "1. If you lose a phone with bank apps, you may need to block your card.",
+          "2. A map app helps you find the way.",
+          "3. If you lose something in a taxi, you should contact the driver or company.",
+          "4. A report form is never useful.",
+          "5. A ticket app can be important for transport.",
+          "6. A backup plan can help in a problem situation."
+        ],
+        type: "multiRow",
+        options: ["True", "False"],
+        correct: ["True", "True", "True", "False", "True", "True"]
+      }
+    ];
+
+    const app = document.getElementById("app");
+    const dictionaryPanel = document.getElementById("dictionary");
+    const dictWord = document.getElementById("dictWord");
+    const dictMeaning = document.getElementById("dictMeaning");
+    let dictionary = new Map();
+    let state = loadState();
+    let hiddenCandidate = null;
+
+    initProtection();
+    loadDictionary();
+    attemptQueuedSubmissions();
+    window.addEventListener("online", attemptQueuedSubmissions);
+    render();
+
+    function emptyState() {
+      return {
+        version: VERSION,
+        started: false,
+        finished: false,
+        current: 0,
+        student: { name: "", group: "OPU23.1" },
+        startedAt: "",
+        taskStartedAt: "",
+        answers: [],
+        drafts: {},
+        submissions: {},
+        queue: [],
+        securityEvents: []
+      };
+    }
+
+    function loadState() {
+      try {
+        const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
+        if (!stored || stored.version !== VERSION) return emptyState();
+        if (localStorage.getItem(LOCK_KEY)) stored.finished = true;
+        stored.answers = stored.answers || [];
+        stored.drafts = stored.drafts || {};
+        stored.queue = stored.queue || [];
+        stored.submissions = stored.submissions || {};
+        stored.securityEvents = stored.securityEvents || [];
+        return stored;
+      } catch (error) {
+        return emptyState();
+      }
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        if (state.finished) localStorage.setItem(LOCK_KEY, state.finishedAt || new Date().toISOString());
+      } catch (error) {
+        setStatus("Progress storage is full. Tell the teacher.", "warn");
+      }
+    }
+
+    function render() {
+      if (state.finished) renderFinished();
+      else if (!state.started) renderStart();
+      else renderTask();
+    }
+
+    function renderStart() {
+      app.innerHTML = `
+        <section class="start">
+          <div class="start-panel">
+            <div class="start-art">
+              <h1>Visual Logistics 25</h1>
+              <p>Best 25 picture tasks. Tap answers, no typing.</p>
+            </div>
+            <form id="startForm" class="start-form" autocomplete="off">
+              <div class="warning">Before you start, turn off VPN. If you leave the exam page, the current task changes to the next one.</div>
+              <div class="field">
+                <label for="name">Student name</label>
+                <input id="name" required autocomplete="off" value="${escapeAttr(state.student.name)}">
+              </div>
+              <div class="field">
+                <label for="group">Group</label>
+                <input id="group" required autocomplete="off" value="${escapeAttr(state.student.group || "OPU23.1")}">
+              </div>
+              <label class="checkrow">
+                <input id="vpn" type="checkbox" required>
+                <span>VPN is off. I understand that finished tasks cannot be opened again.</span>
+              </label>
+              <button class="primary" type="submit">Start 25 tasks</button>
+              <div id="status" class="status"></div>
+            </form>
+          </div>
+        </section>
+      `;
+
+      document.getElementById("startForm").addEventListener("submit", (event) => {
+        event.preventDefault();
+        const name = document.getElementById("name").value.trim();
+        const group = document.getElementById("group").value.trim();
+        if (!name || !group) {
+          setStatus("Write name and group first.", "warn");
+          return;
+        }
+        state.student = { name, group };
+        state.started = true;
+        state.startedAt = state.startedAt || new Date().toISOString();
+        state.taskStartedAt = new Date().toISOString();
+        saveState();
+        renderTask();
+      });
+    }
+
+    function renderTask() {
+      const task = TASKS[state.current];
+      if (!task) {
+        finishExam();
+        return;
+      }
+      const progress = Math.round(state.current / TOTAL * 100);
+      app.innerHTML = `
+        <section class="topbar">
+          <div class="toprow">
+            <h1 class="title">Visual Logistics 25</h1>
+            <div class="counter">${state.current + 1} / ${TOTAL}</div>
+          </div>
+          <div class="progress"><span style="width:${progress}%"></span></div>
+        </section>
+        <section class="task-shell">
+          <article class="visual-card">
+            <div class="photo">
+              <img src="${escapeAttr(task.image)}" alt="" loading="eager">
+              <div class="photo-band"><span>${escapeHtml(task.tag)}</span><span>Source task ${task.source}</span></div>
+            </div>
+            <div class="task-content">
+              <h2>${escapeHtml(task.title)}</h2>
+              <div class="prompt">${task.lines.map((line) => `<div class="prompt-line ${isLabel(line) ? "is-label" : ""}">${decorateLine(line)}</div>`).join("")}</div>
+              <div class="answer-zone">${renderAnswer(task)}</div>
+              <div id="status" class="status"></div>
+            </div>
+          </article>
+        </section>
+      `;
+      attachAnswerHandlers(task);
+      ensureTimer();
+      setStatus(submissionStatusText(), "");
+    }
+
+    function renderAnswer(task) {
+      if (task.type === "single") {
+        return `
+          <div class="hint">Tap the best answer. It saves immediately.</div>
+          <div class="choice-list">
+            ${orderedChoices(task).map((choice, index) => `
+              <button class="choice" type="button" data-index="${index}">${choiceLetter(index)}. ${escapeHtml(choice.text)}</button>
+            `).join("")}
+          </div>
+        `;
+      }
+      if (task.type === "multiSelect") {
+        const draft = getDraft(task);
+        return `
+          <div class="hint">Choose exactly ${task.max} answers. It submits automatically.</div>
+          <div class="multi-board">
+            <div class="multi-row">
+              <div class="multi-label">${draft.length} / ${task.max} selected</div>
+              <div class="mini-grid">
+                ${task.options.map((option) => `
+                  <button class="mini-choice ${draft.includes(option) ? "is-selected" : ""}" type="button" data-value="${escapeAttr(option)}">${escapeHtml(option)}</button>
+                `).join("")}
+              </div>
+            </div>
+          </div>
+        `;
+      }
+      const draft = getDraft(task);
+      return `
+        <div class="hint">Answer every row. It submits automatically.</div>
+        <div class="multi-board">
+          ${task.correct.map((_, row) => `
+            <div class="multi-row" data-row="${row}">
+              <div class="multi-label">Item ${row + 1}</div>
+              <div class="mini-grid">
+                ${task.options.map((option) => `
+                  <button class="mini-choice ${draft[row] === option ? "is-selected" : ""}" type="button" data-row="${row}" data-value="${escapeAttr(option)}">${escapeHtml(option)}</button>
+                `).join("")}
+              </div>
+            </div>
+          `).join("")}
+        </div>
+      `;
+    }
+
+    function attachAnswerHandlers(task) {
+      if (task.type === "single") {
+        document.querySelectorAll(".choice").forEach((button) => {
+          button.addEventListener("click", () => {
+            const choice = orderedChoices(task)[Number(button.dataset.index)];
+            document.querySelectorAll(".choice").forEach((item) => { item.disabled = true; });
+            button.classList.add("is-working");
+            window.setTimeout(() => submitTask(choice.text, Boolean(choice.correct), null), 120);
+          });
+        });
+        return;
+      }
+      if (task.type === "multiSelect") {
+        document.querySelectorAll(".mini-choice").forEach((button) => {
+          button.addEventListener("click", () => chooseMultiSelect(task, button.dataset.value));
+        });
+        updateMultiStatus(task);
+        return;
+      }
+      document.querySelectorAll(".mini-choice").forEach((button) => {
+        button.addEventListener("click", () => chooseMultiRow(task, Number(button.dataset.row), button.dataset.value));
+      });
+      updateMultiStatus(task);
+    }
+
+    function orderedChoices(task) {
+      const choices = task.choices.map((item, index) => ({ text: item[0], correct: Boolean(item[1]), source: index }));
+      let seed = hashText([VERSION, state.student.name, state.student.group, task.source].join("|"));
+      for (let i = choices.length - 1; i > 0; i -= 1) {
+        seed = (seed * 1664525 + 1013904223) >>> 0;
+        const j = seed % (i + 1);
+        const swap = choices[i];
+        choices[i] = choices[j];
+        choices[j] = swap;
+      }
+      return choices;
+    }
+
+    function chooseMultiRow(task, row, value) {
+      const draft = getDraft(task);
+      draft[row] = value;
+      state.drafts[task.source] = draft;
+      const rowNode = document.querySelector(`.multi-row[data-row="${row}"]`);
+      if (rowNode) {
+        rowNode.querySelectorAll(".mini-choice").forEach((button) => {
+          button.classList.toggle("is-selected", button.dataset.value === value);
+        });
+      }
+      updateMultiStatus(task);
+      saveState();
+      if (draft.filter(Boolean).length === task.correct.length) {
+        document.querySelectorAll(".mini-choice").forEach((button) => { button.disabled = true; });
+        const correct = task.correct.every((item, index) => draft[index] === item);
+        window.setTimeout(() => submitTask(draft.map((item, index) => `Item ${index + 1}: ${item}`).join("; "), correct, draft), 180);
+      }
+    }
+
+    function chooseMultiSelect(task, value) {
+      let draft = getDraft(task);
+      if (draft.includes(value)) draft = draft.filter((item) => item !== value);
+      else if (draft.length < task.max) draft = draft.concat(value);
+      else {
+        setStatus("You already chose " + task.max + ". Tap one selected answer to change it.", "warn");
+        return;
+      }
+      state.drafts[task.source] = draft;
+      document.querySelectorAll(".mini-choice").forEach((button) => {
+        button.classList.toggle("is-selected", draft.includes(button.dataset.value));
+      });
+      updateMultiStatus(task);
+      saveState();
+      if (draft.length === task.max) {
+        document.querySelectorAll(".mini-choice").forEach((button) => { button.disabled = true; });
+        const correct = sameSet(draft, task.correct);
+        window.setTimeout(() => submitTask(draft.join("; "), correct, draft), 220);
+      }
+    }
+
+    function updateMultiStatus(task) {
+      const draft = getDraft(task);
+      if (task.type === "multiSelect") setStatus(draft.length + " / " + task.max + " selected.", draft.length ? "" : "warn");
+      else setStatus(draft.filter(Boolean).length + " / " + task.correct.length + " answered.", draft.filter(Boolean).length ? "" : "warn");
+    }
+
+    function getDraft(task) {
+      const draft = state.drafts[task.source];
+      return Array.isArray(draft) ? draft.slice() : [];
+    }
+
+    function submitTask(answer, isCorrect, multiAnswers) {
+      const task = TASKS[state.current];
+      const now = new Date();
+      const started = state.taskStartedAt ? new Date(state.taskStartedAt) : now;
+      state.answers[state.current] = {
+        number: state.current + 1,
+        sourceTask: task.source,
+        title: task.title,
+        answer,
+        isCorrect,
+        multiAnswers,
+        seconds: Math.max(0, Math.round((now - started) / 1000)),
+        answeredAt: now.toISOString()
+      };
+      delete state.drafts[task.source];
+      state.current += 1;
+      state.taskStartedAt = new Date().toISOString();
+      if (CHECKPOINTS.includes(state.current)) queueCheckpoint(state.current);
+      if (state.current >= TOTAL) finishExam();
+      else {
+        saveState();
+        attemptQueuedSubmissions();
+        renderTask();
+      }
+    }
+
+    function finishExam() {
+      state.finished = true;
+      state.finishedAt = state.finishedAt || new Date().toISOString();
+      if (!state.submissions["25"]) queueCheckpoint(25);
+      saveState();
+      attemptQueuedSubmissions();
+      renderFinished();
+    }
+
+    function renderFinished() {
+      app.innerHTML = `
+        <section class="finished">
+          <div class="finish-panel">
+            <div class="start-art">
+              <h1>Exam Completed</h1>
+              <p>Your answers are locked on this phone.</p>
+            </div>
+            <div class="finish-body">
+              <div class="warning">Do not close immediately if a checkpoint is still queued. It will retry while internet is available.</div>
+              <div id="status" class="status">${escapeHtml(submissionStatusText())}</div>
+            </div>
+          </div>
+        </section>
+      `;
+    }
+
+    function ensureTimer() {
+      if (!state.taskStartedAt) {
+        state.taskStartedAt = new Date().toISOString();
+        saveState();
+      }
+    }
+
+    function queueCheckpoint(stage) {
+      const key = String(stage);
+      if (state.submissions[key] && state.submissions[key].sentAt) return;
+      const start = stage === 25 ? 20 : stage - 10;
+      const payload = {
+        exam: EXAM_CODE,
+        version: VERSION,
+        stage,
+        range: (start + 1) + "-" + stage,
+        student: state.student,
+        startedAt: state.startedAt,
+        checkpointAt: new Date().toISOString(),
+        finishedAt: state.finishedAt || "",
+        totalTasks: TOTAL,
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "",
+        userAgent: navigator.userAgent,
+        securityEvents: state.securityEvents.slice(),
+        answers: state.answers.slice(start, stage)
+      };
+      const item = { id: VERSION + "_" + stage + "_" + Date.now(), stage, payload };
+      state.queue = state.queue.filter((queued) => queued.stage !== stage);
+      state.queue.push(item);
+      state.submissions[key] = { stage, queuedAt: item.payload.checkpointAt, sentAt: "" };
+    }
+
+    function attemptQueuedSubmissions() {
+      if (!state.queue || !state.queue.length) return;
+      state.queue.slice().forEach((item) => {
+        submitPayload(item).then(() => {
+          state.queue = state.queue.filter((queued) => queued.id !== item.id);
+          state.submissions[String(item.stage)] = state.submissions[String(item.stage)] || { stage: item.stage };
+          state.submissions[String(item.stage)].sentAt = new Date().toISOString();
+          saveState();
+          setStatus(submissionStatusText(), "ok");
+        }).catch(() => setStatus("Checkpoint queued. It will retry.", "warn"));
+      });
+    }
+
+    function submitPayload(item) {
+      const body = new URLSearchParams();
+      body.set(ENTRY_NAME, state.student.name || "Student");
+      body.set(ENTRY_GROUP, state.student.group || "OPU23.1");
+      body.set(ENTRY_EXAM, EXAM_CODE);
+      body.set(ENTRY_JSON, JSON.stringify(item.payload));
+      body.set("submit", "Submit");
+      if (navigator.sendBeacon && document.visibilityState === "hidden") {
+        const ok = navigator.sendBeacon(FORM_ACTION, body);
+        if (ok) return Promise.resolve();
+      }
+      return fetch(FORM_ACTION, { method: "POST", mode: "no-cors", keepalive: true, body });
+    }
+
+    function submissionStatusText() {
+      const sent = CHECKPOINTS.filter((stage) => state.submissions[String(stage)] && state.submissions[String(stage)].sentAt).length;
+      if (state.queue && state.queue.length) return state.queue.length + " checkpoint(s) queued.";
+      if (sent) return sent + " checkpoint(s) sent.";
+      return "";
+    }
+
+    function loadDictionary() {
+      fetch("words_fixed.json", { cache: "force-cache" })
+        .then((response) => response.ok ? response.json() : [])
+        .then((items) => {
+          dictionary = new Map();
+          (items || []).forEach((item) => {
+            const key = normalizeWord(item.Word || item.word || "");
+            const translation = item.Translation || item.translation || "";
+            const emoji = item.Emoji || item.emoji || "";
+            if (key && translation) dictionary.set(key, { translation, emoji });
+          });
+          if (state.started && !state.finished) renderTask();
+        })
+        .catch(() => {});
+    }
+
+    function decorateLine(line) {
+      return String(line).split(/(\s+)/).map((piece) => {
+        if (/^\s+$/.test(piece)) return piece;
+        const key = normalizeWord(piece);
+        const entry = lookupDictionary(key);
+        if (!entry) return escapeHtml(piece);
+        return `<span class="dict-hit" data-word="${escapeAttr(stripEdge(piece))}" data-key="${escapeAttr(key)}">${escapeHtml(piece)}</span>`;
+      }).join("");
+    }
+
+    function lookupDictionary(key) {
+      if (!key) return null;
+      if (dictionary.has(key)) return dictionary.get(key);
+      if (key.endsWith("ies") && dictionary.has(key.slice(0, -3) + "y")) return dictionary.get(key.slice(0, -3) + "y");
+      if (key.endsWith("es") && dictionary.has(key.slice(0, -2))) return dictionary.get(key.slice(0, -2));
+      if (key.endsWith("s") && key.length > 3 && dictionary.has(key.slice(0, -1))) return dictionary.get(key.slice(0, -1));
+      if (key.endsWith("ing") && dictionary.has(key.slice(0, -3))) return dictionary.get(key.slice(0, -3));
+      if (key.endsWith("ed") && dictionary.has(key.slice(0, -2))) return dictionary.get(key.slice(0, -2));
+      return null;
+    }
+
+    document.addEventListener("click", (event) => {
+      const hit = event.target.closest(".dict-hit");
+      if (!hit) {
+        if (!event.target.closest(".dictionary")) dictionaryPanel.classList.remove("is-open");
+        return;
+      }
+      const entry = lookupDictionary(hit.dataset.key);
+      if (!entry) return;
+      dictWord.textContent = (entry.emoji ? entry.emoji + " " : "") + hit.dataset.word;
+      dictMeaning.textContent = entry.translation;
+      dictionaryPanel.classList.add("is-open");
+    });
+
+    function initProtection() {
+      ["copy", "cut", "contextmenu", "dragstart", "selectstart"].forEach((name) => {
+        document.addEventListener(name, (event) => {
+          if (event.target && event.target.tagName === "INPUT" && name === "selectstart") return;
+          event.preventDefault();
+        }, { capture: true });
+      });
+      document.addEventListener("keydown", (event) => {
+        const key = event.key.toLowerCase();
+        if ((event.ctrlKey || event.metaKey) && ["a", "c", "x", "p", "s", "u"].includes(key)) event.preventDefault();
+      }, { capture: true });
+      document.addEventListener("visibilitychange", () => {
+        if (!state.started || state.finished) return;
+        if (document.visibilityState === "hidden") {
+          const task = TASKS[state.current];
+          if (!task) return;
+          hiddenCandidate = { source: task.source, at: Date.now() };
+          state.securityEvents.push({ type: "page_hidden", sourceTask: task.source, at: new Date().toISOString() });
+          saveState();
+        } else if (document.visibilityState === "visible" && hiddenCandidate) {
+          const task = TASKS[state.current];
+          if (task && task.source === hiddenCandidate.source && Date.now() - hiddenCandidate.at > 1200) {
+            hiddenCandidate = null;
+            submitTask("[no answer: page was left]", false, null);
+          } else {
+            hiddenCandidate = null;
+          }
+        }
+      });
+      window.addEventListener("pagehide", () => {
+        if (state.queue && state.queue.length) state.queue.slice(0, 1).forEach((item) => submitPayload(item).catch(() => {}));
+      });
+    }
+
+    function setStatus(text, mode) {
+      const node = document.getElementById("status");
+      if (!node) return;
+      node.textContent = text || "";
+      node.className = "status" + (mode ? " " + mode : "");
+    }
+
+    function isLabel(line) {
+      return /^(Text:|Questions:|Answer:|Situation:|Choose|Tap|Use:)/.test(line);
+    }
+
+    function sameSet(a, b) {
+      if (a.length !== b.length) return false;
+      const aa = a.slice().sort();
+      const bb = b.slice().sort();
+      return aa.every((item, index) => item === bb[index]);
+    }
+
+    function choiceLetter(index) {
+      return String.fromCharCode(65 + index);
+    }
+
+    function hashText(text) {
+      let hash = 2166136261;
+      for (let i = 0; i < text.length; i += 1) {
+        hash ^= text.charCodeAt(i);
+        hash = Math.imul(hash, 16777619);
+      }
+      return hash >>> 0;
+    }
+
+    function normalizeWord(value) {
+      return stripEdge(value)
+        .toLowerCase()
+        .replace(/[’']/g, "")
+        .replace(/[^a-z0-9 -]/g, "")
+        .trim();
+    }
+
+    function stripEdge(value) {
+      return String(value || "").replace(/^[^A-Za-z0-9]+|[^A-Za-z0-9]+$/g, "");
+    }
+
+    function escapeHtml(value) {
+      return String(value || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+    }
+
+    function escapeAttr(value) {
+      return escapeHtml(value).replace(/"/g, "&quot;");
+    }
+  </script>
+</body>
+</html>
