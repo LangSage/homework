@@ -371,6 +371,59 @@
       height: auto;
     }
 
+    .multi-board {
+      display: grid;
+      gap: 8px;
+    }
+
+    .multi-row {
+      display: grid;
+      gap: 7px;
+      padding: 9px;
+      border: 1px solid #d2e2df;
+      border-radius: 8px;
+      background: #fbfefd;
+    }
+
+    .multi-row-label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .multi-options {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(86px, 1fr));
+      gap: 7px;
+    }
+
+    .mini-option {
+      min-height: 42px;
+      padding: 0;
+      overflow: hidden;
+      border: 1px solid #b8cecb;
+      border-radius: 8px;
+      background: #ffffff;
+      box-shadow: 0 2px 0 rgba(15, 118, 110, .08);
+    }
+
+    .mini-option.is-selected {
+      border-color: var(--accent);
+      background: #dff3ef;
+      box-shadow: inset 0 0 0 1px rgba(15, 118, 110, .24);
+    }
+
+    .mini-option:disabled {
+      opacity: .75;
+    }
+
+    .mini-option-canvas {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
     .answer-actions {
       display: grid;
       grid-template-columns: 1fr;
@@ -439,7 +492,7 @@
   <script>
     "use strict";
 
-    const VERSION = "logistic_exam_final_2026_05_13_v2";
+    const VERSION = "logistic_exam_final_2026_05_13_v3";
     const TOTAL_TASKS = 80;
     const STAGES = [20, 40, 60, 80];
     const STORAGE_KEY = VERSION + "_state";
@@ -461,6 +514,112 @@
     let currentCanvas = null;
     let currentPopup = null;
     let saveTimer = 0;
+
+    const EXTRA_DISTRACTORS = [
+      "Ignore the problem and send it.",
+      "Hide the problem from the supervisor.",
+      "Check nothing and move faster.",
+      "Ship first and report later.",
+      "Guess the answer without checking.",
+      "Put problem cargo with normal cargo.",
+      "Tell the customer it is not your problem.",
+      "Remove the label and continue."
+    ];
+
+    const MULTI_TASKS = {
+      "14": {
+        hint: "Tap True or False for each sentence. It submits when every line is answered.",
+        options: ["True", "False"],
+        correct: ["False", "True", "True", "False", "True", "True", "False", "True"]
+      },
+      "19": {
+        hint: "Tap shortage, extra, or correct for each line. This one has many small taps.",
+        options: ["shortage", "extra", "correct"],
+        correct: ["correct", "shortage", "extra", "shortage", "correct", "extra", "shortage", "correct"]
+      },
+      "25": {
+        hint: "Tap True or False for each sentence.",
+        options: ["True", "False"],
+        correct: ["True", "False", "True", "False", "True", "True", "False", "True"]
+      },
+      "28": {
+        hint: "Choose exactly 4 things Leo must check.",
+        options: ["address", "label", "coffee", "barcode", "phone game", "customer name", "music"],
+        correct: ["address", "label", "barcode", "customer name"],
+        multiSelect: true,
+        max: 4
+      },
+      "32": {
+        hint: "Tap Yes or No for each phrase.",
+        options: ["Yes", "No"],
+        correct: ["Yes", "No", "Yes", "Yes", "No", "Yes", "Yes", "No"]
+      },
+      "34": {
+        hint: "Tap True or False for each sentence.",
+        options: ["True", "False"],
+        correct: ["False", "True", "True", "False", "True", "True"]
+      },
+      "36": {
+        hint: "Tap the best action for each problem.",
+        options: ["Ignore/send", "Fix/check", "Throw/drop"],
+        correct: ["Fix/check", "Fix/check", "Fix/check", "Fix/check"]
+      },
+      "39": {
+        hint: "Tap True or False for each sentence.",
+        options: ["True", "False"],
+        correct: ["True", "True", "False", "True", "True", "False", "True", "True"]
+      },
+      "45": {
+        hint: "Tap the safe action for each situation.",
+        options: ["Unsafe action", "Stop/report", "Mark/quarantine"],
+        correct: ["Stop/report", "Mark/quarantine", "Mark/quarantine", "Stop/report"]
+      },
+      "50": {
+        hint: "Tap Safe or Unsafe for each action.",
+        options: ["Safe", "Unsafe"],
+        correct: ["Safe", "Unsafe", "Safe", "Safe", "Unsafe", "Safe", "Unsafe", "Safe"]
+      },
+      "53": {
+        hint: "Tap True or False for each sentence.",
+        options: ["True", "False"],
+        correct: ["True", "False", "True", "True", "False", "True", "True", "True"]
+      },
+      "55": {
+        hint: "Tap the correct answer for each special cargo rule.",
+        options: ["correct/safe", "wrong/unsafe", "ask music"],
+        correct: ["correct/safe", "correct/safe", "correct/safe", "correct/safe"]
+      },
+      "57": {
+        hint: "Tap True or False for each sentence.",
+        options: ["True", "False"],
+        correct: ["True", "False", "True", "True", "True", "False", "True", "True"]
+      },
+      "65": {
+        hint: "Tap Accept, Refuse, or Ask supervisor for each return case.",
+        options: ["Accept", "Refuse", "Ask supervisor"],
+        correct: ["Accept", "Ask supervisor", "Refuse", "Accept", "Ask supervisor", "Ask supervisor", "Refuse", "Accept"]
+      },
+      "69": {
+        hint: "Tap refund or replacement for each customer situation.",
+        options: ["refund", "replacement"],
+        correct: ["refund", "replacement", "replacement", "refund", "replacement", "refund"]
+      },
+      "71": {
+        hint: "Tap True or False for each sentence.",
+        options: ["True", "False"],
+        correct: ["True", "True", "True", "False", "True", "True", "True", "True"]
+      },
+      "74": {
+        hint: "Tap the best transport action for each situation.",
+        options: ["safe action", "do nothing", "dangerous action"],
+        correct: ["safe action", "safe action", "safe action", "safe action"]
+      },
+      "80": {
+        hint: "Tap True or False for each sentence.",
+        options: ["True", "False"],
+        correct: ["True", "True", "True", "False", "True", "True"]
+      }
+    };
 
     initProtection();
     loadDictionary();
@@ -612,7 +771,8 @@
       const answered = Math.min(state.answers.length, TOTAL_TASKS);
       const taskNumber = Math.min(state.currentIndex + 1, TOTAL_TASKS);
       const task = tasks[state.currentIndex];
-      const choices = getOrderedChoices(task);
+      const multiTask = getMultiTask(task);
+      const choices = multiTask ? [] : getOrderedChoices(task);
       app.innerHTML = `
         <section class="topbar" aria-label="Exam progress">
           <div class="toprow">
@@ -631,14 +791,8 @@
             </div>
           </div>
           <div class="answer-box">
-            <div class="tap-hint">Tap the best answer. It saves immediately and opens the next task.</div>
-            <div id="optionList" class="option-list">
-              ${choices.map((choice, index) => `
-                <button class="option-button notranslate" type="button" data-index="${index}" data-answer="${escapeAttr(choice.text)}" aria-label="Option ${choiceLetter(index)}" translate="no">
-                  <canvas class="option-canvas" aria-hidden="true"></canvas>
-                </button>
-              `).join("")}
-            </div>
+            <div class="tap-hint">${multiTask ? escapeHtml(multiTask.hint) : "Tap the best answer. It saves immediately and opens the next task."}</div>
+            ${multiTask ? renderMultiTask(task, multiTask) : renderSingleChoiceList(choices)}
             <div id="statusLine" class="statusline"></div>
           </div>
         </section>
@@ -646,13 +800,67 @@
 
       currentCanvas = document.getElementById("taskCanvas");
       currentPopup = document.getElementById("dictPopup");
-      document.querySelectorAll(".option-button").forEach((button) => {
-        button.addEventListener("click", () => chooseOption(Number(button.dataset.index)));
-      });
+      if (multiTask) attachMultiTaskHandlers(task, multiTask);
+      else {
+        document.querySelectorAll(".option-button").forEach((button) => {
+          button.addEventListener("click", () => chooseOption(Number(button.dataset.index)));
+        });
+      }
       currentCanvas.addEventListener("pointerdown", handleCanvasPointer);
       ensureTaskTimer();
       drawExamCanvases();
       setStatus(submissionStatusText(), "");
+    }
+
+    function renderSingleChoiceList(choices) {
+      return `
+        <div id="optionList" class="option-list">
+          ${choices.map((choice, index) => `
+            <button class="option-button notranslate" type="button" data-index="${index}" data-answer="${escapeAttr(choice.text)}" aria-label="Option ${choiceLetter(index)}" translate="no">
+              <canvas class="option-canvas" aria-hidden="true"></canvas>
+            </button>
+          `).join("")}
+        </div>
+      `;
+    }
+
+    function renderMultiTask(task, multiTask) {
+      if (multiTask.multiSelect) return renderMultiSelectTask(task, multiTask);
+      const draft = getMultiDraft(task.id);
+      return `
+        <div id="multiBoard" class="multi-board" data-task-id="${task.id}">
+          ${multiTask.correct.map((_, rowIndex) => `
+            <div class="multi-row" data-row="${rowIndex}">
+              <div class="multi-row-label">Item ${rowIndex + 1}</div>
+              <div class="multi-options">
+                ${multiTask.options.map((label, optionIndex) => `
+                  <button class="mini-option notranslate ${draft[rowIndex] === label ? "is-selected" : ""}" type="button" data-row="${rowIndex}" data-value="${escapeAttr(label)}" aria-label="Item ${rowIndex + 1} option ${choiceLetter(optionIndex)}" translate="no">
+                    <canvas class="mini-option-canvas" aria-hidden="true"></canvas>
+                  </button>
+                `).join("")}
+              </div>
+            </div>
+          `).join("")}
+        </div>
+      `;
+    }
+
+    function renderMultiSelectTask(task, multiTask) {
+      const draft = getMultiDraft(task.id);
+      return `
+        <div id="multiBoard" class="multi-board multi-select-board" data-task-id="${task.id}">
+          <div class="multi-row">
+            <div class="multi-row-label">Choose ${multiTask.max} answers</div>
+            <div class="multi-options">
+              ${multiTask.options.map((label, optionIndex) => `
+                <button class="mini-option notranslate ${draft.includes(label) ? "is-selected" : ""}" type="button" data-value="${escapeAttr(label)}" aria-label="Option ${choiceLetter(optionIndex)}" translate="no">
+                  <canvas class="mini-option-canvas" aria-hidden="true"></canvas>
+                </button>
+              `).join("")}
+            </div>
+          </div>
+        </div>
+      `;
     }
 
     function renderLocked() {
@@ -680,6 +888,101 @@
         state.currentTaskStartedAt = new Date().toISOString();
         saveState();
       }
+    }
+
+    function attachMultiTaskHandlers(task, multiTask) {
+      if (multiTask.multiSelect) {
+        document.querySelectorAll(".mini-option").forEach((button) => {
+          button.addEventListener("click", () => chooseMultiSelect(task, multiTask, button.dataset.value));
+        });
+      } else {
+        document.querySelectorAll(".mini-option").forEach((button) => {
+          button.addEventListener("click", () => chooseMultiRow(task, multiTask, Number(button.dataset.row), button.dataset.value));
+        });
+      }
+      updateMultiStatus(task, multiTask);
+    }
+
+    function chooseMultiRow(task, multiTask, rowIndex, value) {
+      const draft = getMultiDraft(task.id);
+      draft[rowIndex] = value;
+      state.drafts[multiDraftKey(task.id)] = draft;
+      const row = document.querySelector(`.multi-row[data-row="${rowIndex}"]`);
+      if (row) {
+        row.querySelectorAll(".mini-option").forEach((button) => {
+          button.classList.toggle("is-selected", button.dataset.value === value);
+        });
+      }
+      drawMultiCanvases();
+      updateMultiStatus(task, multiTask);
+      saveState();
+      if (draft.filter(Boolean).length === multiTask.correct.length) {
+        document.querySelectorAll(".mini-option").forEach((button) => { button.disabled = true; });
+        window.setTimeout(() => submitCurrentTask(false, buildMultiChoice(task, multiTask, draft), null), 180);
+      }
+    }
+
+    function chooseMultiSelect(task, multiTask, value) {
+      let draft = getMultiDraft(task.id);
+      if (draft.includes(value)) {
+        draft = draft.filter((item) => item !== value);
+      } else if (draft.length < multiTask.max) {
+        draft = draft.concat(value);
+      } else {
+        setStatus("You already chose " + multiTask.max + ". Tap one again to change it.", "warn");
+        return;
+      }
+      state.drafts[multiDraftKey(task.id)] = draft;
+      document.querySelectorAll(".mini-option").forEach((button) => {
+        button.classList.toggle("is-selected", draft.includes(button.dataset.value));
+      });
+      drawMultiCanvases();
+      updateMultiStatus(task, multiTask);
+      saveState();
+      if (draft.length === multiTask.max) {
+        document.querySelectorAll(".mini-option").forEach((button) => { button.disabled = true; });
+        window.setTimeout(() => submitCurrentTask(false, buildMultiChoice(task, multiTask, draft), null), 220);
+      }
+    }
+
+    function updateMultiStatus(task, multiTask) {
+      const draft = getMultiDraft(task.id);
+      if (multiTask.multiSelect) {
+        setStatus(draft.length + " / " + multiTask.max + " selected.", draft.length ? "" : "warn");
+      } else {
+        const done = draft.filter(Boolean).length;
+        setStatus(done + " / " + multiTask.correct.length + " answered.", done ? "" : "warn");
+      }
+    }
+
+    function buildMultiChoice(task, multiTask, draft) {
+      const answerText = multiTask.multiSelect
+        ? draft.map((value, index) => (index + 1) + ". " + value).join("; ")
+        : draft.map((value, index) => "Item " + (index + 1) + ": " + value).join("; ");
+      const isCorrect = multiTask.multiSelect
+        ? sameSet(draft, multiTask.correct)
+        : multiTask.correct.every((value, index) => draft[index] === value);
+      return {
+        text: answerText,
+        correct: isCorrect,
+        multiAnswers: draft.slice()
+      };
+    }
+
+    function sameSet(a, b) {
+      if (a.length !== b.length) return false;
+      const sortedA = a.slice().sort();
+      const sortedB = b.slice().sort();
+      return sortedA.every((value, index) => value === sortedB[index]);
+    }
+
+    function getMultiDraft(taskId) {
+      const draft = state.drafts[multiDraftKey(taskId)];
+      return Array.isArray(draft) ? draft.slice() : [];
+    }
+
+    function multiDraftKey(taskId) {
+      return "multi_" + taskId;
     }
 
     function chooseOption(index) {
@@ -712,6 +1015,7 @@
         choiceIndex: Number.isInteger(selectedIndex) ? selectedIndex : null,
         choiceLetter: Number.isInteger(selectedIndex) ? choiceLetter(selectedIndex) : "",
         isCorrect: selectedChoice ? Boolean(selectedChoice.correct) : false,
+        multiAnswers: selectedChoice && selectedChoice.multiAnswers ? selectedChoice.multiAnswers : null,
         answeredAt: now.toISOString(),
         seconds: Math.max(0, Math.round((now - started) / 1000)),
         securitySkip: Boolean(securitySkip)
@@ -719,6 +1023,7 @@
 
       state.answers[state.currentIndex] = record;
       delete state.drafts[task.id];
+      delete state.drafts[multiDraftKey(task.id)];
       state.currentIndex += 1;
       state.currentTaskStartedAt = new Date().toISOString();
 
@@ -868,6 +1173,11 @@
     function drawExamCanvases() {
       drawTaskCanvas();
       drawOptionCanvases();
+      drawMultiCanvases();
+    }
+
+    function getMultiTask(task) {
+      return MULTI_TASKS[String(task.id)] || null;
     }
 
     function getOrderedChoices(task) {
@@ -880,6 +1190,15 @@
       const choices = raw.length ? raw : [
         { text: "I understand this task and choose to continue.", correct: false, sourceIndex: 0 }
       ];
+
+      let extraSeed = hashText([VERSION, "extra", task.id].join("|"));
+      while (choices.length < 4) {
+        extraSeed = (extraSeed * 1103515245 + 12345) >>> 0;
+        const text = EXTRA_DISTRACTORS[extraSeed % EXTRA_DISTRACTORS.length];
+        if (!choices.some((choice) => choice.text === text)) {
+          choices.push({ text, correct: false, sourceIndex: 100 + choices.length });
+        }
+      }
 
       const ordered = choices.slice();
       let seed = hashText([VERSION, state.student.name, state.student.group, task.id].join("|"));
@@ -934,6 +1253,42 @@
         ctx.clearRect(0, 0, cssWidth, cssHeight);
         ctx.font = "800 " + fontSize + "px Arial";
         ctx.fillStyle = "#162126";
+        let y = padY + fontSize;
+        rows.forEach((row) => {
+          drawPlainTokenRow(ctx, row, padX, y);
+          y += lineHeight;
+        });
+      });
+    }
+
+    function drawMultiCanvases() {
+      const buttons = Array.from(document.querySelectorAll(".mini-option"));
+      buttons.forEach((button) => {
+        const canvas = button.querySelector("canvas");
+        if (!canvas) return;
+        const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+        const cssWidth = Math.max(76, Math.floor(button.clientWidth));
+        const padX = 9;
+        const padY = 9;
+        const fontSize = cssWidth < 110 ? 13 : 14;
+        const lineHeight = Math.round(fontSize * 1.25);
+        const text = button.dataset.value || "";
+        const measure = document.createElement("canvas").getContext("2d");
+        measure.font = "800 " + fontSize + "px Arial";
+        const rows = wrapText(measure, text, cssWidth - padX * 2);
+        const cssHeight = Math.max(42, Math.ceil(padY * 2 + rows.length * lineHeight));
+
+        canvas.style.width = cssWidth + "px";
+        canvas.style.height = cssHeight + "px";
+        canvas.width = Math.round(cssWidth * dpr);
+        canvas.height = Math.round(cssHeight * dpr);
+        button.style.minHeight = cssHeight + "px";
+
+        const ctx = canvas.getContext("2d");
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.clearRect(0, 0, cssWidth, cssHeight);
+        ctx.font = "800 " + fontSize + "px Arial";
+        ctx.fillStyle = button.classList.contains("is-selected") ? "#0f766e" : "#162126";
         let y = padY + fontSize;
         rows.forEach((row) => {
           drawPlainTokenRow(ctx, row, padX, y);
@@ -1360,6 +1715,13 @@
       return String(value || "")
         .replace(/&/g, "&amp;")
         .replace(/"/g, "&quot;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+    }
+
+    function escapeHtml(value) {
+      return String(value || "")
+        .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;");
     }
