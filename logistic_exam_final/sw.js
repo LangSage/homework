@@ -1,8 +1,9 @@
-const CACHE_NAME = "logistic_exam_final_2026_05_13_v1";
+const CACHE_NAME = "logistic_exam_final_2026_05_13_v2";
 const ASSETS = [
   "./",
   "./index.html",
   "./tasks.js",
+  "./choices.js",
   "./words_fixed.json"
 ];
 
@@ -28,12 +29,14 @@ self.addEventListener("fetch", (event) => {
   if (request.method !== "GET" || url.origin !== self.location.origin) return;
 
   event.respondWith(
-    caches.match(request).then((cached) => {
-      if (cached) return cached;
-      return fetch(request).then((response) => {
-        const copy = response.clone();
-        caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
-        return response;
+    fetch(request).then((response) => {
+      const copy = response.clone();
+      caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+      return response;
+    }).catch(() => {
+      return caches.match(request).then((cached) => {
+        if (cached) return cached;
+        return caches.match("./index.html");
       });
     })
   );

@@ -50,8 +50,7 @@
     }
 
     button,
-    input,
-    textarea {
+    input {
       font: inherit;
     }
 
@@ -59,7 +58,6 @@
       touch-action: manipulation;
     }
 
-    textarea,
     input {
       user-select: text;
       -webkit-user-select: text;
@@ -191,8 +189,7 @@
       font-weight: 800;
     }
 
-    .field input,
-    .answer-box textarea {
+    .field input {
       width: 100%;
       border: 1px solid #b9cacb;
       border-radius: 8px;
@@ -206,8 +203,7 @@
       padding: 12px 13px;
     }
 
-    .field input:focus,
-    .answer-box textarea:focus {
+    .field input:focus {
       border-color: var(--accent);
       box-shadow: 0 0 0 3px rgba(15, 118, 110, .14);
     }
@@ -326,7 +322,7 @@
 
     .answer-box {
       display: grid;
-      gap: 10px;
+      gap: 9px;
       padding: 12px;
       border: 1px solid var(--line);
       border-radius: 8px;
@@ -334,12 +330,45 @@
       box-shadow: 0 10px 30px rgba(20, 38, 44, .09);
     }
 
-    .answer-box textarea {
-      min-height: 136px;
-      resize: vertical;
-      padding: 13px;
-      font-size: 16px;
-      line-height: 1.45;
+    .tap-hint {
+      color: #26343a;
+      font-size: 14px;
+      font-weight: 900;
+      line-height: 1.35;
+    }
+
+    .option-list {
+      display: grid;
+      gap: 9px;
+    }
+
+    .option-button {
+      width: 100%;
+      min-height: 58px;
+      padding: 0;
+      overflow: hidden;
+      border: 1px solid #aec7c5;
+      border-radius: 8px;
+      background: #ffffff;
+      box-shadow: 0 2px 0 rgba(15, 118, 110, .12);
+      text-align: left;
+    }
+
+    .option-button:active,
+    .option-button.is-working {
+      border-color: var(--accent);
+      background: #e9f6f3;
+      transform: translateY(1px);
+    }
+
+    .option-button:disabled {
+      opacity: .78;
+    }
+
+    .option-canvas {
+      display: block;
+      width: 100%;
+      height: auto;
     }
 
     .answer-actions {
@@ -406,10 +435,11 @@
   <main id="app" class="app" aria-live="polite"></main>
 
   <script src="tasks.js"></script>
+  <script src="choices.js"></script>
   <script>
     "use strict";
 
-    const VERSION = "logistic_exam_final_2026_05_13_v1";
+    const VERSION = "logistic_exam_final_2026_05_13_v2";
     const TOTAL_TASKS = 80;
     const STAGES = [20, 40, 60, 80];
     const STORAGE_KEY = VERSION + "_state";
@@ -438,7 +468,7 @@
     requestPersistentStorage();
     attemptQueuedSubmissions();
     window.addEventListener("online", attemptQueuedSubmissions);
-    window.addEventListener("resize", debounce(drawTaskCanvas, 120));
+    window.addEventListener("resize", debounce(drawExamCanvases, 120));
 
     if (tasks.length !== TOTAL_TASKS) {
       app.innerHTML = '<section class="locked"><div class="panel"><div class="panel-head"><h1>Exam file error</h1><p>The task bank did not load correctly.</p></div></div></section>';
@@ -534,7 +564,7 @@
           <div class="panel">
             <div class="panel-head">
               <h1>Logistics Final Exam</h1>
-              <p>80 tasks. The exam saves progress on this phone and sends answers after tasks 20, 40, 60, and 80.</p>
+              <p>80 tap-choice tasks. The exam saves progress on this phone and sends answers after tasks 20, 40, 60, and 80.</p>
             </div>
             <form id="startForm" class="start-form" autocomplete="off">
               <div class="warning">Before you start, turn off VPN. If you leave the exam page, the current task changes to the next one.</div>
@@ -581,6 +611,8 @@
     function renderExam() {
       const answered = Math.min(state.answers.length, TOTAL_TASKS);
       const taskNumber = Math.min(state.currentIndex + 1, TOTAL_TASKS);
+      const task = tasks[state.currentIndex];
+      const choices = getOrderedChoices(task);
       app.innerHTML = `
         <section class="topbar" aria-label="Exam progress">
           <div class="toprow">
@@ -599,30 +631,28 @@
             </div>
           </div>
           <div class="answer-box">
-            <textarea id="answerInput" autocomplete="off" autocapitalize="sentences" spellcheck="false" placeholder="Type your answer here."></textarea>
-            <div class="answer-actions">
-              <div id="statusLine" class="statusline"></div>
-              <button id="submitAnswer" class="primary" type="button">Submit answer</button>
+            <div class="tap-hint">Tap the best answer. It saves immediately and opens the next task.</div>
+            <div id="optionList" class="option-list">
+              ${choices.map((choice, index) => `
+                <button class="option-button notranslate" type="button" data-index="${index}" data-answer="${escapeAttr(choice.text)}" aria-label="Option ${choiceLetter(index)}" translate="no">
+                  <canvas class="option-canvas" aria-hidden="true"></canvas>
+                </button>
+              `).join("")}
             </div>
+            <div id="statusLine" class="statusline"></div>
           </div>
         </section>
       `;
 
       currentCanvas = document.getElementById("taskCanvas");
       currentPopup = document.getElementById("dictPopup");
-      const answerInput = document.getElementById("answerInput");
-      const task = tasks[state.currentIndex];
-      answerInput.value = state.drafts[task.id] || "";
-      answerInput.addEventListener("input", () => {
-        state.drafts[task.id] = answerInput.value;
-        scheduleSave();
+      document.querySelectorAll(".option-button").forEach((button) => {
+        button.addEventListener("click", () => chooseOption(Number(button.dataset.index)));
       });
-      document.getElementById("submitAnswer").addEventListener("click", () => submitCurrentTask(false));
       currentCanvas.addEventListener("pointerdown", handleCanvasPointer);
       ensureTaskTimer();
-      drawTaskCanvas();
+      drawExamCanvases();
       setStatus(submissionStatusText(), "");
-      setTimeout(() => answerInput.focus({ preventScroll: true }), 120);
     }
 
     function renderLocked() {
@@ -652,12 +682,22 @@
       }
     }
 
-    function submitCurrentTask(securitySkip) {
+    function chooseOption(index) {
       const task = tasks[state.currentIndex];
-      const textarea = document.getElementById("answerInput");
-      const answer = textarea ? textarea.value.trim() : (state.drafts[task.id] || "").trim();
+      const choice = getOrderedChoices(task)[index];
+      if (!choice) return;
+      document.querySelectorAll(".option-button").forEach((button) => {
+        button.disabled = true;
+        if (Number(button.dataset.index) === index) button.classList.add("is-working");
+      });
+      window.setTimeout(() => submitCurrentTask(false, choice, index), 110);
+    }
+
+    function submitCurrentTask(securitySkip, selectedChoice, selectedIndex) {
+      const task = tasks[state.currentIndex];
+      const answer = selectedChoice ? selectedChoice.text : "";
       if (!securitySkip && !answer) {
-        setStatus("Write an answer before you continue.", "warn");
+        setStatus("Choose one answer to continue.", "warn");
         return;
       }
 
@@ -669,6 +709,9 @@
         part: task.part,
         kind: task.kind,
         answer: answer || "[no answer: page was left]",
+        choiceIndex: Number.isInteger(selectedIndex) ? selectedIndex : null,
+        choiceLetter: Number.isInteger(selectedIndex) ? choiceLetter(selectedIndex) : "",
+        isCorrect: selectedChoice ? Boolean(selectedChoice.correct) : false,
         answeredAt: now.toISOString(),
         seconds: Math.max(0, Math.round((now - started) / 1000)),
         securitySkip: Boolean(securitySkip)
@@ -820,6 +863,91 @@
       if (!node) return;
       node.textContent = text || "";
       node.className = "statusline" + (mode ? " " + mode : "");
+    }
+
+    function drawExamCanvases() {
+      drawTaskCanvas();
+      drawOptionCanvases();
+    }
+
+    function getOrderedChoices(task) {
+      const raw = ((window.EXAM_CHOICES || {})[String(task.id)] || []).map((choice, index) => ({
+        text: choice.text || "",
+        correct: Boolean(choice.correct),
+        sourceIndex: index
+      })).filter((choice) => choice.text);
+
+      const choices = raw.length ? raw : [
+        { text: "I understand this task and choose to continue.", correct: false, sourceIndex: 0 }
+      ];
+
+      const ordered = choices.slice();
+      let seed = hashText([VERSION, state.student.name, state.student.group, task.id].join("|"));
+      for (let i = ordered.length - 1; i > 0; i -= 1) {
+        seed = (seed * 1664525 + 1013904223) >>> 0;
+        const j = seed % (i + 1);
+        const temp = ordered[i];
+        ordered[i] = ordered[j];
+        ordered[j] = temp;
+      }
+      return ordered;
+    }
+
+    function hashText(text) {
+      let hash = 2166136261;
+      for (let i = 0; i < text.length; i += 1) {
+        hash ^= text.charCodeAt(i);
+        hash = Math.imul(hash, 16777619);
+      }
+      return hash >>> 0;
+    }
+
+    function choiceLetter(index) {
+      return String.fromCharCode(65 + index);
+    }
+
+    function drawOptionCanvases() {
+      const buttons = Array.from(document.querySelectorAll(".option-button"));
+      buttons.forEach((button) => {
+        const canvas = button.querySelector("canvas");
+        if (!canvas) return;
+        const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+        const cssWidth = Math.max(260, Math.floor(button.clientWidth));
+        const padX = 14;
+        const padY = 12;
+        const fontSize = cssWidth < 380 ? 15 : 16;
+        const lineHeight = Math.round(fontSize * 1.42);
+        const text = choiceLetter(Number(button.dataset.index)) + ". " + (button.dataset.answer || "");
+        const measure = document.createElement("canvas").getContext("2d");
+        measure.font = "800 " + fontSize + "px Arial";
+        const rows = wrapText(measure, text, cssWidth - padX * 2);
+        const cssHeight = Math.max(58, Math.ceil(padY * 2 + rows.length * lineHeight));
+
+        canvas.style.width = cssWidth + "px";
+        canvas.style.height = cssHeight + "px";
+        canvas.width = Math.round(cssWidth * dpr);
+        canvas.height = Math.round(cssHeight * dpr);
+        button.style.minHeight = cssHeight + "px";
+
+        const ctx = canvas.getContext("2d");
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.clearRect(0, 0, cssWidth, cssHeight);
+        ctx.font = "800 " + fontSize + "px Arial";
+        ctx.fillStyle = "#162126";
+        let y = padY + fontSize;
+        rows.forEach((row) => {
+          drawPlainTokenRow(ctx, row, padX, y);
+          y += lineHeight;
+        });
+      });
+    }
+
+    function drawPlainTokenRow(ctx, row, x, baseline) {
+      let cursor = x;
+      row.forEach((token) => {
+        if (!token.isSpace) ctx.fillText(token.text, cursor, baseline);
+        cursor += token.width;
+      });
     }
 
     function drawTaskCanvas() {
@@ -1129,7 +1257,7 @@
             const emoji = item.Emoji || item.emoji || "";
             if (word && translation) dictionary.set(word, { translation, emoji });
           });
-          drawTaskCanvas();
+          drawExamCanvases();
         })
         .catch(() => {
           dictionary = new Map();
@@ -1162,7 +1290,7 @@
     function initProtection() {
       ["copy", "cut", "contextmenu", "dragstart", "selectstart"].forEach((eventName) => {
         document.addEventListener(eventName, (event) => {
-          if (event.target && /^(INPUT|TEXTAREA)$/.test(event.target.tagName) && eventName === "selectstart") return;
+          if (event.target && event.target.tagName === "INPUT" && eventName === "selectstart") return;
           event.preventDefault();
         }, { capture: true });
       });
@@ -1179,9 +1307,7 @@
         if (!state.started || state.finished) return;
         if (document.visibilityState === "hidden") {
           const task = tasks[state.currentIndex];
-          const input = document.getElementById("answerInput");
-          if (task && input) {
-            state.drafts[task.id] = input.value;
+          if (task) {
             hiddenCandidate = { taskId: task.id, at: Date.now() };
             state.securityEvents.push({
               type: "page_hidden",
@@ -1203,12 +1329,6 @@
       });
 
       window.addEventListener("pagehide", () => {
-        const task = tasks[state.currentIndex];
-        const input = document.getElementById("answerInput");
-        if (task && input && state.started && !state.finished) {
-          state.drafts[task.id] = input.value;
-          saveState();
-        }
         if (state.queue && state.queue.length) {
           state.queue.slice(0, 1).forEach((item) => submitPayload(item).then(() => markSubmitted(item)).catch(() => {}));
         }
