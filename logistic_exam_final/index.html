@@ -1,0 +1,1248 @@
+<!DOCTYPE html>
+<html lang="en" translate="no" class="notranslate">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="google" content="notranslate">
+  <meta name="robots" content="noindex">
+  <title>Logistics Final Exam</title>
+  <style>
+    :root {
+      --ink: #162126;
+      --muted: #5b6870;
+      --line: #d7e1e3;
+      --paper: #fbfcfc;
+      --page: #edf5f2;
+      --accent: #0f766e;
+      --accent-2: #b45309;
+      --danger: #b42318;
+      --ok: #16784f;
+      --shadow: 0 18px 48px rgba(20, 38, 44, .14);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      min-height: 100%;
+      margin: 0;
+      color: var(--ink);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.72), rgba(255,255,255,0) 34rem),
+        var(--page);
+      font-family: Arial, Helvetica, sans-serif;
+      -webkit-text-size-adjust: 100%;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+      overscroll-behavior-y: contain;
+    }
+
+    body::after {
+      content: "Printing is disabled for this exam.";
+      display: none;
+    }
+
+    button,
+    input,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      touch-action: manipulation;
+    }
+
+    textarea,
+    input {
+      user-select: text;
+      -webkit-user-select: text;
+    }
+
+    @media print {
+      main {
+        display: none !important;
+      }
+
+      body::after {
+        display: block;
+        padding: 2rem;
+        font-size: 18px;
+      }
+    }
+
+    .app {
+      width: min(100%, 760px);
+      min-height: 100svh;
+      margin: 0 auto;
+      padding: max(12px, env(safe-area-inset-top)) 12px max(20px, env(safe-area-inset-bottom));
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      display: grid;
+      gap: 8px;
+      padding: 10px 0 12px;
+      background: linear-gradient(180deg, var(--page) 72%, rgba(237,245,242,0));
+    }
+
+    .toprow {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .exam-title {
+      min-width: 0;
+      margin: 0;
+      font-size: 17px;
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: 0;
+    }
+
+    .task-count {
+      flex: 0 0 auto;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .progress {
+      width: 100%;
+      height: 8px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: #d8e6e4;
+      border: 1px solid #c8d8d5;
+    }
+
+    .progress span {
+      display: block;
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), #3b8f68 58%, var(--accent-2));
+      transition: width .2s ease;
+    }
+
+    .start,
+    .locked {
+      min-height: calc(100svh - 40px);
+      display: grid;
+      align-content: center;
+      gap: 16px;
+      padding: 18px 2px;
+    }
+
+    .panel {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .92);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .panel-head {
+      padding: 18px 18px 14px;
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(135deg, rgba(15,118,110,.13), rgba(180,83,9,.10));
+    }
+
+    .panel-head h1,
+    .panel-head h2 {
+      margin: 0;
+      font-size: clamp(24px, 7vw, 34px);
+      line-height: 1.04;
+      letter-spacing: 0;
+    }
+
+    .panel-head p {
+      margin: 9px 0 0;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.45;
+    }
+
+    .start-form {
+      display: grid;
+      gap: 14px;
+      padding: 16px 18px 18px;
+    }
+
+    .field {
+      display: grid;
+      gap: 7px;
+    }
+
+    .field label,
+    .checkrow {
+      color: #26343a;
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .field input,
+    .answer-box textarea {
+      width: 100%;
+      border: 1px solid #b9cacb;
+      border-radius: 8px;
+      background: #fff;
+      color: var(--ink);
+      outline: none;
+    }
+
+    .field input {
+      min-height: 48px;
+      padding: 12px 13px;
+    }
+
+    .field input:focus,
+    .answer-box textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(15, 118, 110, .14);
+    }
+
+    .warning {
+      padding: 13px 14px;
+      border: 1px solid #f4c27b;
+      border-radius: 8px;
+      background: #fff7e8;
+      color: #5d3b00;
+      font-size: 14px;
+      line-height: 1.45;
+      font-weight: 700;
+    }
+
+    .checkrow {
+      display: grid;
+      grid-template-columns: 22px 1fr;
+      align-items: start;
+      gap: 9px;
+      line-height: 1.38;
+    }
+
+    .checkrow input {
+      width: 20px;
+      height: 20px;
+      margin: 0;
+      accent-color: var(--accent);
+    }
+
+    .primary,
+    .secondary {
+      min-height: 48px;
+      border: 0;
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-weight: 900;
+      letter-spacing: 0;
+    }
+
+    .primary {
+      color: #fff;
+      background: var(--accent);
+    }
+
+    .primary:disabled {
+      background: #9bb7b2;
+      color: #eef4f3;
+    }
+
+    .secondary {
+      color: var(--accent);
+      border: 1px solid #a9c7c3;
+      background: #f6fbfa;
+    }
+
+    .task-stage {
+      display: grid;
+      gap: 12px;
+    }
+
+    .canvas-wrap {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+
+    #taskCanvas {
+      display: block;
+      width: 100%;
+      height: auto;
+      background: var(--paper);
+    }
+
+    .dictionary-popup {
+      position: absolute;
+      z-index: 8;
+      width: min(260px, calc(100% - 24px));
+      padding: 12px 13px;
+      border: 1px solid #bfd0d1;
+      border-radius: 8px;
+      background: #ffffff;
+      box-shadow: 0 14px 35px rgba(20, 38, 44, .22);
+      transform: translateY(8px);
+      display: none;
+    }
+
+    .dictionary-popup.is-open {
+      display: block;
+    }
+
+    .dict-word {
+      font-size: 16px;
+      font-weight: 900;
+      color: var(--accent);
+      overflow-wrap: anywhere;
+    }
+
+    .dict-translation {
+      margin-top: 5px;
+      color: var(--ink);
+      font-size: 15px;
+      line-height: 1.35;
+      overflow-wrap: anywhere;
+    }
+
+    .dict-tip {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .answer-box {
+      display: grid;
+      gap: 10px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255,255,255,.94);
+      box-shadow: 0 10px 30px rgba(20, 38, 44, .09);
+    }
+
+    .answer-box textarea {
+      min-height: 136px;
+      resize: vertical;
+      padding: 13px;
+      font-size: 16px;
+      line-height: 1.45;
+    }
+
+    .answer-actions {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+
+    .statusline {
+      min-height: 20px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.35;
+    }
+
+    .statusline.warn {
+      color: var(--danger);
+    }
+
+    .statusline.ok {
+      color: var(--ok);
+    }
+
+    .locked .panel {
+      box-shadow: var(--shadow);
+    }
+
+    .submission-list {
+      display: grid;
+      gap: 8px;
+      padding: 16px 18px 18px;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .submission-list div {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      border-bottom: 1px solid #e5eeee;
+      padding-bottom: 8px;
+    }
+
+    @media (min-width: 560px) {
+      .app {
+        padding-inline: 18px;
+      }
+
+      .answer-actions {
+        grid-template-columns: 1fr auto;
+        align-items: center;
+      }
+
+      .primary,
+      .secondary {
+        min-width: 178px;
+      }
+    }
+  </style>
+</head>
+<body class="notranslate" translate="no">
+  <main id="app" class="app" aria-live="polite"></main>
+
+  <script src="tasks.js"></script>
+  <script>
+    "use strict";
+
+    const VERSION = "logistic_exam_final_2026_05_13_v1";
+    const TOTAL_TASKS = 80;
+    const STAGES = [20, 40, 60, 80];
+    const STORAGE_KEY = VERSION + "_state";
+    const LOCK_KEY = VERSION + "_locked";
+    const PROFILE_KEY = "logistic_exam_final_profile";
+    const FORM_ACTION = "https://docs.google.com/forms/d/e/1FAIpQLSeUzYUvQbbzo_1r81AacP6Kj7HlKDzEVfa93Dam39LiVjcItA/formResponse";
+    const ENTRY_NAME = "entry.1582931880";
+    const ENTRY_GROUP = "entry.1222434157";
+    const ENTRY_EXAM = "entry.371289786";
+    const ENTRY_JSON = "entry.679064514";
+    const EXAM_CODE = "final_exam_opu";
+
+    const app = document.getElementById("app");
+    const tasks = (window.EXAM_TASKS || []).slice(0, TOTAL_TASKS);
+    let state = loadState();
+    let dictionary = new Map();
+    let hitBoxes = [];
+    let hiddenCandidate = null;
+    let currentCanvas = null;
+    let currentPopup = null;
+    let saveTimer = 0;
+
+    initProtection();
+    loadDictionary();
+    registerServiceWorker();
+    requestPersistentStorage();
+    attemptQueuedSubmissions();
+    window.addEventListener("online", attemptQueuedSubmissions);
+    window.addEventListener("resize", debounce(drawTaskCanvas, 120));
+
+    if (tasks.length !== TOTAL_TASKS) {
+      app.innerHTML = '<section class="locked"><div class="panel"><div class="panel-head"><h1>Exam file error</h1><p>The task bank did not load correctly.</p></div></div></section>';
+    } else {
+      render();
+    }
+
+    function emptyState() {
+      return {
+        version: VERSION,
+        started: false,
+        finished: false,
+        student: { name: "", group: "OPU23.1" },
+        currentIndex: 0,
+        drafts: {},
+        answers: [],
+        currentTaskStartedAt: "",
+        startedAt: "",
+        finishedAt: "",
+        submissions: {},
+        queue: [],
+        securityEvents: []
+      };
+    }
+
+    function loadState() {
+      try {
+        const locked = localStorage.getItem(LOCK_KEY);
+        const stored = localStorage.getItem(STORAGE_KEY);
+        const loaded = stored ? JSON.parse(stored) : emptyState();
+        if (!loaded || loaded.version !== VERSION) return emptyState();
+        if (locked) loaded.finished = true;
+        loaded.drafts = loaded.drafts || {};
+        loaded.answers = loaded.answers || [];
+        loaded.submissions = loaded.submissions || {};
+        loaded.queue = loaded.queue || [];
+        loaded.securityEvents = loaded.securityEvents || [];
+        loaded.student = loaded.student || { name: "", group: "OPU23.1" };
+        return loaded;
+      } catch (error) {
+        return emptyState();
+      }
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        if (state.finished) localStorage.setItem(LOCK_KEY, state.finishedAt || new Date().toISOString());
+      } catch (error) {
+        setStatus("Progress storage is full. Tell the teacher before continuing.", "warn");
+      }
+    }
+
+    function scheduleSave() {
+      window.clearTimeout(saveTimer);
+      saveTimer = window.setTimeout(saveState, 160);
+    }
+
+    function loadProfile() {
+      try {
+        const profile = JSON.parse(localStorage.getItem(PROFILE_KEY) || "{}");
+        return {
+          name: profile.name || "",
+          group: profile.group || "OPU23.1"
+        };
+      } catch (error) {
+        return { name: "", group: "OPU23.1" };
+      }
+    }
+
+    function saveProfile(student) {
+      try {
+        localStorage.setItem(PROFILE_KEY, JSON.stringify(student));
+      } catch (error) {}
+    }
+
+    function render() {
+      if (state.finished) {
+        renderLocked();
+      } else if (!state.started) {
+        renderStart();
+      } else {
+        renderExam();
+      }
+    }
+
+    function renderStart() {
+      const profile = loadProfile();
+      state.student.name = state.student.name || profile.name;
+      state.student.group = state.student.group || profile.group || "OPU23.1";
+      app.innerHTML = `
+        <section class="start">
+          <div class="panel">
+            <div class="panel-head">
+              <h1>Logistics Final Exam</h1>
+              <p>80 tasks. The exam saves progress on this phone and sends answers after tasks 20, 40, 60, and 80.</p>
+            </div>
+            <form id="startForm" class="start-form" autocomplete="off">
+              <div class="warning">Before you start, turn off VPN. If you leave the exam page, the current task changes to the next one.</div>
+              <div class="field">
+                <label for="studentName">Student name</label>
+                <input id="studentName" name="studentName" value="${escapeAttr(state.student.name)}" inputmode="text" autocomplete="off" required>
+              </div>
+              <div class="field">
+                <label for="studentGroup">Group</label>
+                <input id="studentGroup" name="studentGroup" value="${escapeAttr(state.student.group || "OPU23.1")}" inputmode="text" autocomplete="off" required>
+              </div>
+              <label class="checkrow">
+                <input id="vpnCheck" type="checkbox" required>
+                <span>VPN is off. I understand that completed tasks cannot be opened again.</span>
+              </label>
+              <button class="primary" type="submit">Start exam</button>
+              <div id="startStatus" class="statusline"></div>
+            </form>
+          </div>
+        </section>
+      `;
+
+      document.getElementById("startForm").addEventListener("submit", (event) => {
+        event.preventDefault();
+        const name = document.getElementById("studentName").value.trim();
+        const group = document.getElementById("studentGroup").value.trim();
+        const status = document.getElementById("startStatus");
+        if (!name || !group) {
+          status.textContent = "Write your name and group first.";
+          status.className = "statusline warn";
+          return;
+        }
+        state.student = { name, group };
+        state.started = true;
+        state.startedAt = state.startedAt || new Date().toISOString();
+        state.currentTaskStartedAt = new Date().toISOString();
+        state.currentIndex = Math.max(0, Math.min(state.currentIndex || 0, TOTAL_TASKS - 1));
+        saveProfile(state.student);
+        saveState();
+        renderExam();
+      });
+    }
+
+    function renderExam() {
+      const answered = Math.min(state.answers.length, TOTAL_TASKS);
+      const taskNumber = Math.min(state.currentIndex + 1, TOTAL_TASKS);
+      app.innerHTML = `
+        <section class="topbar" aria-label="Exam progress">
+          <div class="toprow">
+            <h1 class="exam-title">Logistics Final Exam</h1>
+            <div class="task-count">Task ${taskNumber} / ${TOTAL_TASKS}</div>
+          </div>
+          <div class="progress"><span style="width:${Math.round(answered / TOTAL_TASKS * 100)}%"></span></div>
+        </section>
+        <section class="task-stage">
+          <div id="canvasWrap" class="canvas-wrap">
+            <canvas id="taskCanvas"></canvas>
+            <div id="dictPopup" class="dictionary-popup" role="status">
+              <div id="dictWord" class="dict-word"></div>
+              <div id="dictTranslation" class="dict-translation"></div>
+              <div class="dict-tip">Tap another word to change dictionary.</div>
+            </div>
+          </div>
+          <div class="answer-box">
+            <textarea id="answerInput" autocomplete="off" autocapitalize="sentences" spellcheck="false" placeholder="Type your answer here."></textarea>
+            <div class="answer-actions">
+              <div id="statusLine" class="statusline"></div>
+              <button id="submitAnswer" class="primary" type="button">Submit answer</button>
+            </div>
+          </div>
+        </section>
+      `;
+
+      currentCanvas = document.getElementById("taskCanvas");
+      currentPopup = document.getElementById("dictPopup");
+      const answerInput = document.getElementById("answerInput");
+      const task = tasks[state.currentIndex];
+      answerInput.value = state.drafts[task.id] || "";
+      answerInput.addEventListener("input", () => {
+        state.drafts[task.id] = answerInput.value;
+        scheduleSave();
+      });
+      document.getElementById("submitAnswer").addEventListener("click", () => submitCurrentTask(false));
+      currentCanvas.addEventListener("pointerdown", handleCanvasPointer);
+      ensureTaskTimer();
+      drawTaskCanvas();
+      setStatus(submissionStatusText(), "");
+      setTimeout(() => answerInput.focus({ preventScroll: true }), 120);
+    }
+
+    function renderLocked() {
+      const rows = STAGES.map((stage) => {
+        const item = state.submissions[String(stage)];
+        const text = item && item.sentAt ? "sent" : item ? "queued" : "not reached";
+        return `<div><span>Stage ${stage}</span><strong>${text}</strong></div>`;
+      }).join("");
+      app.innerHTML = `
+        <section class="locked">
+          <div class="panel">
+            <div class="panel-head">
+              <h2>Exam completed</h2>
+              <p>Your answers are locked on this phone. Keep this page open for a moment if any checkpoint is still queued.</p>
+            </div>
+            <div class="submission-list">${rows}</div>
+          </div>
+        </section>
+      `;
+      attemptQueuedSubmissions();
+    }
+
+    function ensureTaskTimer() {
+      if (!state.currentTaskStartedAt) {
+        state.currentTaskStartedAt = new Date().toISOString();
+        saveState();
+      }
+    }
+
+    function submitCurrentTask(securitySkip) {
+      const task = tasks[state.currentIndex];
+      const textarea = document.getElementById("answerInput");
+      const answer = textarea ? textarea.value.trim() : (state.drafts[task.id] || "").trim();
+      if (!securitySkip && !answer) {
+        setStatus("Write an answer before you continue.", "warn");
+        return;
+      }
+
+      const now = new Date();
+      const started = state.currentTaskStartedAt ? new Date(state.currentTaskStartedAt) : now;
+      const record = {
+        taskId: task.id,
+        title: task.title,
+        part: task.part,
+        kind: task.kind,
+        answer: answer || "[no answer: page was left]",
+        answeredAt: now.toISOString(),
+        seconds: Math.max(0, Math.round((now - started) / 1000)),
+        securitySkip: Boolean(securitySkip)
+      };
+
+      state.answers[state.currentIndex] = record;
+      delete state.drafts[task.id];
+      state.currentIndex += 1;
+      state.currentTaskStartedAt = new Date().toISOString();
+
+      if (securitySkip) {
+        state.securityEvents.push({
+          type: "left_page_advanced",
+          taskId: task.id,
+          at: now.toISOString()
+        });
+      }
+
+      if (STAGES.includes(state.currentIndex)) {
+        queueStageSubmission(state.currentIndex);
+      }
+
+      if (state.currentIndex >= TOTAL_TASKS) {
+        state.finished = true;
+        state.finishedAt = new Date().toISOString();
+        if (!state.submissions[String(TOTAL_TASKS)]) queueStageSubmission(TOTAL_TASKS);
+      }
+
+      saveState();
+      attemptQueuedSubmissions();
+      render();
+      if (securitySkip) setStatus("Security rule applied: the previous task was closed.", "warn");
+    }
+
+    function queueStageSubmission(stage) {
+      const key = String(stage);
+      if (state.submissions[key] && state.submissions[key].sentAt) return;
+      const payload = buildStagePayload(stage);
+      const queued = {
+        id: VERSION + "_" + stage + "_" + Date.now(),
+        stage,
+        createdAt: new Date().toISOString(),
+        attempts: 0,
+        payload
+      };
+      state.submissions[key] = {
+        stage,
+        queuedAt: queued.createdAt,
+        sentAt: "",
+        attempts: 0
+      };
+      state.queue = (state.queue || []).filter((item) => item.stage !== stage);
+      state.queue.push(queued);
+    }
+
+    function buildStagePayload(stage) {
+      const start = stage - 20;
+      const end = stage;
+      return {
+        exam: EXAM_CODE,
+        version: VERSION,
+        stage,
+        range: (start + 1) + "-" + end,
+        totalTasks: TOTAL_TASKS,
+        student: {
+          name: state.student.name,
+          group: state.student.group
+        },
+        startedAt: state.startedAt,
+        checkpointAt: new Date().toISOString(),
+        finishedAt: state.finishedAt || "",
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "",
+        userAgent: navigator.userAgent,
+        securityEvents: state.securityEvents.slice(),
+        answers: state.answers.slice(start, end).map((answer, index) => {
+          const task = tasks[start + index];
+          return answer || {
+            taskId: task.id,
+            title: task.title,
+            part: task.part,
+            answer: "[not answered in this checkpoint]"
+          };
+        })
+      };
+    }
+
+    function attemptQueuedSubmissions() {
+      if (!state || !state.queue || !state.queue.length) return;
+      const queue = state.queue.slice();
+      queue.forEach((item) => {
+        submitPayload(item)
+          .then(() => markSubmitted(item))
+          .catch(() => markSubmitAttempt(item));
+      });
+      saveState();
+    }
+
+    function submitPayload(item) {
+      const body = new URLSearchParams();
+      body.set(ENTRY_NAME, state.student.name || item.payload.student.name || "Student");
+      body.set(ENTRY_GROUP, state.student.group || item.payload.student.group || "OPU23.1");
+      body.set(ENTRY_EXAM, EXAM_CODE);
+      body.set(ENTRY_JSON, JSON.stringify(item.payload));
+      body.set("submit", "Submit");
+
+      if (navigator.sendBeacon && document.visibilityState === "hidden") {
+        const ok = navigator.sendBeacon(FORM_ACTION, body);
+        if (ok) return Promise.resolve();
+      }
+
+      return fetch(FORM_ACTION, {
+        method: "POST",
+        mode: "no-cors",
+        keepalive: true,
+        body
+      });
+    }
+
+    function markSubmitted(item) {
+      state.queue = (state.queue || []).filter((queued) => queued.id !== item.id);
+      const key = String(item.stage);
+      state.submissions[key] = state.submissions[key] || { stage: item.stage };
+      state.submissions[key].sentAt = new Date().toISOString();
+      state.submissions[key].attempts = (state.submissions[key].attempts || 0) + 1;
+      saveState();
+      setStatus(submissionStatusText(), "ok");
+      if (state.finished) renderLocked();
+    }
+
+    function markSubmitAttempt(item) {
+      const key = String(item.stage);
+      state.submissions[key] = state.submissions[key] || { stage: item.stage };
+      state.submissions[key].attempts = (state.submissions[key].attempts || 0) + 1;
+      item.attempts = (item.attempts || 0) + 1;
+      saveState();
+      setStatus("Checkpoint is queued. It will retry when internet is available.", "warn");
+    }
+
+    function submissionStatusText() {
+      const sent = STAGES.filter((stage) => state.submissions[String(stage)] && state.submissions[String(stage)].sentAt).length;
+      const queued = (state.queue || []).length;
+      if (queued) return queued + " checkpoint" + (queued === 1 ? "" : "s") + " queued.";
+      if (sent) return sent + " checkpoint" + (sent === 1 ? "" : "s") + " sent.";
+      return "";
+    }
+
+    function setStatus(text, mode) {
+      const node = document.getElementById("statusLine") || document.getElementById("startStatus");
+      if (!node) return;
+      node.textContent = text || "";
+      node.className = "statusline" + (mode ? " " + mode : "");
+    }
+
+    function drawTaskCanvas() {
+      const canvas = document.getElementById("taskCanvas");
+      const wrap = document.getElementById("canvasWrap");
+      if (!canvas || !wrap || !tasks[state.currentIndex]) return;
+      hideDictionary();
+
+      const cssWidth = Math.max(300, Math.floor(wrap.clientWidth));
+      const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+      const pad = cssWidth < 390 ? 16 : 20;
+      const maxWidth = cssWidth - pad * 2;
+      const bodySize = cssWidth < 390 ? 16 : 17;
+      const titleSize = cssWidth < 390 ? 22 : 25;
+      const metaSize = 12;
+      const bodyLine = Math.round(bodySize * 1.5);
+      const titleLine = Math.round(titleSize * 1.18);
+      const task = tasks[state.currentIndex];
+      const measure = document.createElement("canvas").getContext("2d");
+      const contentBlocks = [];
+
+      measure.font = "800 " + titleSize + "px Arial";
+      contentBlocks.push({
+        rows: wrapText(measure, task.title, maxWidth),
+        font: "800 " + titleSize + "px Arial",
+        color: "#162126",
+        lineHeight: titleLine,
+        gapAfter: 12
+      });
+
+      if (task.part) {
+        measure.font = "700 " + metaSize + "px Arial";
+        contentBlocks.push({
+          rows: wrapText(measure, task.part, maxWidth),
+          font: "700 " + metaSize + "px Arial",
+          color: "#5b6870",
+          lineHeight: 18,
+          gapAfter: 14
+        });
+      }
+
+      task.lines.forEach((line) => {
+        const isLabel = /^(Text:|Questions:|Answer:|Situation:|Use:|Example:|Principles:|Actions:)/.test(line);
+        const font = (isLabel ? "800 " : "500 ") + bodySize + "px Arial";
+        measure.font = font;
+        contentBlocks.push({
+          rows: wrapText(measure, line, maxWidth),
+          font,
+          color: isLabel ? "#0f766e" : "#233137",
+          lineHeight: bodyLine,
+          gapAfter: isLabel ? 4 : 3
+        });
+      });
+
+      const rowsHeight = contentBlocks.reduce((sum, block) => sum + block.rows.length * block.lineHeight + block.gapAfter, 0);
+      const headerHeight = 76;
+      const cssHeight = Math.max(280, Math.ceil(headerHeight + rowsHeight + pad + 10));
+
+      canvas.style.width = cssWidth + "px";
+      canvas.style.height = cssHeight + "px";
+      canvas.width = Math.round(cssWidth * dpr);
+      canvas.height = Math.round(cssHeight * dpr);
+
+      const ctx = canvas.getContext("2d");
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, cssWidth, cssHeight);
+      hitBoxes = [];
+
+      drawCanvasBackground(ctx, cssWidth, cssHeight);
+      drawTaskIcon(ctx, cssWidth - pad - 52, 21, task);
+
+      ctx.fillStyle = "#5b6870";
+      ctx.font = "800 " + metaSize + "px Arial";
+      ctx.fillText("TASK " + (state.currentIndex + 1) + " OF " + TOTAL_TASKS + "  |  STAGE " + currentStageLabel(), pad, 34);
+
+      let y = 70;
+      contentBlocks.forEach((block) => {
+        ctx.font = block.font;
+        ctx.fillStyle = block.color;
+        block.rows.forEach((row) => {
+          drawTokenRow(ctx, row, pad, y, block.lineHeight, parseFontSize(block.font), block.color);
+          y += block.lineHeight;
+        });
+        y += block.gapAfter;
+      });
+    }
+
+    function wrapText(ctx, text, maxWidth) {
+      const tokens = tokenize(text);
+      const rows = [];
+      let row = [];
+      let rowWidth = 0;
+
+      tokens.forEach((token) => {
+        const pieces = token.isSpace ? [token] : splitLongToken(ctx, token, maxWidth);
+        pieces.forEach((piece) => {
+          piece.width = ctx.measureText(piece.text).width;
+          if (!piece.isSpace && rowWidth + piece.width > maxWidth && row.length) {
+            rows.push(trimRow(row));
+            row = [];
+            rowWidth = 0;
+          }
+          if (!(piece.isSpace && row.length === 0)) {
+            row.push(piece);
+            rowWidth += piece.width;
+          }
+        });
+      });
+
+      if (row.length) rows.push(trimRow(row));
+      return rows.length ? rows : [[{ text: "", isSpace: false, width: 0 }]];
+    }
+
+    function tokenize(text) {
+      return (text.match(/\s+|[^\s]+/g) || [""]).map((part) => ({
+        text: part,
+        isSpace: /^\s+$/.test(part),
+        key: normalizeWord(part)
+      }));
+    }
+
+    function splitLongToken(ctx, token, maxWidth) {
+      if (ctx.measureText(token.text).width <= maxWidth) return [token];
+      const pieces = [];
+      let chunk = "";
+      for (const char of token.text) {
+        if (chunk && ctx.measureText(chunk + char).width > maxWidth) {
+          pieces.push({ text: chunk, isSpace: false, key: normalizeWord(chunk) });
+          chunk = char;
+        } else {
+          chunk += char;
+        }
+      }
+      if (chunk) pieces.push({ text: chunk, isSpace: false, key: normalizeWord(chunk) });
+      return pieces;
+    }
+
+    function trimRow(row) {
+      while (row.length && row[row.length - 1].isSpace) row.pop();
+      return row;
+    }
+
+    function drawTokenRow(ctx, row, x, baseline, lineHeight, fontSize, color) {
+      let cursor = x;
+      row.forEach((token) => {
+        if (!token.isSpace) {
+          const dict = lookupDictionary(token.key);
+          ctx.fillStyle = dict ? "#0b685f" : color;
+          ctx.fillText(token.text, cursor, baseline);
+          if (dict) {
+            ctx.strokeStyle = "rgba(15, 118, 110, .55)";
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(cursor, baseline + 3);
+            ctx.lineTo(cursor + token.width, baseline + 3);
+            ctx.stroke();
+            hitBoxes.push({
+              x: cursor,
+              y: baseline - fontSize - 3,
+              w: token.width,
+              h: lineHeight,
+              word: token.text,
+              dict
+            });
+          }
+        }
+        cursor += token.width;
+      });
+    }
+
+    function drawCanvasBackground(ctx, width, height) {
+      ctx.fillStyle = "#fbfcfc";
+      ctx.fillRect(0, 0, width, height);
+      ctx.fillStyle = "rgba(15,118,110,.08)";
+      ctx.fillRect(0, 0, width, 54);
+      ctx.fillStyle = "rgba(180,83,9,.10)";
+      ctx.fillRect(0, 54, width, 4);
+      ctx.strokeStyle = "rgba(22,33,38,.08)";
+      ctx.lineWidth = 1;
+      for (let y = 94; y < height; y += 34) {
+        ctx.beginPath();
+        ctx.moveTo(18, y);
+        ctx.lineTo(width - 18, y);
+        ctx.stroke();
+      }
+    }
+
+    function drawTaskIcon(ctx, x, y, task) {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.fillStyle = "#e9f3f0";
+      ctx.strokeStyle = "#87aaa6";
+      ctx.lineWidth = 2;
+      roundRect(ctx, 0, 0, 48, 38, 8);
+      ctx.fill();
+      ctx.stroke();
+      const part = task.part || "";
+      if (/Safety|dangerous/i.test(part)) {
+        ctx.fillStyle = "#b42318";
+        ctx.beginPath();
+        ctx.moveTo(24, 7);
+        ctx.lineTo(38, 14);
+        ctx.lineTo(34, 31);
+        ctx.lineTo(24, 35);
+        ctx.lineTo(14, 31);
+        ctx.lineTo(10, 14);
+        ctx.closePath();
+        ctx.fill();
+        ctx.fillStyle = "#fff";
+        ctx.fillRect(22, 14, 4, 12);
+        ctx.fillRect(22, 28, 4, 4);
+      } else if (/Transport|Delivery/i.test(part)) {
+        ctx.fillStyle = "#0f766e";
+        ctx.fillRect(9, 17, 22, 10);
+        ctx.fillRect(28, 13, 10, 14);
+        ctx.fillStyle = "#26343a";
+        ctx.beginPath(); ctx.arc(15, 29, 4, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(34, 29, 4, 0, Math.PI * 2); ctx.fill();
+      } else if (/Returns|claims/i.test(part)) {
+        ctx.strokeStyle = "#b45309";
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.arc(24, 20, 11, .2, Math.PI * 1.65);
+        ctx.stroke();
+        ctx.fillStyle = "#b45309";
+        ctx.beginPath();
+        ctx.moveTo(11, 18);
+        ctx.lineTo(16, 8);
+        ctx.lineTo(20, 19);
+        ctx.closePath();
+        ctx.fill();
+      } else {
+        ctx.fillStyle = "#b45309";
+        ctx.fillRect(13, 13, 22, 17);
+        ctx.strokeStyle = "#fff";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(13, 18);
+        ctx.lineTo(35, 18);
+        ctx.moveTo(24, 13);
+        ctx.lineTo(24, 30);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    function roundRect(ctx, x, y, w, h, r) {
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.arcTo(x + w, y, x + w, y + h, r);
+      ctx.arcTo(x + w, y + h, x, y + h, r);
+      ctx.arcTo(x, y + h, x, y, r);
+      ctx.arcTo(x, y, x + w, y, r);
+      ctx.closePath();
+    }
+
+    function parseFontSize(font) {
+      const match = font.match(/(\d+)px/);
+      return match ? Number(match[1]) : 16;
+    }
+
+    function currentStageLabel() {
+      if (state.currentIndex < 20) return "1";
+      if (state.currentIndex < 40) return "2";
+      if (state.currentIndex < 60) return "3";
+      return "4";
+    }
+
+    function handleCanvasPointer(event) {
+      const rect = currentCanvas.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
+      const hit = hitBoxes.find((box) => x >= box.x && x <= box.x + box.w && y >= box.y && y <= box.y + box.h);
+      if (!hit) {
+        hideDictionary();
+        return;
+      }
+      showDictionary(hit, x, y);
+    }
+
+    function showDictionary(hit, x, y) {
+      if (!currentPopup) return;
+      const wrap = document.getElementById("canvasWrap");
+      const wordNode = document.getElementById("dictWord");
+      const translationNode = document.getElementById("dictTranslation");
+      wordNode.textContent = (hit.dict.emoji ? hit.dict.emoji + " " : "") + stripEdgePunctuation(hit.word);
+      translationNode.textContent = hit.dict.translation || "";
+      const left = Math.max(12, Math.min(x, wrap.clientWidth - 272));
+      const top = Math.max(12, Math.min(y + 12, wrap.clientHeight - 140));
+      currentPopup.style.left = left + "px";
+      currentPopup.style.top = top + "px";
+      currentPopup.classList.add("is-open");
+    }
+
+    function hideDictionary() {
+      if (currentPopup) currentPopup.classList.remove("is-open");
+    }
+
+    function loadDictionary() {
+      fetch("words_fixed.json", { cache: "force-cache" })
+        .then((response) => response.ok ? response.json() : [])
+        .then((items) => {
+          dictionary = new Map();
+          (items || []).forEach((item) => {
+            const word = normalizeWord(item.Word || item.word || "");
+            const translation = item.Translation || item.translation || "";
+            const emoji = item.Emoji || item.emoji || "";
+            if (word && translation) dictionary.set(word, { translation, emoji });
+          });
+          drawTaskCanvas();
+        })
+        .catch(() => {
+          dictionary = new Map();
+        });
+    }
+
+    function lookupDictionary(key) {
+      if (!key) return null;
+      if (dictionary.has(key)) return dictionary.get(key);
+      if (key.endsWith("ies") && dictionary.has(key.slice(0, -3) + "y")) return dictionary.get(key.slice(0, -3) + "y");
+      if (key.endsWith("es") && dictionary.has(key.slice(0, -2))) return dictionary.get(key.slice(0, -2));
+      if (key.endsWith("s") && key.length > 3 && dictionary.has(key.slice(0, -1))) return dictionary.get(key.slice(0, -1));
+      if (key.endsWith("ing") && key.length > 5 && dictionary.has(key.slice(0, -3))) return dictionary.get(key.slice(0, -3));
+      if (key.endsWith("ed") && key.length > 4 && dictionary.has(key.slice(0, -2))) return dictionary.get(key.slice(0, -2));
+      return null;
+    }
+
+    function normalizeWord(value) {
+      return stripEdgePunctuation(String(value || ""))
+        .toLowerCase()
+        .replace(/[’']/g, "")
+        .replace(/[^a-z0-9 -]/g, "")
+        .trim();
+    }
+
+    function stripEdgePunctuation(value) {
+      return String(value || "").replace(/^[^A-Za-z0-9]+|[^A-Za-z0-9]+$/g, "");
+    }
+
+    function initProtection() {
+      ["copy", "cut", "contextmenu", "dragstart", "selectstart"].forEach((eventName) => {
+        document.addEventListener(eventName, (event) => {
+          if (event.target && /^(INPUT|TEXTAREA)$/.test(event.target.tagName) && eventName === "selectstart") return;
+          event.preventDefault();
+        }, { capture: true });
+      });
+
+      document.addEventListener("keydown", (event) => {
+        const key = event.key.toLowerCase();
+        if ((event.ctrlKey || event.metaKey) && ["a", "c", "x", "p", "s", "u"].includes(key)) {
+          event.preventDefault();
+        }
+        if (key === "printscreen") event.preventDefault();
+      }, { capture: true });
+
+      document.addEventListener("visibilitychange", () => {
+        if (!state.started || state.finished) return;
+        if (document.visibilityState === "hidden") {
+          const task = tasks[state.currentIndex];
+          const input = document.getElementById("answerInput");
+          if (task && input) {
+            state.drafts[task.id] = input.value;
+            hiddenCandidate = { taskId: task.id, at: Date.now() };
+            state.securityEvents.push({
+              type: "page_hidden",
+              taskId: task.id,
+              at: new Date().toISOString()
+            });
+            saveState();
+          }
+        } else if (document.visibilityState === "visible" && hiddenCandidate) {
+          const task = tasks[state.currentIndex];
+          const awayLongEnough = Date.now() - hiddenCandidate.at > 1200;
+          if (task && task.id === hiddenCandidate.taskId && awayLongEnough) {
+            hiddenCandidate = null;
+            submitCurrentTask(true);
+          } else {
+            hiddenCandidate = null;
+          }
+        }
+      });
+
+      window.addEventListener("pagehide", () => {
+        const task = tasks[state.currentIndex];
+        const input = document.getElementById("answerInput");
+        if (task && input && state.started && !state.finished) {
+          state.drafts[task.id] = input.value;
+          saveState();
+        }
+        if (state.queue && state.queue.length) {
+          state.queue.slice(0, 1).forEach((item) => submitPayload(item).then(() => markSubmitted(item)).catch(() => {}));
+        }
+      });
+    }
+
+    function registerServiceWorker() {
+      if (!("serviceWorker" in navigator)) return;
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("sw.js").catch(() => {});
+      });
+    }
+
+    function requestPersistentStorage() {
+      if (navigator.storage && navigator.storage.persist) {
+        navigator.storage.persist().catch(() => {});
+      }
+    }
+
+    function debounce(fn, delay) {
+      let timer = 0;
+      return function debounced() {
+        window.clearTimeout(timer);
+        timer = window.setTimeout(fn, delay);
+      };
+    }
+
+    function escapeAttr(value) {
+      return String(value || "")
+        .replace(/&/g, "&amp;")
+        .replace(/"/g, "&quot;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+    }
+  </script>
+</body>
+</html>
