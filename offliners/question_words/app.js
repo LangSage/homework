@@ -40,26 +40,26 @@
   ];
 
   const QUESTION_WORDS = [
-    ['what', 'thing or action', 'What do you need?'],
-    ['who', 'person', 'Who is calling?'],
-    ['where', 'place', 'Where is the office?'],
-    ['when', 'time', 'When do we start?'],
-    ['why', 'reason', 'Why are you late?'],
-    ['how', 'way or condition', 'How do you know?'],
-    ['which', 'choice', 'Which route is faster?'],
-    ['whose', 'owner', 'Whose phone is this?'],
-    ['whom', 'object person', 'Whom did you invite?'],
+    ['what', 'предмет / действие', 'What do you need?'],
+    ['who', 'человек', 'Who is calling?'],
+    ['where', 'место', 'Where is the office?'],
+    ['when', 'время', 'When do we start?'],
+    ['why', 'причина', 'Why are you late?'],
+    ['how', 'как / способ', 'How do you know?'],
+    ['which', 'выбор из вариантов', 'Which route is faster?'],
+    ['whose', 'чей / владелец', 'Whose phone is this?'],
+    ['whom', 'кого / кому', 'Whom did you invite?'],
   ];
 
   const STEPS = [
     {
       id: 'map',
       type: 'lesson',
-      minutes: '0-6 min',
-      title: 'Question words ask for one missing piece',
+      minutes: '0-6 мин',
+      title: 'Вопросительное слово показывает, какой ответ нужен',
       body: [
-        'Do not memorize them as a list. Each question word asks for a type of answer.',
-        'If you know the type of answer you want, the correct word becomes easy.',
+        'Не учим их как длинный список. Каждое слово просит один тип ответа.',
+        'Сначала подумай: мне нужен человек, место, время, причина или выбор?',
       ],
       cards: QUESTION_WORDS.slice(0, 6),
       visual: 'compass',
@@ -67,236 +67,236 @@
     {
       id: 'full-map',
       type: 'lesson',
-      minutes: '6-12 min',
-      title: 'The full question-word map',
+      minutes: '6-12 мин',
+      title: 'Карта вопросительных слов',
       body: [
-        'Use this map like a control panel: thing, person, place, time, reason, way, choice, owner, object person.',
-        'Tap any underlined word in the canvas to see the dictionary meaning.',
+        'Смотри на тип ответа: предмет, человек, место, время, причина, способ, выбор, владелец.',
+        'Нажимай на подчеркнутые английские слова: появится перевод из словаря.',
       ],
       cards: QUESTION_WORDS,
     },
     {
       id: 'q-what-name',
       type: 'quiz',
-      minutes: '12-15 min',
-      title: 'Pick the missing question word',
+      minutes: '12-15 мин',
+      title: 'Выбери пропущенное вопросительное слово',
       prompt: '___ is your name?',
       choices: ['What', 'Where', 'Who', 'Why'],
       answer: 0,
-      explain: 'A name is information, so the question asks for what.',
+      explain: 'Имя - это информация. Для такой информации обычно нужен what.',
     },
     {
       id: 'q-where-from',
       type: 'quiz',
-      minutes: '15-18 min',
-      title: 'Find the place question',
+      minutes: '15-18 мин',
+      title: 'Вопрос про место',
       prompt: '___ are you from?',
       choices: ['When', 'Where', 'Which', 'Whose'],
       answer: 1,
-      explain: 'From asks about place or origin, so use where.',
+      explain: 'From значит "из какого места". Для места используем where.',
     },
     {
       id: 'formula',
       type: 'lesson',
-      minutes: '18-24 min',
-      title: 'Question formula',
+      minutes: '18-24 мин',
+      title: 'Простая формула вопроса',
       body: [
-        'Most English questions use this order: question word + helper/be + person + action.',
-        'Examples: Where is the station? Why do you study English? What did she buy?',
+        'Частый порядок в английском вопросе: вопросительное слово + помощник/be + кто + действие.',
+        'Примеры ниже читаем как готовые модели. Сначала вопросительное слово, потом is/do/did.',
       ],
-      formula: ['Question word', 'helper / be', 'subject', 'verb / rest'],
+      formula: ['Вопрос. слово', 'помощник / be', 'кто?', 'действие / конец'],
       examples: ['Where is the station?', 'Why do you study English?', 'What did she buy?'],
     },
     {
       id: 'q-why-late',
       type: 'quiz',
-      minutes: '24-27 min',
-      title: 'Ask for a reason',
+      minutes: '24-27 мин',
+      title: 'Спросить причину',
       prompt: '___ are you late?',
       choices: ['Where', 'Why', 'When', 'Whose'],
       answer: 1,
-      explain: 'Late needs a reason. Why asks for a reason.',
+      explain: 'Если ответ будет "потому что...", нужен why.',
     },
     {
       id: 'q-how-school',
       type: 'quiz',
-      minutes: '27-30 min',
-      title: 'Ask for a way',
+      minutes: '27-30 мин',
+      title: 'Спросить способ',
       prompt: '___ do you get to school?',
       choices: ['How', 'Who', 'Which', 'Whom'],
       answer: 0,
-      explain: 'The answer can be by bus, by car, or on foot. That is the way, so use how.',
+      explain: 'Ответ может быть by bus, by car, on foot. Это способ. Значит, нужен how.',
     },
     {
       id: 'how-family',
       type: 'lesson',
-      minutes: '30-36 min',
-      title: 'The how family',
+      minutes: '30-36 мин',
+      title: 'Семья слова how',
       body: [
-        'How often teams up with another word to ask for number, price, age, distance, or frequency.',
-        'Read the noun after how. It tells you what kind of number you need.',
+        'How часто работает вместе с другим словом: many, much, old, long, often, far.',
+        'Смотри на слово после how. Оно подсказывает, о чем вопрос: количество, цена, возраст, длина, частота или расстояние.',
       ],
       family: [
-        ['how many', 'number you can count', 'How many boxes?'],
-        ['how much', 'price or amount', 'How much is it?'],
-        ['how old', 'age', 'How old are you?'],
-        ['how long', 'time or length', 'How long is the lesson?'],
-        ['how often', 'frequency', 'How often do you train?'],
-        ['how far', 'distance', 'How far is the office?'],
+        ['how many', 'сколько штук', 'How many boxes?'],
+        ['how much', 'сколько стоит / сколько', 'How much is it?'],
+        ['how old', 'возраст', 'How old are you?'],
+        ['how long', 'как долго / длина', 'How long is the lesson?'],
+        ['how often', 'как часто', 'How often do you train?'],
+        ['how far', 'как далеко', 'How far is the office?'],
       ],
     },
     {
       id: 'q-how-many',
       type: 'quiz',
-      minutes: '36-38 min',
-      title: 'Countable number',
+      minutes: '36-38 мин',
+      title: 'Количество предметов',
       prompt: '___ many students are in the room?',
       choices: ['What', 'How', 'Where', 'Whose'],
       answer: 1,
-      explain: 'Many needs how before it: How many students?',
+      explain: 'Many почти всегда идет с how: How many students?',
     },
     {
       id: 'q-how-much',
       type: 'quiz',
-      minutes: '38-40 min',
-      title: 'Price question',
+      minutes: '38-40 мин',
+      title: 'Вопрос о цене',
       prompt: '___ much is the ticket?',
       choices: ['Who', 'How', 'Which', 'When'],
       answer: 1,
-      explain: 'Price uses how much.',
+      explain: 'Цена - это how much: How much is the ticket?',
     },
     {
       id: 'choice-owner',
       type: 'lesson',
-      minutes: '40-45 min',
-      title: 'Choice and owner',
+      minutes: '40-45 мин',
+      title: 'Выбор и владелец',
       body: [
-        'Which means there is a small set of choices. Whose means you need the owner.',
-        'A quick test: if the answer can be mine, yours, his, her, or their, use whose.',
+        'Which используем, когда есть выбор: A или B, красный или синий, первый или второй.',
+        'Whose используем, когда нужен владелец: мой, твой, его, ее, их.',
       ],
       examples: ['Which jacket do you want, red or blue?', 'Whose jacket is on the chair?'],
     },
     {
       id: 'q-whose',
       type: 'quiz',
-      minutes: '45-47 min',
-      title: 'Ask about ownership',
+      minutes: '45-47 мин',
+      title: 'Спросить, чей предмет',
       prompt: '___ backpack is under the table?',
       choices: ['Who', 'Whose', 'Which', 'Where'],
       answer: 1,
-      explain: 'The answer is an owner: my backpack, Olga\'s backpack, his backpack. Use whose.',
+      explain: 'Ответ будет про владельца: my backpack, Olga\'s backpack, his backpack. Нужен whose.',
     },
     {
       id: 'q-which',
       type: 'quiz',
-      minutes: '47-49 min',
-      title: 'Ask about a choice',
+      minutes: '47-49 мин',
+      title: 'Спросить про выбор',
       prompt: '___ route is faster, A or B?',
       choices: ['Which', 'Whose', 'Why', 'When'],
       answer: 0,
-      explain: 'A or B is a choice, so use which.',
+      explain: 'A or B - это выбор из вариантов. Значит, нужен which.',
     },
     {
       id: 'who-whom',
       type: 'lesson',
-      minutes: '49-52 min',
-      title: 'Who and whom',
+      minutes: '49-52 мин',
+      title: 'Who и whom',
       body: [
-        'Who usually asks about the person doing the action.',
-        'Whom is formal and asks about the person receiving the action. In everyday speech, many people use who instead.',
+        'Who - простой и самый частый вопрос "кто?". Обычно это человек, который делает действие.',
+        'Whom - формальное слово "кого / кому". В обычной речи часто говорят who, но знать whom полезно.',
       ],
       examples: ['Who called you?', 'Whom did you call?'],
     },
     {
       id: 'q-who',
       type: 'quiz',
-      minutes: '52-53 min',
-      title: 'Person doing the action',
+      minutes: '52-53 мин',
+      title: 'Человек делает действие',
       prompt: '___ opened the door?',
       choices: ['Who', 'Whom', 'Where', 'How'],
       answer: 0,
-      explain: 'The answer is the person doing the action, so who is best.',
+      explain: 'Нужен человек, который открыл дверь. Поэтому who.',
     },
     {
       id: 'q-whom',
       type: 'quiz',
-      minutes: '53-54 min',
-      title: 'Formal object person',
+      minutes: '53-54 мин',
+      title: 'Формальное "кого"',
       prompt: '___ did the manager invite?',
       choices: ['Where', 'Whose', 'Whom', 'When'],
       answer: 2,
-      explain: 'The invited person receives the action. Formal English uses whom.',
+      explain: 'Менеджер пригласил кого? В формальном английском здесь whom.',
     },
     {
       id: 'memory',
       type: 'lesson',
-      minutes: '54-56 min',
-      title: 'Memory sprint',
+      minutes: '54-56 мин',
+      title: 'Быстрое запоминание',
       body: [
-        'Say the map once: what thing, who person, where place, when time, why reason, how way.',
-        'Then add: which choice, whose owner, whom object person.',
+        'Повтори вслух: what - что, who - кто, where - где, when - когда, why - почему, how - как.',
+        'Добавь еще три: which - какой из вариантов, whose - чей, whom - кого / кому.',
       ],
       recap: true,
     },
     {
       id: 'q-category-reason',
       type: 'quiz',
-      minutes: '56-57 min',
-      title: 'Meaning check',
-      prompt: 'Which word asks for a reason?',
+      minutes: '56-57 мин',
+      title: 'Проверка значения',
+      prompt: 'Какое слово спрашивает причину?',
       choices: ['When', 'Why', 'Where', 'Which'],
       answer: 1,
-      explain: 'Why asks for the reason: because...',
+      explain: 'Why спрашивает причину. Ответ часто начинается с because.',
     },
     {
       id: 'q-order',
       type: 'quiz',
-      minutes: '57-58 min',
-      title: 'Choose the correct order',
-      prompt: 'You need a place question. Which sentence is correct?',
+      minutes: '57-58 мин',
+      title: 'Выбери правильный порядок',
+      prompt: 'Нужен вопрос про место. Какое предложение правильное?',
       choices: ['Where is the classroom?', 'Is where the classroom?', 'Where the classroom is?', 'Classroom where is?'],
       answer: 0,
-      explain: 'The order is question word + be/helper + subject: Where is the classroom?',
+      explain: 'Порядок такой: вопросительное слово + is/do/did + кто/что. Правильно: Where is the classroom?',
     },
     {
       id: 'q-place',
       type: 'quiz',
-      minutes: '58-59 min',
-      title: 'Ask for a place',
-      prompt: 'You want to know the location of the meeting.',
+      minutes: '58-59 мин',
+      title: 'Спросить место',
+      prompt: 'Ты хочешь узнать, где будет встреча.',
       choices: ['When is the meeting?', 'Where is the meeting?', 'Why is the meeting?', 'Whose is the meeting?'],
       answer: 1,
-      explain: 'Location means place, so ask where.',
+      explain: 'Место = where. Поэтому правильно: Where is the meeting?',
     },
     {
       id: 'mission-1',
       type: 'quiz',
-      minutes: '59 min',
-      title: 'Final mission 1',
-      prompt: 'A student says: I lost my phone. You need the owner of the phone. What do you ask?',
+      minutes: '59 мин',
+      title: 'Финальная задача 1',
+      prompt: 'Студент говорит: I lost my phone. Нужно спросить, чей это телефон.',
       choices: ['Whose phone is it?', 'Where phone is it?', 'Who phone is it?', 'Why phone is it?'],
       answer: 0,
-      explain: 'Owner questions use whose.',
+      explain: 'Когда спрашиваем владельца, используем whose.',
     },
     {
       id: 'mission-2',
       type: 'quiz',
-      minutes: '59 min',
-      title: 'Final mission 2',
-      prompt: 'You see three buses. You need the correct bus. What do you ask?',
+      minutes: '59 мин',
+      title: 'Финальная задача 2',
+      prompt: 'Ты видишь три автобуса. Нужно спросить, какой автобус правильный.',
       choices: ['Which bus do we need?', 'Why bus do we need?', 'Whose bus do we need?', 'Who bus do we need?'],
       answer: 0,
-      explain: 'Three buses create a choice. Use which.',
+      explain: 'Три автобуса = выбор из вариантов. Используем which.',
     },
     {
       id: 'mission-3',
       type: 'quiz',
-      minutes: '60 min',
-      title: 'Final mission 3',
-      prompt: 'Your partner answers: Because the train was late. What was your question word?',
+      minutes: '60 мин',
+      title: 'Финальная задача 3',
+      prompt: 'Партнер отвечает: Because the train was late. Какое было вопросительное слово?',
       choices: ['When', 'Why', 'How', 'Where'],
       answer: 1,
-      explain: 'Because gives a reason, so the question word was why.',
+      explain: 'Because дает причину. Значит, вопрос начинался с why.',
     },
   ];
 
@@ -319,11 +319,11 @@
     sessionId: '',
     dict: new Map(),
     dictCount: 0,
-    dictStatus: 'Loading dictionary...',
+    dictStatus: 'Загружаю словарь...',
     dictFallback: false,
     answers: {},
     submitted: false,
-    submitStatus: 'Waiting',
+    submitStatus: 'Ждет',
     tooltip: null,
     hoverControl: null,
     hoverWord: null,
@@ -387,8 +387,8 @@
     state.dictCount = map.size;
     state.dictFallback = fallback;
     state.dictStatus = fallback
-      ? 'Core dictionary is active. Serve this folder to load all words.'
-      : `${map.size} dictionary words are active.`;
+      ? 'Работает короткий словарь. Открой через сервер, чтобы загрузить все слова.'
+      : `Словарь подключен: ${map.size} слов.`;
     requestRender();
   }
 
@@ -681,8 +681,8 @@
     setFont(18, 900);
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText('ANSWER', 0, -10);
-    ctx.fillText('TYPE', 0, 16);
+    ctx.fillText('ТИП', 0, -10);
+    ctx.fillText('ОТВЕТА', 0, 16);
     ctx.restore();
     ctx.textAlign = 'left';
   }
@@ -748,7 +748,7 @@
       setFont(compact ? 11 : 13, 900);
       ctx.fillStyle = index === 0 ? '#c8fff6' : '#6d7e88';
       ctx.textBaseline = 'alphabetic';
-      ctx.fillText(`STEP ${index + 1}`, bx + 12, by + 19);
+      ctx.fillText(`ШАГ ${index + 1}`, bx + 12, by + 19);
       drawWrappedText(part, bx + 12, by + 26, boxW - 24, {
         size: compact ? 13 : 16,
         lineHeight: compact ? 15 : 18,
@@ -791,8 +791,8 @@
     const exerciseTotal = STEPS.filter(s => s.type === 'quiz').length;
     const answeredCount = Object.keys(state.answers).length;
     const score = getScore();
-    drawChip('Question Words', pad, 24, '#ffffff', '#173047');
-    drawChip(step ? step.minutes : 'Done', pad + 160, 24, '#173047', '#ffffff');
+    drawChip('Вопросы', pad, 24, '#ffffff', '#173047');
+    drawChip(step ? step.minutes : 'Готово', pad + 160, 24, '#173047', '#ffffff');
     const status = `${Math.min(state.stepIndex + 1, STEPS.length)} / ${STEPS.length}`;
     const scoreText = `${score} / ${exerciseTotal}`;
     const statusW = drawChip(status, w - pad - 204, 24, '#ffffff', '#173047');
@@ -805,7 +805,7 @@
     fillRound(barX, barY, barW * ((state.stepIndex + 1) / STEPS.length), 10, 5, '#23857b');
     setFont(12, 800);
     ctx.fillStyle = '#617480';
-    ctx.fillText(`${answeredCount} exercises answered`, pad, 92);
+    ctx.fillText(`Ответов: ${answeredCount}`, pad, 92);
   }
 
   function renderStart(w, h) {
@@ -817,18 +817,18 @@
     const panelH = h - pad * 2;
 
     fillRound(panelX, panelY, panelW, panelH, phone ? 18 : 24, 'rgba(255,255,255,.72)', 'rgba(31, 82, 105, .18)', 1);
-    drawChip('Canvas lesson', panelX + 22, panelY + 22, '#173047', '#ffffff');
-    drawChip('45-60 minutes', panelX + 160, panelY + 22, '#ffe0cc', '#6c3522');
+    drawChip('Урок в canvas', panelX + 22, panelY + 22, '#173047', '#ffffff');
+    drawChip('45-60 минут', panelX + 160, panelY + 22, '#ffe0cc', '#6c3522');
 
-    const titleSize = phone ? 34 : 52;
-    drawWrappedText('Question Words', panelX + 24, panelY + (phone ? 62 : 80), phone ? panelW - 48 : panelW * .54, {
+    const titleSize = phone ? 34 : 50;
+    const titleBottom = drawWrappedText('Вопросительные слова', panelX + 24, panelY + (phone ? 62 : 80), phone ? panelW - 48 : panelW * .54, {
       size: titleSize,
       lineHeight: titleSize + 6,
       weight: 900,
       color: '#173047',
       linkColor: '#174a63',
     });
-    drawWrappedText('Understand, remember, and use what, who, where, when, why, how, which, whose, and whom.', panelX + 26, panelY + (phone ? 142 : 158), phone ? panelW - 130 : panelW * .52, {
+    drawWrappedText('Разберись и запомни: what, who, where, when, why, how, which, whose, whom.', panelX + 26, titleBottom + (phone ? 14 : 16), phone ? panelW - 130 : panelW * .52, {
       size: phone ? 18 : 22,
       lineHeight: phone ? 24 : 30,
       weight: 800,
@@ -847,16 +847,16 @@
 
     const fieldW = phone ? panelW - 44 : (panelW - 74) / 2;
     const fieldH = phone ? 62 : 76;
-    drawInput('name', 'Name', panelX + 22, fieldTop, fieldW, fieldH, 'Student name');
-    drawInput('group', 'Group', phone ? panelX + 22 : panelX + 52 + fieldW, phone ? fieldTop + 72 : fieldTop, fieldW, fieldH, 'Group');
+    drawInput('name', 'Имя', panelX + 22, fieldTop, fieldW, fieldH, 'Имя студента');
+    drawInput('group', 'Группа', phone ? panelX + 22 : panelX + 52 + fieldW, phone ? fieldTop + 72 : fieldTop, fieldW, fieldH, 'Группа');
 
     const buttonY = phone ? fieldTop + 144 : fieldTop + 98;
     const phoneButtonW = (panelW - 54) / 2;
-    drawButton('start', panelX + 22, buttonY, phone ? phoneButtonW : 220, phone ? 50 : 56, 'Start lesson', {
+    drawButton('start', panelX + 22, buttonY, phone ? phoneButtonW : 220, phone ? 50 : 56, 'Начать', {
       disabled: !state.profile.name.trim(),
       size: phone ? 15 : 18,
     });
-    drawButton('resetProfile', phone ? panelX + 32 + phoneButtonW : panelX + 260, buttonY, phone ? phoneButtonW : 178, phone ? 50 : 56, 'Clear', {
+    drawButton('resetProfile', phone ? panelX + 32 + phoneButtonW : panelX + 260, buttonY, phone ? phoneButtonW : 178, phone ? 50 : 56, 'Очистить', {
       kind: 'ghost',
       size: phone ? 15 : 18,
     });
@@ -881,7 +881,7 @@
     const cardH = h - cardY - (phone ? 82 : 100);
     fillRound(cardX, cardY, cardW, cardH, 22, 'rgba(255,255,255,.78)', 'rgba(31, 82, 105, .16)', 1);
 
-    drawChip('Lesson', cardX + 20, cardY + 18, '#e7f7f3', '#174a63');
+    drawChip('Урок', cardX + 20, cardY + 18, '#e7f7f3', '#174a63');
     let y = cardY + (phone ? 50 : 64);
     y = drawWrappedText(step.title, cardX + 22, y, cardW - 44, {
       size: phone ? 22 : 34,
@@ -944,15 +944,15 @@
     if (step.recap) {
       const cols = phone ? 1 : 2;
       const lines = [
-        'what = thing',
-        'who = person',
-        'where = place',
-        'when = time',
-        'why = reason',
-        'how = way',
-        'which = choice',
-        'whose = owner',
-        'whom = object person',
+        'what = что / какой',
+        'who = кто',
+        'where = где / куда',
+        'when = когда',
+        'why = почему',
+        'how = как',
+        'which = какой из вариантов',
+        'whose = чей',
+        'whom = кого / кому',
       ];
       const gap = 10;
       const itemW = (cardW - 44 - gap * (cols - 1)) / cols;
@@ -987,7 +987,7 @@
     const cardH = h - cardY - (phone ? 82 : 100);
     fillRound(cardX, cardY, cardW, cardH, 22, 'rgba(255,255,255,.8)', 'rgba(31, 82, 105, .16)', 1);
 
-    drawChip('Exercise', cardX + 20, cardY + 18, '#173047', '#ffffff');
+    drawChip('Задание', cardX + 20, cardY + 18, '#173047', '#ffffff');
     let y = cardY + (phone ? 48 : 64);
     y = drawWrappedText(step.title, cardX + 22, y, cardW - 44, {
       size: phone ? 21 : 32,
@@ -1030,7 +1030,7 @@
     if (answer) {
       const good = answer.selected === step.answer;
       fillRound(cardX + 20, feedbackY, cardW - 40, phone ? 62 : 82, 16, good ? '#e7f7f3' : '#fff2e8', good ? '#56a99e' : '#db8b61', 1.2);
-      drawWrappedText(good ? 'Correct. ' + step.explain : 'Not this time. ' + step.explain, cardX + 38, feedbackY + 12, cardW - 76, {
+      drawWrappedText(good ? 'Верно. ' + step.explain : 'Пока нет. ' + step.explain, cardX + 38, feedbackY + 12, cardW - 76, {
         size: phone ? 12 : 16,
         lineHeight: phone ? 15 : 22,
         weight: 850,
@@ -1038,7 +1038,7 @@
         linkColor: '#174a63',
       });
     } else {
-      drawWrappedText('Choose one answer. You can tap underlined words for dictionary help.', cardX + 22, feedbackY + 8, cardW - 44, {
+      drawWrappedText('Выбери один ответ. На подчеркнутые английские слова можно нажать: появится перевод.', cardX + 22, feedbackY + 8, cardW - 44, {
         size: phone ? 12 : 15,
         lineHeight: phone ? 15 : 20,
         weight: 800,
@@ -1075,13 +1075,13 @@
   function drawFooterNav(w, h, pad, nextDisabled) {
     const y = h - (w < 720 ? 66 : 76);
     const bw = w < 720 ? 112 : 146;
-    drawButton('prev', pad, y, bw, 52, 'Back', {
+    drawButton('prev', pad, y, bw, 52, 'Назад', {
       kind: 'ghost',
       disabled: state.stepIndex === 0,
     });
-    const nextLabel = state.stepIndex === STEPS.length - 1 ? 'Finish' : 'Next';
+    const nextLabel = state.stepIndex === STEPS.length - 1 ? 'Финиш' : 'Далее';
     drawButton('next', w - pad - bw, y, bw, 52, nextLabel, { disabled: nextDisabled });
-    drawButton('home', pad + bw + 12, y, w < 720 ? 96 : 128, 52, 'Home', { kind: 'ghost' });
+    drawButton('home', pad + bw + 12, y, w < 720 ? 96 : 128, 52, 'Начало', { kind: 'ghost' });
   }
 
   function getScore() {
@@ -1104,10 +1104,10 @@
     const panelH = h - pad * 2;
     fillRound(panelX, panelY, panelW, panelH, 24, 'rgba(255,255,255,.8)', 'rgba(31, 82, 105, .18)', 1);
 
-    drawChip('Completed', panelX + 24, panelY + 24, '#173047', '#ffffff');
+    drawChip('Готово', panelX + 24, panelY + 24, '#173047', '#ffffff');
     drawChip(state.submitStatus, panelX + 150, panelY + 24, state.submitted ? '#e7f7f3' : '#fff2e8', state.submitted ? '#185d55' : '#7a3f26');
 
-    drawWrappedText(percent >= 80 ? 'Strong question-word control' : 'Good session: review the map once more', panelX + 24, panelY + 78, panelW - 48, {
+    drawWrappedText(percent >= 80 ? 'Отлично: вопросительные слова понятны' : 'Хорошая работа: повтори карту еще раз', panelX + 24, panelY + 78, panelW - 48, {
       size: phone ? 28 : 42,
       lineHeight: phone ? 34 : 48,
       weight: 900,
@@ -1127,10 +1127,10 @@
 
     const statsY = scoreY + (phone ? 126 : 156);
     const stats = [
-      ['Name', state.profile.name || '-'],
-      ['Group', state.profile.group || '-'],
-      ['Time', formatDuration((state.finishedAt || Date.now()) - (state.startedAt || Date.now()))],
-      ['Session', state.sessionId || '-'],
+      ['Имя', state.profile.name || '-'],
+      ['Группа', state.profile.group || '-'],
+      ['Время', formatDuration((state.finishedAt || Date.now()) - (state.startedAt || Date.now()))],
+      ['Сессия', state.sessionId || '-'],
     ];
     const cols = phone ? 1 : 2;
     const gap = 10;
@@ -1151,7 +1151,7 @@
     const missed = STEPS.filter(step => step.type === 'quiz' && state.answers[step.id] && !state.answers[step.id].correct).slice(0, 3);
     const reviewY = statsY + Math.ceil(stats.length / cols) * (boxH + gap) + 14;
     if (missed.length) {
-      drawWrappedText('Review focus: ' + missed.map(step => step.title).join(', '), panelX + 24, reviewY, panelW - 48, {
+      drawWrappedText('Повтори: ' + missed.map(step => step.title).join(', '), panelX + 24, reviewY, panelW - 48, {
         size: phone ? 14 : 16,
         lineHeight: phone ? 19 : 22,
         weight: 850,
@@ -1159,7 +1159,7 @@
         linkColor: '#174a63',
       });
     } else {
-      drawWrappedText('Clean run. You matched every question word to its answer type.', panelX + 24, reviewY, panelW - 48, {
+      drawWrappedText('Без ошибок. Ты связал каждое вопросительное слово с типом ответа.', panelX + 24, reviewY, panelW - 48, {
         size: phone ? 14 : 16,
         lineHeight: phone ? 19 : 22,
         weight: 850,
@@ -1169,8 +1169,8 @@
     }
 
     const buttonY = h - (phone ? 150 : 128);
-    drawButton('resend', panelX + 24, buttonY, phone ? panelW - 48 : 190, 56, 'Send again');
-    drawButton('restart', phone ? panelX + 24 : panelX + 232, phone ? buttonY + 68 : buttonY, phone ? panelW - 48 : 170, 56, 'Restart', { kind: 'ghost' });
+    drawButton('resend', panelX + 24, buttonY, phone ? panelW - 48 : 190, 56, 'Отправить');
+    drawButton('restart', phone ? panelX + 24 : panelX + 232, phone ? buttonY + 68 : buttonY, phone ? panelW - 48 : 170, 56, 'Сначала', { kind: 'ghost' });
   }
 
   function formatDuration(ms) {
@@ -1258,7 +1258,7 @@
   }
 
   function startSession() {
-    state.profile.name = state.profile.name.trim() || 'Student';
+    state.profile.name = state.profile.name.trim() || 'Студент';
     state.profile.group = state.profile.group.trim();
     saveProfile();
     state.screen = 'lesson';
@@ -1267,7 +1267,7 @@
     state.startedAt = Date.now();
     state.finishedAt = null;
     state.submitted = false;
-    state.submitStatus = 'Waiting';
+    state.submitStatus = 'Ждет';
     state.sessionId = makeSessionId();
     state.tooltip = null;
     state.activeField = null;
@@ -1300,11 +1300,11 @@
     try {
       responseForm.submit();
       state.submitted = true;
-      state.submitStatus = force ? 'Sent again' : 'Sent';
+      state.submitStatus = force ? 'Отправлено снова' : 'Отправлено';
       localStorage.setItem(STORAGE_KEYS.result, JSON.stringify(payload));
     } catch (error) {
       state.submitted = false;
-      state.submitStatus = 'Send blocked';
+      state.submitStatus = 'Отправка заблокирована';
     }
   }
 
@@ -1402,7 +1402,7 @@
       state.startedAt = null;
       state.finishedAt = null;
       state.submitted = false;
-      state.submitStatus = 'Waiting';
+      state.submitStatus = 'Ждет';
       state.tooltip = null;
       requestRender();
       return true;
