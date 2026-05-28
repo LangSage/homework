@@ -1,6 +1,8 @@
 const root = document.getElementById("lessonRoot");
 const tip = document.getElementById("tip");
 const checkBtn = document.getElementById("checkBtn");
+const backBtn = document.getElementById("backBtn");
+const nextBtn = document.getElementById("nextBtn");
 const clearBtn = document.getElementById("clearBtn");
 const sendBtn = document.getElementById("sendBtn");
 const legendBtn = document.getElementById("legendBtn");
@@ -8,17 +10,25 @@ const legend = document.getElementById("legend");
 const legendClose = document.getElementById("legendClose");
 const studentName = document.getElementById("studentName");
 const scoreText = document.getElementById("scoreText");
-const shieldCanvas = document.getElementById("shieldCanvas");
-const saveKey = "psTravelHomeworkProgressV2";
+const saveKey = "psTravelSequentialProgress";
 const formBase = "https://docs.google.com/forms/d/e/1FAIpQLSeUzYUvQbbzo_1r81AacP6Kj7HlKDzEVfa93Dam39LiVjcItA/formResponse";
+
+const steps = Array.from(root.querySelectorAll(".panel, .task-card"));
+let currentStep = 0;
 
 document.documentElement.setAttribute("translate", "no");
 document.body.setAttribute("translate", "no");
-document.body.classList.add("lock-select");
+document.body.classList.add("lock-select", "sequential-mode");
 
-document.querySelectorAll(".panel, .task-card").forEach((slide, index) => {
-  slide.classList.add("slide");
-  slide.dataset.slide = String(index + 1);
+steps.forEach((step, index) => {
+  step.classList.add("lesson-step");
+  step.dataset.step = String(index + 1);
+  if (!step.querySelector(".step-badge")) {
+    const badge = document.createElement("div");
+    badge.className = "step-badge no-copy";
+    badge.textContent = `Step ${index + 1} / ${steps.length}`;
+    step.prepend(badge);
+  }
 });
 
 ["copy", "cut", "contextmenu", "dragstart"].forEach((eventName) => {
@@ -43,14 +53,74 @@ function normalize(value) {
     .toLowerCase();
 }
 
-function checkAnswers() {
+function words(value) {
+  return String(value || "").trim().split(/\s+/).filter(Boolean).length;
+}
+
+function currentFields() {
+  return Array.from(steps[currentStep].querySelectorAll("input, textarea, select"));
+}
+
+function showStep(index) {
+  currentStep = Math.max(0, Math.min(index, steps.length - 1));
+  steps.forEach((step, stepIndex) => {
+    step.classList.toggle("is-active", stepIndex === currentStep);
+  });
+  backBtn.disabled = currentStep === 0;
+  nextBtn.textContent = currentStep === steps.length - 1 ? "Finish" : "Continue";
+  scoreText.textContent = `Step ${currentStep + 1}/${steps.length}`;
+  document.querySelector(".lesson-shell-anchor")?.scrollIntoView({ block: "start" });
+  saveProgress();
+}
+
+function validateStep(mark = true) {
+  const fields = currentFields();
+  if (!fields.length) return true;
+
+  let ok = true;
+  let answered = false;
+
+  fields.forEach((field) => {
+    const value = field.value.trim();
+    const expected = field.dataset.answer;
+    field.classList.remove("correct", "wrong");
+
+    if (value) answered = true;
+
+    if (expected) {
+      const isCorrect = normalize(value) === normalize(expected);
+      if (!isCorrect) ok = false;
+      if (mark && value) field.classList.add(isCorrect ? "correct" : "wrong");
+      if (!value) ok = false;
+      return;
+    }
+
+    if (field.tagName === "TEXTAREA" && words(value) < 4) ok = false;
+    if (field.tagName !== "TEXTAREA" && !value) ok = false;
+  });
+
+  if (!answered) {
+    scoreText.textContent = "Answer first";
+    return false;
+  }
+
+  if (!ok) {
+    scoreText.textContent = "Check this step";
+    return false;
+  }
+
+  scoreText.textContent = "Good";
+  return true;
+}
+
+function checkAllAnswers() {
   let checked = 0;
   let correct = 0;
 
   document.querySelectorAll("[data-answer]").forEach((field) => {
     const answer = normalize(field.dataset.answer);
     const value = normalize(field.value);
-    if (!answer || !value) {
+    if (!value) {
       field.classList.remove("correct", "wrong");
       return;
     }
@@ -62,59 +132,8 @@ function checkAnswers() {
     field.classList.toggle("wrong", !ok);
   });
 
-  scoreText.textContent = checked ? `${correct}/${checked} checked` : "Write answers first";
-  saveProgress();
   return { checked, correct };
 }
-
-function clearWork() {
-  document.querySelectorAll("input, textarea, select").forEach((field) => {
-    field.value = "";
-    field.classList.remove("correct", "wrong");
-  });
-  scoreText.textContent = "";
-  localStorage.removeItem(saveKey);
-  document.cookie = `${saveKey}=; Max-Age=0; path=/`;
-}
-
-checkBtn.addEventListener("click", checkAnswers);
-clearBtn.addEventListener("click", clearWork);
-sendBtn.addEventListener("click", sendResults);
-
-legendBtn.addEventListener("click", () => {
-  legend.hidden = false;
-  window.clearTimeout(legend.hideTimer);
-  legend.hideTimer = window.setTimeout(() => { legend.hidden = true; }, 12000);
-});
-
-legendClose.addEventListener("click", () => { legend.hidden = true; });
-
-document.addEventListener("input", (event) => {
-  if (event.target.matches("input, textarea, select")) saveProgress();
-});
-
-document.addEventListener("change", (event) => {
-  if (event.target.matches("input, textarea, select")) saveProgress();
-});
-
-function showTip(button, entry) {
-  const rect = button.getBoundingClientRect();
-  tip.innerHTML = `<b>${entry.emoji ? `${entry.emoji} ` : ""}${entry.word}</b><br>${entry.translation}`;
-  tip.hidden = false;
-  const left = Math.min(rect.left, window.innerWidth - tip.offsetWidth - 12);
-  const top = rect.bottom + tip.offsetHeight + 14 > window.innerHeight
-    ? rect.top - tip.offsetHeight - 10
-    : rect.bottom + 10;
-  tip.style.left = `${Math.max(12, left)}px`;
-  tip.style.top = `${Math.max(12, top)}px`;
-}
-
-function hideTip(event) {
-  if (!event.target.closest(".vocab-word")) tip.hidden = true;
-}
-
-document.addEventListener("click", hideTip);
-window.addEventListener("scroll", () => { tip.hidden = true; }, { passive: true });
 
 function fieldId(field, index) {
   if (!field.dataset.saveId) field.dataset.saveId = `field-${index}`;
@@ -127,6 +146,7 @@ function getFields() {
 
 function saveProgress() {
   const data = {
+    step: currentStep,
     updatedAt: new Date().toISOString(),
     fields: {}
   };
@@ -149,14 +169,25 @@ function loadProgress() {
       const value = data.fields?.[fieldId(field, index)];
       if (typeof value === "string") field.value = value;
     });
-    scoreText.textContent = "progress saved";
+    currentStep = Math.min(Number(data.step) || 0, steps.length - 1);
   } catch {
     localStorage.removeItem(saveKey);
   }
 }
 
+function clearWork() {
+  getFields().forEach((field) => {
+    field.value = "";
+    field.classList.remove("correct", "wrong");
+  });
+  currentStep = 0;
+  localStorage.removeItem(saveKey);
+  document.cookie = `${saveKey}=; Max-Age=0; path=/`;
+  showStep(0);
+}
+
 function buildResults() {
-  const score = checkAnswers();
+  const score = checkAllAnswers();
   const tasks = Array.from(document.querySelectorAll("[data-task]")).map((task, index) => {
     const fields = Array.from(task.querySelectorAll("input, textarea, select"));
     const checkedFields = fields.filter((field) => field.dataset.answer);
@@ -221,6 +252,51 @@ function sendResults() {
   }, 5000);
 }
 
+checkBtn.addEventListener("click", () => validateStep(true));
+backBtn.addEventListener("click", () => showStep(currentStep - 1));
+nextBtn.addEventListener("click", () => {
+  if (!validateStep(true)) return;
+  if (currentStep === steps.length - 1) {
+    sendResults();
+    return;
+  }
+  showStep(currentStep + 1);
+});
+clearBtn.addEventListener("click", clearWork);
+sendBtn.addEventListener("click", sendResults);
+
+legendBtn.addEventListener("click", () => {
+  legend.hidden = false;
+  window.clearTimeout(legend.hideTimer);
+  legend.hideTimer = window.setTimeout(() => { legend.hidden = true; }, 12000);
+});
+
+legendClose.addEventListener("click", () => { legend.hidden = true; });
+
+document.addEventListener("input", (event) => {
+  if (event.target.matches("input, textarea, select")) saveProgress();
+});
+
+document.addEventListener("change", (event) => {
+  if (event.target.matches("input, textarea, select")) saveProgress();
+});
+
+function showTip(button, entry) {
+  const rect = button.getBoundingClientRect();
+  tip.innerHTML = `<b>${entry.emoji ? `${entry.emoji} ` : ""}${entry.word}</b><br>${entry.translation}`;
+  tip.hidden = false;
+  const left = Math.min(rect.left, window.innerWidth - tip.offsetWidth - 12);
+  const top = rect.bottom + tip.offsetHeight + 14 > window.innerHeight
+    ? rect.top - tip.offsetHeight - 10
+    : rect.bottom + 10;
+  tip.style.left = `${Math.max(12, left)}px`;
+  tip.style.top = `${Math.max(12, top)}px`;
+}
+
+document.addEventListener("click", (event) => {
+  if (!event.target.closest(".vocab-word")) tip.hidden = true;
+});
+
 async function loadVocabulary() {
   try {
     const response = await fetch("words_fixed.json", { cache: "force-cache" });
@@ -247,12 +323,12 @@ async function loadVocabulary() {
 function wrapText(container, dict) {
   const used = new Map();
   let totalWrapped = 0;
-  const maxTotal = 360;
-  const maxPerWord = 3;
+  const maxTotal = 280;
+  const maxPerWord = 2;
   const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT, {
     acceptNode(node) {
       const parent = node.parentElement;
-      if (!parent || parent.closest("input, textarea, select, button, script, style")) {
+      if (!parent || parent.closest("input, textarea, select, button, label, .task-head, .step-badge, script, style")) {
         return NodeFilter.FILTER_REJECT;
       }
       return /[A-Za-z]/.test(node.nodeValue) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
@@ -293,25 +369,10 @@ function wrapText(container, dict) {
   });
 }
 
-function drawShield() {
-  const ratio = window.devicePixelRatio || 1;
-  shieldCanvas.width = Math.floor(window.innerWidth * ratio);
-  shieldCanvas.height = Math.floor(window.innerHeight * ratio);
-  const ctx = shieldCanvas.getContext("2d");
-  ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
-  ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-  ctx.fillStyle = "#1f7a74";
-  ctx.font = "700 15px Segoe UI, Arial";
-  ctx.rotate(-Math.PI / 9);
+const anchor = document.createElement("div");
+anchor.className = "lesson-shell-anchor";
+document.querySelector(".layout").prepend(anchor);
 
-  for (let x = -window.innerWidth; x < window.innerWidth * 1.4; x += 240) {
-    for (let y = 0; y < window.innerHeight * 1.8; y += 140) {
-      ctx.fillText("Past Simple Travel", x, y);
-    }
-  }
-}
-
-window.addEventListener("resize", drawShield);
-drawShield();
 loadProgress();
+showStep(currentStep);
 loadVocabulary();

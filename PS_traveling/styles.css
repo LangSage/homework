@@ -17,7 +17,7 @@
 
 html {
   scroll-behavior: smooth;
-  scroll-snap-type: y proximity;
+  scroll-snap-type: none;
   -webkit-text-size-adjust: 100%;
 }
 
@@ -39,22 +39,11 @@ body.lock-select,
   user-select: none;
 }
 
-#shieldCanvas {
-  position: fixed;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  opacity: .08;
-  z-index: 20;
-}
-
 .hero {
-  min-height: 55vh;
-  scroll-snap-align: start;
+  min-height: 42vh;
   display: grid;
   align-items: end;
-  padding: 8vh clamp(18px, 5vw, 72px) 46px;
+  padding: 7vh clamp(18px, 5vw, 72px) 34px;
   background:
     linear-gradient(135deg, rgba(22, 70, 68, .86), rgba(31, 122, 116, .72)),
     url("https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1600&q=80") center / cover;
@@ -119,40 +108,14 @@ h3 {
 }
 
 .layout {
-  width: min(1180px, 100%);
+  width: min(960px, 100%);
   margin: 0 auto;
   padding: 28px clamp(14px, 3vw, 28px) 130px;
-  display: grid;
-  grid-template-columns: 210px minmax(0, 1fr);
-  gap: 24px;
+  display: block;
 }
 
 .progress {
-  position: sticky;
-  top: 18px;
-  align-self: start;
-  padding: 16px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: rgba(255, 255, 255, .86);
-  box-shadow: 0 8px 22px rgba(30, 37, 34, .08);
-}
-
-.progress strong {
-  display: block;
-  margin-bottom: 12px;
-}
-
-.progress a {
-  display: block;
-  padding: 9px 8px;
-  color: var(--ink);
-  text-decoration: none;
-  border-radius: 6px;
-}
-
-.progress a:hover {
-  background: var(--mint);
+  display: none;
 }
 
 .content {
@@ -163,17 +126,36 @@ h3 {
 .task-card {
   position: relative;
   overflow: hidden;
-  margin-bottom: 18px;
+  margin: 0;
   padding: clamp(18px, 3vw, 30px);
-  min-height: calc(100vh - 156px);
-  scroll-snap-align: start;
-  display: flex;
+  min-height: min(640px, calc(100vh - 162px));
+  display: none;
   flex-direction: column;
   justify-content: center;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: rgba(255, 255, 255, .94);
   box-shadow: var(--shadow);
+}
+
+.lesson-step.is-active {
+  display: flex;
+}
+
+.lesson-shell-anchor {
+  display: block;
+  height: 1px;
+}
+
+.step-badge {
+  align-self: flex-start;
+  margin-bottom: 16px;
+  padding: 7px 11px;
+  border-radius: 999px;
+  background: #e8eee9;
+  color: var(--muted);
+  font-size: .82rem;
+  font-weight: 850;
 }
 
 .task-card > *,
@@ -257,7 +239,8 @@ ol {
 }
 
 label {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: 7px;
   line-height: 1.45;
   font-weight: 650;
@@ -360,6 +343,11 @@ button {
   cursor: pointer;
 }
 
+button:disabled {
+  opacity: .45;
+  cursor: default;
+}
+
 #clearBtn {
   background: #e8eee9;
   color: var(--ink);
@@ -414,27 +402,8 @@ button {
 
 @media (max-width: 860px) {
   .hero {
-    min-height: 48vh;
+    min-height: 38vh;
     padding-top: 7vh;
-  }
-
-  .layout {
-    grid-template-columns: 1fr;
-  }
-
-  .progress {
-    position: static;
-    display: flex;
-    gap: 6px;
-    overflow-x: auto;
-  }
-
-  .progress strong {
-    display: none;
-  }
-
-  .progress a {
-    white-space: nowrap;
   }
 
   .rule-grid,
@@ -446,7 +415,7 @@ button {
 
 @media (max-width: 520px) {
   .hero {
-    min-height: 54vh;
+    min-height: 34vh;
   }
 
   .task-head {
@@ -457,12 +426,19 @@ button {
   .panel,
   .task-card {
     padding: 18px;
-    min-height: calc(100vh - 142px);
+    min-height: calc(100vh - 240px);
+    justify-content: flex-start;
+  }
+
+  .layout {
+    padding-bottom: 270px;
   }
 
   .toolbar {
     flex-wrap: wrap;
     bottom: 8px;
+    max-height: 220px;
+    overflow-y: auto;
   }
 
   .toolbar button {
