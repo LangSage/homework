@@ -261,7 +261,7 @@ textarea {
 }
 
 .student-name {
-  width: min(170px, 24vw);
+  width: min(190px, 32vw);
   flex: 0 0 auto;
 }
 
@@ -318,7 +318,7 @@ select.wrong {
   left: 50%;
   bottom: 16px;
   transform: translateX(-50%);
-  width: min(920px, calc(100vw - 24px));
+  width: min(650px, calc(100vw - 24px));
   display: flex;
   align-items: center;
   gap: 10px;
@@ -348,17 +348,8 @@ button:disabled {
   cursor: default;
 }
 
-#clearBtn {
-  background: #e8eee9;
-  color: var(--ink);
-}
-
 #legendBtn {
   background: var(--blue);
-}
-
-#sendBtn {
-  background: var(--coral);
 }
 
 #scoreText {
@@ -431,18 +422,18 @@ button:disabled {
   }
 
   .layout {
-    padding-bottom: 270px;
+    padding-bottom: 210px;
   }
 
   .toolbar {
     flex-wrap: wrap;
     bottom: 8px;
-    max-height: 220px;
+    max-height: 170px;
     overflow-y: auto;
   }
 
   .toolbar button {
-    flex: 1 1 120px;
+    flex: 1 1 86px;
   }
 
   .student-name {

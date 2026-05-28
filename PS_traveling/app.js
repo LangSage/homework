@@ -1,10 +1,7 @@
 const root = document.getElementById("lessonRoot");
 const tip = document.getElementById("tip");
-const checkBtn = document.getElementById("checkBtn");
 const backBtn = document.getElementById("backBtn");
 const nextBtn = document.getElementById("nextBtn");
-const clearBtn = document.getElementById("clearBtn");
-const sendBtn = document.getElementById("sendBtn");
 const legendBtn = document.getElementById("legendBtn");
 const legend = document.getElementById("legend");
 const legendClose = document.getElementById("legendClose");
@@ -67,7 +64,7 @@ function showStep(index) {
     step.classList.toggle("is-active", stepIndex === currentStep);
   });
   backBtn.disabled = currentStep === 0;
-  nextBtn.textContent = currentStep === steps.length - 1 ? "Finish" : "Continue";
+  nextBtn.textContent = currentStep === steps.length - 1 ? "Finish" : "Next";
   scoreText.textContent = `Step ${currentStep + 1}/${steps.length}`;
   document.querySelector(".lesson-shell-anchor")?.scrollIntoView({ block: "start" });
   saveProgress();
@@ -175,17 +172,6 @@ function loadProgress() {
   }
 }
 
-function clearWork() {
-  getFields().forEach((field) => {
-    field.value = "";
-    field.classList.remove("correct", "wrong");
-  });
-  currentStep = 0;
-  localStorage.removeItem(saveKey);
-  document.cookie = `${saveKey}=; Max-Age=0; path=/`;
-  showStep(0);
-}
-
 function buildResults() {
   const score = checkAllAnswers();
   const tasks = Array.from(document.querySelectorAll("[data-task]")).map((task, index) => {
@@ -245,14 +231,13 @@ function sendResults() {
 
   document.body.appendChild(form);
   form.submit();
-  scoreText.textContent = `sent: ${payload.score}/${payload.checked}`;
+  scoreText.textContent = `Sent ${payload.score}/${payload.checked}`;
   window.setTimeout(() => {
     iframe.remove();
     form.remove();
   }, 5000);
 }
 
-checkBtn.addEventListener("click", () => validateStep(true));
 backBtn.addEventListener("click", () => showStep(currentStep - 1));
 nextBtn.addEventListener("click", () => {
   if (!validateStep(true)) return;
@@ -262,8 +247,6 @@ nextBtn.addEventListener("click", () => {
   }
   showStep(currentStep + 1);
 });
-clearBtn.addEventListener("click", clearWork);
-sendBtn.addEventListener("click", sendResults);
 
 legendBtn.addEventListener("click", () => {
   legend.hidden = false;
