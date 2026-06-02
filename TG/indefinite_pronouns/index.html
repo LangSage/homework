@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Indefinite Pronouns – Sequential Trainer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Your streak animation styles -->
+  <link rel="stylesheet" href="streak-animations.css" />
+
+  <style>
+    :root {
+      --bg: #020617;
+      --card: #060012;
+      --accent: #e879f9;
+      --accent-soft: rgba(232, 121, 249, 0.18);
+      --accent-strong: #f97316;
+      --text: #f9fafb;
+      --muted: #cbd5f5;
+      --border: #312e81;
+      --danger: #fecaca;
+      --success: #bbf7d0;
+      --radius-lg: 20px;
+      --radius-md: 12px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at top left, #1f2937 0, transparent 55%),
+        radial-gradient(circle at bottom right, #4c1d95 0, #020617 60%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .page {
+      width: 100%;
+      max-width: 900px;
+      margin: 0 auto 40px;
+    }
+
+    .card {
+      background: radial-gradient(circle at top, #1e0b3a 0, #020617 55%);
+      border-radius: 26px;
+      border: 1px solid rgba(129, 140, 248, 0.4);
+      box-shadow:
+        0 30px 80px rgba(0,0,0,0.7),
+        0 0 0 1px rgba(15,23,42,0.8);
+      overflow: hidden;
+    }
+
+    .card-header {
+      padding: 18px 18px 12px;
+      background:
+        radial-gradient(circle at top left, rgba(232,121,249,0.35), transparent 55%),
+        linear-gradient(135deg, rgba(15,23,42,0.9), rgba(15,23,42,0.9));
+      border-bottom: 1px solid rgba(129,140,248,0.5);
+    }
+
+    .title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .title-main {
+      font-size: 1.5rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      letter-spacing: 0.02em;
+    }
+
+    .title-main span.emoji { font-size: 1.7rem; }
+
+    .title-sub {
+      font-size: 0.9rem;
+      color: var(--muted);
+      margin-top: 6px;
+      max-width: 420px;
+    }
+
+    .badge {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.11em;
+      border-radius: 999px;
+      padding: 4px 10px;
+      border: 1px solid rgba(191,219,254,0.7);
+      color: #e0f2fe;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+      background: radial-gradient(circle at left, rgba(56,189,248,0.3), rgba(15,23,42,0.9));
+    }
+
+    .badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: #22c55e;
+      box-shadow: 0 0 12px rgba(34,197,94,0.9);
+    }
+
+    .card-body {
+      padding: 16px 16px 20px;
+    }
+
+    @media (min-width: 640px) {
+      .card-header { padding: 22px 24px 16px; }
+      .card-body { padding: 20px 24px 24px; }
+      .title-main { font-size: 1.7rem; }
+    }
+
+    .section {
+      margin-bottom: 18px;
+      padding: 14px 14px 16px;
+      border-radius: var(--radius-lg);
+      background: radial-gradient(circle at top left, rgba(76,29,149,0.6), #020617);
+      border: 1px solid rgba(129,140,248,0.6);
+    }
+
+    .section.alt {
+      background: radial-gradient(circle at top right, rgba(248,113,113,0.55), #020617);
+      border-color: rgba(248,113,113,0.7);
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      gap: 8px;
+    }
+
+    .section-title {
+      font-size: 1rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-title span.icon { font-size: 1.2rem; }
+
+    .section-tag {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .section-body {
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .two-col {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    @media (min-width: 640px) {
+      .two-col { flex-direction: row; }
+      .two-col > .field-row { flex: 1; }
+    }
+
+    .field-group {
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .field-row {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .field-label {
+      font-size: 0.85rem;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .field-label span.req {
+      color: var(--accent);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .small-hint {
+      font-size: 0.7rem;
+      color: #9ca3af;
+    }
+
+    input[type="text"],
+    select {
+      width: 100%;
+      background: rgba(15,23,42,0.95);
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(129,140,248,0.7);
+      padding: 8px 10px;
+      color: var(--text);
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+    }
+
+    input[type="text"]:focus,
+    select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(232,121,249,0.7);
+      background: rgba(15,23,42,1);
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .pill {
+      font-size: 0.76rem;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(129,140,248,0.7);
+      color: var(--muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(15,23,42,0.96);
+    }
+
+    .pill strong { color: var(--accent); font-weight: 500; }
+
+    .quote-box {
+      margin-top: 10px;
+      padding: 8px 10px;
+      border-radius: var(--radius-md);
+      background: rgba(15,23,42,0.95);
+      border: 1px dashed rgba(148,163,184,0.7);
+      font-size: 0.83rem;
+      color: #e5e7eb;
+    }
+
+    .quote-box em { color: #c4b5fd; }
+
+    /* Trainer area */
+    .trainer-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .progress-badge {
+      padding: 3px 9px;
+      border-radius: 999px;
+      border: 1px solid rgba(129,140,248,0.7);
+      background: rgba(15,23,42,0.96);
+      font-size: 0.78rem;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(15,23,42,0.95);
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+
+    .progress-inner {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #f97316, #ec4899, #38bdf8);
+      transition: width 0.25s ease-out;
+    }
+
+    .question-box {
+      padding: 10px;
+      border-radius: var(--radius-lg);
+      background: #020617;
+      border: 1px solid rgba(31,41,55,0.9);
+    }
+
+    .question-text {
+      font-size: 1rem;
+      margin-bottom: 10px;
+      color: #e5e7eb;
+    }
+
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .option-btn {
+      border-radius: 999px;
+      border: 1px solid rgba(129,140,248,0.8);
+      background: rgba(15,23,42,0.96);
+      color: var(--muted);
+      padding: 7px 10px;
+      font-size: 0.9rem;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.12s ease, transform 0.08s ease, border-color 0.12s ease;
+    }
+
+    .option-btn span.bullet {
+      width: 20px;
+      height: 20px;
+      border-radius: 999px;
+      background: rgba(55,65,81,0.9);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.78rem;
+      color: #e5e7eb;
+      flex-shrink: 0;
+    }
+
+    .option-btn:hover {
+      background: rgba(30,64,175,0.7);
+      transform: translateY(-1px);
+    }
+
+    .option-btn.correct {
+      border-color: #22c55e;
+      background: rgba(22,163,74,0.2);
+      color: #bbf7d0;
+    }
+
+    .option-btn.wrong {
+      border-color: #ef4444;
+      background: rgba(185,28,28,0.25);
+      color: #fecaca;
+    }
+
+    .feedback {
+      margin-top: 8px;
+      font-size: 0.85rem;
+      min-height: 1em;
+    }
+
+    .feedback.ok { color: #bbf7d0; }
+    .feedback.bad { color: #fecaca; }
+
+    .explanation-box {
+      margin-top: 8px;
+      padding: 7px 9px;
+      border-radius: var(--radius-md);
+      background: rgba(15,23,42,0.96);
+      border: 1px dashed rgba(248,250,252,0.6);
+      font-size: 0.82rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+    }
+
+    .explanation-icon {
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+
+    .hidden { display: none; }
+
+    .summary-box {
+      margin-top: 10px;
+      padding: 8px 10px;
+      border-radius: var(--radius-md);
+      background: rgba(15,23,42,0.96);
+      border: 1px solid rgba(129,140,248,0.7);
+      font-size: 0.85rem;
+    }
+
+    .submit-row {
+      margin-top: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: stretch;
+    }
+
+    .btn-primary {
+      border: none;
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      background: linear-gradient(135deg, #f97316, #ec4899);
+      color: #0f172a;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 12px 30px rgba(236,72,153,0.6);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.6;
+      cursor: default;
+      box-shadow: none;
+    }
+
+    .btn-primary span.icon { font-size: 1.1rem; }
+
+    .status-bar {
+      font-size: 0.8rem;
+      text-align: center;
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(15,23,42,0.96);
+      border: 1px solid rgba(129,140,248,0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      min-height: 34px;
+    }
+
+    .status-bar span.dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+    }
+
+    .status-idle span.dot { background: rgba(148,163,184,0.9); }
+
+    .status-sending span.dot {
+      background: #f97316;
+      box-shadow: 0 0 12px rgba(249,115,22,0.9);
+    }
+
+    .status-success span.dot {
+      background: #22c55e;
+      box-shadow: 0 0 14px rgba(34,197,94,0.9);
+    }
+
+    .status-error span.dot {
+      background: #ef4444;
+      box-shadow: 0 0 14px rgba(239,68,68,0.9);
+    }
+
+    .status-sending::after {
+      content: "";
+      width: 12px;
+      height: 12px;
+      border-radius: 999px;
+      border: 2px solid rgba(148,163,184,0.6);
+      border-top-color: #f97316;
+      animation: spin 0.7s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .status-text { color: var(--muted); }
+    .status-success .status-text { color: var(--success); }
+    .status-error .status-text { color: var(--danger); }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="card">
+      <div class="card-header">
+        <div class="title-row">
+          <div>
+            <div class="title-main">
+              <span class="emoji">🧠</span>
+              <span>Indefinite Pronouns – 30-Question Trainer</span>
+            </div>
+
+          </div>
+          <div class="badge">
+            <span class="badge-dot"></span>
+            Sequential · Phone-friendly
+          </div>
+        </div>
+      </div>
+
+      <div class="card-body">
+        <!-- STUDENT INFO -->
+        <section class="section alt">
+          <div class="section-header">
+            <div class="section-title">
+              <span class="icon">👤</span>
+              <span>Student info</span>
+            </div>
+            <div class="section-tag">Fill this before sending</div>
+          </div>
+          <div class="section-body">
+            <div class="two-col field-group">
+              <div class="field-row">
+                <label class="field-label" for="studentName">
+                  <span>Full name</span>
+                  <span class="req">required</span>
+                </label>
+                <input type="text" id="studentName" placeholder="Example: Ivan Petrov" autocomplete="name" />
+              </div>
+              <div class="field-row">
+                <label class="field-label" for="studentGroup">
+                  <span>Group</span>
+                  <span class="req">required</span>
+                </label>
+                <select id="studentGroup">
+                  <option value="">Select your group</option>
+                  <option>ТГ.25А</option>
+                  <option>ТГ.23.2А</option>
+                  <option>ТГ.23.1А</option>
+                  <option>ОПУ22.2</option>
+                                <option>ОПУ22.1</option>
+                  <option>Other</option>
+                </select>
+              </div>
+            </div>
+            <p class="small-hint" style="margin-top:6px;">
+              Answers are sent to the same hidden Google Form as JSON. Students stay on this page – no Google window appears.
+            </p>
+          </div>
+        </section>
+
+        <!-- MINI THEORY -->
+        <section class="section">
+          <div class="section-header">
+            <div class="section-title">
+              <span class="icon">📚</span>
+              <span>Mini theory – indefinite pronouns</span>
+            </div>
+            <div class="section-tag">Short reminder in English + Russian</div>
+          </div>
+          <div class="section-body">
+            <div class="pill-row">
+              <div class="pill">
+                <strong>some</strong> – обычно в утвердительных
+                <span>👉 I have <strong>some</strong> friends.</span>
+              </div>
+              <div class="pill">
+                <strong>any</strong> – вопросы и отрицания
+                <span>👉 Do you have <strong>any</strong> money?</span>
+              </div>
+              <div class="pill">
+                <strong>no</strong> – значение «нет чего-то»
+                <span>👉 There is <strong>no</strong> time.</span>
+              </div>
+            </div>
+            <div class="pill-row" style="margin-top:6px;">
+              <div class="pill"><strong>somebody / someone</strong> – кто-то</div>
+              <div class="pill"><strong>anybody / anyone</strong> – кто-нибудь (в ? / -)</div>
+              <div class="pill"><strong>nobody / no one</strong> – никто</div>
+              <div class="pill"><strong>everybody / everyone</strong> – все</div>
+            </div>
+            <div class="pill-row" style="margin-top:6px;">
+              <div class="pill"><strong>something</strong> – что-то</div>
+              <div class="pill"><strong>anything</strong> – что-нибудь (в ? / -)</div>
+              <div class="pill"><strong>nothing</strong> – ничего</div>
+              <div class="pill"><strong>everything</strong> – всё</div>
+            </div>
+            <div class="pill-row" style="margin-top:6px;">
+              <div class="pill"><strong>somewhere</strong> – где-то</div>
+              <div class="pill"><strong>anywhere</strong> – где-нибудь (в ? / -)</div>
+              <div class="pill"><strong>nowhere</strong> – нигде</div>
+              <div class="pill"><strong>everywhere</strong> – всюду</div>
+            </div>
+
+            <div class="quote-box">
+              💡 <strong>Tip:</strong><br />
+              <em>Do you want something to drink?</em> – вежливое предложение → <strong>something</strong><br />
+              <em>I don’t want anything.</em> – отрицание с <strong>don’t</strong> → <strong>anything</strong>
+            </div>
+          </div>
+        </section>
+
+        <!-- TRAINER -->
+        <section class="section">
+          <div class="section-header">
+            <div class="section-title">
+              <span class="icon">🎮</span>
+              <span>Trainer – one question at a time</span>
+            </div>
+            <div class="section-tag">30 questions, all about indefinite pronouns</div>
+          </div>
+          <div class="section-body">
+            <div class="trainer-header">
+              <div id="questionCounter">Question 1 / 30</div>
+              <div class="progress-badge">
+                <span id="correctOnFirst">0 correct on first try</span>
+              </div>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-inner" id="progressInner"></div>
+            </div>
+
+            <div class="question-box">
+              <div class="question-text" id="questionText">
+                <!-- question text -->
+              </div>
+              <div class="options" id="optionsContainer">
+                <!-- options -->
+              </div>
+              <div class="feedback" id="feedback"></div>
+              <div class="explanation-box hidden" id="explanationBox">
+                <div class="explanation-icon">❓</div>
+                <div id="explanationText"></div>
+              </div>
+            </div>
+
+            <div class="summary-box hidden" id="summaryBox">
+              <strong>Отлично!</strong> Ты ответил(а) на все 30 вопросов. Теперь можешь отправить результат учителю.
+              <div id="summaryStats" style="margin-top:4px;"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- SUBMIT -->
+        <section class="section">
+          <div class="section-header">
+            <div class="section-title">
+              <span class="icon">📤</span>
+              <span>Send your result</span>
+            </div>
+          <div class="section-tag">Works only after all 30 questions are correct</div>
+          </div>
+          <div class="section-body">
+            <div class="submit-row">
+              <button type="button" class="btn-primary" id="submitBtn">
+                <span class="icon">🚀</span>
+                <span>Send result to teacher</span>
+              </button>
+              <div class="status-bar status-idle" id="statusBar">
+                <span class="dot"></span>
+                <span class="status-text">
+                  Отвечай на вопросы. Прогресс сохраняется на этом устройстве. После всех 30 вопросов можно отправить результат.
+                </span>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <!-- Streak animation container -->
+  <div id="streak-anim-container">
+    <div class="streak-bubble">
+      <div class="streak-confetti"></div>
+      <div id="streak-emoji" class="streak-emoji">⭐</div>
+      <div id="streak-text" class="streak-text">Nice! Keep going!</div>
+    </div>
+  </div>
+
+  <!-- Your streak logic -->
+  <script src="streak-animations.js"></script>
+
+  <script>
+    // === CONFIG: same Google Form as before ===
+    const GOOGLE_FORM_ACTION =
+      "https://docs.google.com/forms/d/e/1FAIpQLScNOJgyC8DP1x6Zb-QlEtAevEIgwaC8B7V58eXI3pENtmLHRQ/formResponse";
+
+    const ENTRY_NAME_GROUP = "entry.1921741824"; // Name + group
+    const ENTRY_JSON = "entry.1988412302";       // JSON payload
+
+    // === LOCAL STORAGE KEY ===
+    const STORAGE_KEY = "indefinite_trainer_seq_v1";
+
+    // === QUESTIONS (30 total) ===
+    const questions = [
+      // some / any / no
+      {
+        text: "I have ___ friends in this city.",
+        options: ["some", "any", "no"],
+        correct: "some",
+        explanation: "Здесь обычное утвердительное предложение, поэтому используем \"some\": I have some friends in this city."
+      },
+      {
+        text: "Do you have ___ questions?",
+        options: ["some", "any", "no"],
+        correct: "any",
+        explanation: "В вопросах обычно используется \"any\": Do you have any questions? – У тебя есть какие-нибудь вопросы?"
+      },
+      {
+        text: "There isn’t ___ milk in the fridge.",
+        options: ["some", "any", "no"],
+        correct: "any",
+        explanation: "Отрицание с isn’t → \"any\": There isn’t any milk in the fridge. – В холодильнике нет молока."
+      },
+      {
+        text: "We don’t have ___ lessons today.",
+        options: ["some", "any", "no"],
+        correct: "any",
+        explanation: "Отрицание с don’t → используем \"any\": We don’t have any lessons today. – У нас сегодня нет уроков."
+      },
+      {
+        text: "There is ___ water in the bottle.",
+        options: ["some", "any", "no"],
+        correct: "some",
+        explanation: "Утвердительное предложение, говорим \"some water\" – немного воды есть."
+      },
+      {
+        text: "Is there ___ sugar in your coffee?",
+        options: ["some", "any", "no"],
+        correct: "any",
+        explanation: "Вопрос об общем наличии → \"any\": Is there any sugar in your coffee?"
+      },
+      {
+        text: "There is ___ bus to the hotel. We need a taxi.",
+        options: ["some", "any", "no"],
+        correct: "no",
+        explanation: "\"There is no bus\" = автобуса нет, поэтому используем \"no\"."
+      },
+
+      // somebody / anybody / nobody / everybody
+      {
+        text: "I can’t see ___ in the room.",
+        options: ["somebody", "anybody", "nobody", "everybody"],
+        correct: "anybody",
+        explanation: "В отрицаниях обычно употребляем \"anybody\": I can’t see anybody in the room. – Я никого не вижу."
+      },
+      {
+        text: "___ is waiting for you at the reception.",
+        options: ["somebody", "anybody", "nobody", "everybody"],
+        correct: "somebody",
+        explanation: "\"Somebody\" – кто-то конкретный, но неизвестно кто: Somebody is waiting for you."
+      },
+      {
+        text: "___ knows the answer.",
+        options: ["somebody", "anybody", "nobody", "everybody"],
+        correct: "everybody",
+        explanation: "\"Everybody\" – все: Everybody knows the answer. – Все знают ответ."
+      },
+      {
+        text: "There was ___ in the corridor, it was completely empty.",
+        options: ["somebody", "anybody", "nobody", "everybody"],
+        correct: "nobody",
+        explanation: "\"Nobody\" = никто: There was nobody in the corridor. – В коридоре никого не было."
+      },
+      {
+        text: "Is ___ here from group TG.24A?",
+        options: ["somebody", "anybody", "nobody", "everybody"],
+        correct: "anybody",
+        explanation: "В общих вопросах чаще \"anybody\": Is anybody here from group TG.24A?"
+      },
+      {
+        text: "I want to talk to ___. I feel lonely.",
+        options: ["somebody", "anybody", "nobody", "everybody"],
+        correct: "somebody",
+        explanation: "\"Somebody\" – кто-то (мне нужен хоть кто-нибудь для разговора): I want to talk to somebody."
+      },
+      {
+        text: "___ called you, but they didn’t leave a name.",
+        options: ["somebody", "anybody", "nobody", "everybody"],
+        correct: "somebody",
+        explanation: "Кто-то конкретный звонил → \"somebody called you\"."
+      },
+      {
+        text: "___ is perfect, everyone can make mistakes.",
+        options: ["somebody", "anybody", "nobody", "everybody"],
+        correct: "nobody",
+        explanation: "\"Nobody is perfect\" – никто не идеален."
+      },
+
+      // something / anything / nothing / everything
+      {
+        text: "Would you like ___ to drink?",
+        options: ["something", "anything", "nothing", "everything"],
+        correct: "something",
+        explanation: "Вежливое предложение → обычно \"something\": Would you like something to drink?"
+      },
+      {
+        text: "I didn’t buy ___ at the shop.",
+        options: ["something", "anything", "nothing", "everything"],
+        correct: "anything",
+        explanation: "Отрицание с didn’t → \"anything\": I didn’t buy anything at the shop."
+      },
+      {
+        text: "There is ___ on your desk. It looks important.",
+        options: ["something", "anything", "nothing", "everything"],
+        correct: "something",
+        explanation: "\"Something\" – что-то конкретное (на столе лежит какая-то вещь)."
+      },
+      {
+        text: "She lost ___ important – her passport.",
+        options: ["something", "anything", "nothing", "everything"],
+        correct: "something",
+        explanation: "\"Something important\" – что-то важное: She lost something important."
+      },
+      {
+        text: "I can’t see ___ on the screen, it’s black.",
+        options: ["something", "anything", "nothing", "everything"],
+        correct: "anything",
+        explanation: "Отрицание с can’t → \"anything\": I can’t see anything on the screen."
+      },
+      {
+        text: "After the exam I want to do ___ and just relax.",
+        options: ["something", "anything", "nothing", "everything"],
+        correct: "nothing",
+        explanation: "\"Do nothing\" – ничего не делать: I want to do nothing and relax."
+      },
+      {
+        text: "He ate ___ in the fridge!",
+        options: ["something", "anything", "nothing", "everything"],
+        correct: "everything",
+        explanation: "\"Everything\" – всё: He ate everything in the fridge."
+      },
+      {
+        text: "Is there ___ interesting to watch on TV?",
+        options: ["something", "anything", "nothing", "everything"],
+        correct: "anything",
+        explanation: "Вопрос → чаще \"anything\": Is there anything interesting to watch on TV?"
+      },
+      {
+        text: "I have ___ special for you – a small gift.",
+        options: ["something", "anything", "nothing", "everything"],
+        correct: "something",
+        explanation: "\"Something special\" – что-то особенное: I have something special for you."
+      },
+      {
+        text: "We did ___ wrong, the project is great.",
+        options: ["something", "anything", "nothing", "everything"],
+        correct: "nothing",
+        explanation: "\"We did nothing wrong\" – мы ничего не сделали неправильно."
+      },
+
+      // somewhere / anywhere / nowhere / everywhere
+      {
+        text: "I can’t find my keys ___.",
+        options: ["somewhere", "anywhere", "nowhere", "everywhere"],
+        correct: "anywhere",
+        explanation: "Отрицание с can’t → \"anywhere\": I can’t find my keys anywhere. – Я нигде не могу найти ключи."
+      },
+      {
+        text: "Let’s go ___ quiet and drink coffee.",
+        options: ["somewhere", "anywhere", "nowhere", "everywhere"],
+        correct: "somewhere",
+        explanation: "\"Somewhere quiet\" – куда-нибудь в тихое место."
+      },
+      {
+        text: "There is trash ___ in the street. It looks terrible.",
+        options: ["somewhere", "anywhere", "nowhere", "everywhere"],
+        correct: "everywhere",
+        explanation: "\"Everywhere\" – повсюду: мусор везде на улице."
+      },
+      {
+        text: "There was ___ to sit, so we stood.",
+        options: ["somewhere", "anywhere", "nowhere", "everywhere"],
+        correct: "nowhere",
+        explanation: "\"Nowhere\" – нигде: There was nowhere to sit. – Сесть было негде."
+      },
+      {
+        text: "Did you go ___ interesting on your holiday?",
+        options: ["somewhere", "anywhere", "nowhere", "everywhere"],
+        correct: "anywhere",
+        explanation: "В общем вопросе о местах чаще \"anywhere\": Did you go anywhere interesting?"
+      }
+    ];
+
+    // === STATE ===
+    let currentIndex = 0;
+    let totalWrongAnswers = 0;
+    let correctOnFirstTry = 0;
+    let currentQuestionWrongTries = 0;
+    let finished = false;
+    let resultsSent = false;
+    const results = [];
+
+    // === DOM ===
+    const questionCounter = document.getElementById("questionCounter");
+    const progressInner = document.getElementById("progressInner");
+    const correctOnFirstLabel = document.getElementById("correctOnFirst");
+    const questionTextEl = document.getElementById("questionText");
+    const optionsContainer = document.getElementById("optionsContainer");
+    const feedbackEl = document.getElementById("feedback");
+    const explanationBox = document.getElementById("explanationBox");
+    const explanationText = document.getElementById("explanationText");
+    const summaryBox = document.getElementById("summaryBox");
+    const summaryStats = document.getElementById("summaryStats");
+    const submitBtn = document.getElementById("submitBtn");
+    const statusBar = document.getElementById("statusBar");
+
+    function setStatus(mode, text) {
+      statusBar.classList.remove("status-idle", "status-sending", "status-success", "status-error");
+      statusBar.classList.add(mode);
+      statusBar.querySelector(".status-text").textContent = text;
+    }
+
+    // === LOCAL STORAGE HELPERS ===
+    function saveState() {
+      try {
+        const state = {
+          currentIndex,
+          totalWrongAnswers,
+          correctOnFirstTry,
+          currentQuestionWrongTries,
+          finished,
+          results,
+          resultsSent
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch (e) {
+        console.error("Error saving state:", e);
+      }
+    }
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return;
+        const state = JSON.parse(raw);
+        if (!state || typeof state !== "object") return;
+
+        currentIndex = Number.isInteger(state.currentIndex) ? state.currentIndex : 0;
+        totalWrongAnswers = Number.isInteger(state.totalWrongAnswers) ? state.totalWrongAnswers : 0;
+        correctOnFirstTry = Number.isInteger(state.correctOnFirstTry) ? state.correctOnFirstTry : 0;
+        currentQuestionWrongTries = Number.isInteger(state.currentQuestionWrongTries) ? state.currentQuestionWrongTries : 0;
+        finished = !!state.finished;
+        resultsSent = !!state.resultsSent;
+
+        if (Array.isArray(state.results)) {
+          results.splice(0, results.length, ...state.results);
+        }
+      } catch (e) {
+        console.error("Error loading state:", e);
+      }
+    }
+
+    function updateProgress() {
+      const total = questions.length;
+      const current = Math.min(currentIndex + 1, total);
+      questionCounter.textContent = `Question ${current} / ${total}`;
+      const percent = (currentIndex / total) * 100;
+      progressInner.style.width = percent + "%";
+      correctOnFirstLabel.textContent = `${correctOnFirstTry} correct on first try`;
+    }
+
+    function clearFeedback() {
+      feedbackEl.textContent = "";
+      feedbackEl.classList.remove("ok", "bad");
+      explanationBox.classList.add("hidden");
+      explanationText.textContent = "";
+    }
+
+    function renderQuestion() {
+      clearFeedback();
+
+      if (currentIndex >= questions.length) {
+        finished = true;
+        progressInner.style.width = "100%";
+        questionCounter.textContent = `Question ${questions.length} / ${questions.length}`;
+        questionTextEl.textContent = "✅ All 30 questions are completed!";
+        optionsContainer.innerHTML = "";
+        summaryBox.classList.remove("hidden");
+        summaryStats.textContent =
+          `Ошибок: ${totalWrongAnswers}. С первого раза правильно: ${correctOnFirstTry} из ${questions.length}.`;
+        setStatus("status-success", "Ты закончил(а) тренировку. Теперь можно отправить результат учителю.");
+        if (window.Streak && typeof Streak.correct === "function") {
+          Streak.correct();
+        }
+        saveState();
+        return;
+      }
+
+      const q = questions[currentIndex];
+      questionTextEl.textContent = q.text;
+      optionsContainer.innerHTML = "";
+      summaryBox.classList.add("hidden");
+
+      q.options.forEach((opt, idx) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "option-btn";
+        btn.dataset.value = opt.toLowerCase();
+
+        const bullet = document.createElement("span");
+        bullet.className = "bullet";
+        bullet.textContent = String.fromCharCode(65 + idx); // A,B,C,D...
+
+        const text = document.createElement("span");
+        text.textContent = opt;
+
+        btn.appendChild(bullet);
+        btn.appendChild(text);
+
+        btn.addEventListener("click", () => handleAnswer(opt.toLowerCase(), btn));
+
+        optionsContainer.appendChild(btn);
+      });
+
+      updateProgress();
+      // currentQuestionWrongTries restored from state; do not reset if reloaded mid-question.
+    }
+
+    function handleAnswer(selected, btnEl) {
+      if (currentIndex >= questions.length) return;
+
+      const q = questions[currentIndex];
+      const isCorrect = selected === q.correct.toLowerCase();
+
+      // Reset option button styles
+      Array.from(optionsContainer.querySelectorAll(".option-btn")).forEach(b => {
+        b.classList.remove("correct", "wrong");
+      });
+
+      if (isCorrect) {
+        if (currentQuestionWrongTries === 0) {
+          correctOnFirstTry += 1;
+        }
+        feedbackEl.textContent = "✅ Правильно!";
+        feedbackEl.classList.remove("bad");
+        feedbackEl.classList.add("ok");
+        explanationBox.classList.add("hidden");
+        explanationText.textContent = "";
+
+        btnEl.classList.add("correct");
+
+        if (window.Streak && typeof Streak.correct === "function") {
+          Streak.correct();
+        }
+
+        // Save result for this question
+        results.push({
+          index: currentIndex + 1,
+          question: q.text,
+          options: q.options,
+          correct: q.correct,
+          finalAnswer: selected,
+          wrongTries: currentQuestionWrongTries
+        });
+
+        currentIndex += 1;
+        currentQuestionWrongTries = 0;
+        saveState();
+
+        setTimeout(() => {
+          renderQuestion();
+        }, 700);
+      } else {
+        totalWrongAnswers += 1;
+        currentQuestionWrongTries += 1;
+
+        feedbackEl.textContent = "❌ Пока неправильно. Посмотри подсказку и попробуй ещё раз.";
+        feedbackEl.classList.remove("ok");
+        feedbackEl.classList.add("bad");
+
+        btnEl.classList.add("wrong");
+        explanationText.textContent = q.explanation;
+        explanationBox.classList.remove("hidden");
+
+        if (window.Streak && typeof Streak.wrong === "function") {
+          Streak.wrong();
+        }
+
+        saveState();
+      }
+    }
+
+    function collectPayload() {
+      const name = document.getElementById("studentName").value.trim();
+      const group = document.getElementById("studentGroup").value.trim();
+
+      return {
+        name,
+        group,
+        payload: {
+          meta: {
+            trainer: "indefinite_pronouns_sequential",
+            timestamp: new Date().toISOString(),
+            totalQuestions: questions.length,
+            totalWrongAnswers: totalWrongAnswers,
+            correctOnFirstTry: correctOnFirstTry
+          },
+          student: {
+            name,
+            group
+          },
+          results
+        }
+      };
+    }
+
+    async function sendToGoogleForm() {
+      if (!finished) {
+        setStatus("status-error", "Сначала ответь правильно на все 30 вопросов. Потом отправляй результат.");
+        return;
+      }
+
+      if (resultsSent) {
+        setStatus("status-success", "Результат уже отправлен учителю.");
+        return;
+      }
+
+      const { name, group, payload } = collectPayload();
+
+      if (!name || !group) {
+        setStatus("status-error", "Пожалуйста, впиши своё имя и группу перед отправкой.");
+        return;
+      }
+
+      const nameGroup = `${name} ${group}`;
+      const jsonText = JSON.stringify(payload, null, 2);
+
+      const formData = new FormData();
+      formData.append(ENTRY_NAME_GROUP, nameGroup);
+      formData.append(ENTRY_JSON, jsonText);
+
+      try {
+        setStatus("status-sending", "Отправляю результат…");
+        submitBtn.disabled = true;
+
+        await fetch(GOOGLE_FORM_ACTION, {
+          method: "POST",
+          mode: "no-cors",
+          body: formData
+        });
+
+        resultsSent = true;
+        saveState();
+        setStatus("status-success", "Готово! Результат отправлен учителю.");
+      } catch (err) {
+        console.error("Error sending to Google Form:", err);
+        setStatus("status-error", "Ошибка при отправке. Попробуй ещё раз или сделай скриншот для учителя.");
+        submitBtn.disabled = false;
+      }
+    }
+
+    submitBtn.addEventListener("click", () => {
+      sendToGoogleForm();
+    });
+
+    // === INIT: load saved state if exists, then render ===
+    loadState();
+    renderQuestion();
+
+    if (finished) {
+      setStatus(
+        "status-success",
+        "Прогресс восстановлен: все 30 вопросов уже сделаны. Можно отправить результат или продолжить позже."
+      );
+    } else {
+      setStatus(
+        "status-idle",
+        "Отвечай на вопросы по очереди. После нажми кнопку отправить, когда все выполнишь."
+      );
+    }
+  </script>
+</body>
+</html>
+
