@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>English Exam Trainer</title>
+  <style>
+    :root{
+      --bg:#f7f1e7;
+      --card:#fffaf0;
+      --ink:#171310;
+      --muted:#655b52;
+      --line:#2b241f;
+      --accent:#ff9f1c;
+      --accent2:#ffd166;
+      --good:#18794e;
+      --bad:#b42318;
+      --soft:#fff3d6;
+      --shadow:0 10px 28px rgba(23,19,16,.12);
+      --radius:18px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      background: radial-gradient(circle at top left, #fff4d9 0, var(--bg) 42%, #f2e3ce 100%);
+      color:var(--ink);
+      min-height:100vh;
+    }
+    .app{max-width:1180px;margin:0 auto;padding:18px 14px 44px}
+    header{
+      display:grid;
+      grid-template-columns:1fr auto;
+      gap:16px;
+      align-items:center;
+      padding:16px 0 10px;
+    }
+    h1{font-size:clamp(28px,5vw,56px);line-height:.95;margin:0;letter-spacing:-.04em}
+    .subtitle{font-size:clamp(14px,2.1vw,18px);color:var(--muted);margin:10px 0 0;max-width:720px}
+    .scoreBox{
+      background:var(--card);border:2px solid var(--line);border-radius:var(--radius);padding:12px 14px;min-width:170px;box-shadow:var(--shadow)
+    }
+    .scoreBig{font-size:30px;font-weight:900;line-height:1}.scoreSmall{font-size:13px;color:var(--muted);margin-top:4px}
+    nav{position:sticky;top:0;z-index:5;background:rgba(247,241,231,.88);backdrop-filter: blur(10px);padding:10px 0 12px;border-bottom:1px solid rgba(43,36,31,.14)}
+    .tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+    button{font:inherit;color:inherit}
+    .tab,.smallBtn,.answerBtn,.ticketBtn{
+      border:2px solid var(--line);background:var(--card);border-radius:14px;padding:11px 12px;font-weight:800;cursor:pointer;box-shadow:0 3px 0 var(--line);transition:.12s transform,.12s box-shadow,.12s background
+    }
+    .tab:hover,.smallBtn:hover,.answerBtn:hover,.ticketBtn:hover{transform:translateY(-1px);box-shadow:0 4px 0 var(--line)}
+    .tab.active{background:var(--accent);}
+    .grid{display:grid;grid-template-columns:330px 1fr;gap:16px;margin-top:16px;align-items:start}
+    .panel{background:var(--card);border:2px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px}
+    .topicTitle{font-size:26px;line-height:1.05;margin:0 0 8px}.topicLead{color:var(--muted);margin:0 0 12px;line-height:1.45}
+    .formula{background:var(--soft);border:2px solid var(--line);border-radius:14px;padding:12px;margin:12px 0;font-weight:750}
+    .list{display:grid;gap:8px;margin-top:12px}.pill{border:1.5px solid var(--line);background:#fff;border-radius:12px;padding:9px 10px;line-height:1.3}.pill b{font-weight:900}.ru{color:var(--muted)}
+    .controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.smallBtn{font-size:14px;padding:9px 11px;background:#fff}.smallBtn.primary{background:var(--accent2)}
+    .taskTop{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:12px}.badge{font-size:13px;border:2px solid var(--line);border-radius:999px;padding:5px 9px;background:var(--accent2);font-weight:900;white-space:nowrap}.taskNum{font-size:14px;color:var(--muted);font-weight:800}
+    .prompt{font-size:clamp(22px,3.2vw,34px);line-height:1.15;font-weight:900;margin:8px 0 8px;letter-spacing:-.02em}.hint{font-size:15px;color:var(--muted);min-height:22px;margin:0 0 12px}.answers{display:grid;grid-template-columns:1fr 1fr;gap:10px}.answerBtn{text-align:left;background:#fff;min-height:58px;font-weight:850;line-height:1.2}.answerBtn.correct{background:#dff6ea;border-color:var(--good)}.answerBtn.wrong{background:#ffe0dc;border-color:var(--bad)}.answerBtn:disabled{cursor:default;transform:none;box-shadow:0 3px 0 var(--line);opacity:1}.feedback{margin-top:14px;border:2px solid var(--line);background:#fff;border-radius:14px;padding:12px;display:none;line-height:1.45}.feedback.good{display:block;border-color:var(--good)}.feedback.bad{display:block;border-color:var(--bad)}.feedback b{font-weight:950}.bottomNav{display:flex;justify-content:space-between;gap:10px;margin-top:14px}.bottomNav .smallBtn{flex:1}.progressTrack{height:12px;border:2px solid var(--line);border-radius:999px;overflow:hidden;background:#fff;margin-top:12px}.progressFill{height:100%;width:0;background:var(--accent);transition:.25s width}.miniStats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.stat{border:1.5px solid var(--line);border-radius:12px;background:#fff;padding:9px;text-align:center}.stat b{display:block;font-size:20px}.stat span{font-size:12px;color:var(--muted)}
+    .tickets{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.ticket{background:#fff;border:2px solid var(--line);border-radius:16px;padding:14px}.ticket h3{margin:0 0 9px;font-size:21px}.ticket ol{margin:0 0 12px 20px;padding:0;line-height:1.45}.sample{display:none;background:var(--soft);border:1.5px solid var(--line);border-radius:12px;padding:11px;line-height:1.45}.sample.open{display:block}.ticketBtn{background:var(--accent2);padding:8px 10px;font-size:14px;box-shadow:0 2px 0 var(--line)}
+    .wordTable{display:grid;gap:7px}.row{display:grid;grid-template-columns:110px 1fr;border:1.5px solid var(--line);background:#fff;border-radius:11px;overflow:hidden}.row div{padding:8px}.row div:first-child{font-weight:900;background:var(--soft);border-right:1.5px solid var(--line)}
+    .hidden{display:none!important}
+    @media (max-width:880px){header{grid-template-columns:1fr}.scoreBox{min-width:0}.grid{grid-template-columns:1fr}.tabs{grid-template-columns:1fr 1fr}.panel{padding:14px}.tickets{grid-template-columns:1fr}.wordTable .row{grid-template-columns:95px 1fr}}
+    @media (max-width:520px){.app{padding:12px 10px 34px}.tabs{gap:7px}.tab{padding:10px 8px;font-size:14px}.answers{grid-template-columns:1fr}.prompt{font-size:25px}.bottomNav{position:sticky;bottom:8px}.bottomNav .smallBtn{background:#fff}.topicTitle{font-size:24px}.panel{border-radius:16px}.scoreBig{font-size:26px}}
+    @media (prefers-reduced-motion: reduce){*{transition:none!important;scroll-behavior:auto!important}}
+  </style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div>
+      <h1>English Exam Trainer</h1>
+      <p class="subtitle">Question words · Modal verbs · Description of a person</p>
+    </div>
+    <div class="scoreBox" aria-live="polite">
+      <div class="scoreBig"><span id="totalScore">0</span>/<span id="totalDone">0</span></div>
+      <div class="scoreSmall">correct answers</div>
+    </div>
+  </header>
+  <nav>
+    <div class="tabs" role="tablist">
+      <button class="tab active" data-view="question_words">Question words</button>
+      <button class="tab" data-view="modal_verbs">Modal verbs</button>
+      <button class="tab" data-view="description_person">Description</button>
+      <button class="tab" data-view="exam_tickets">Exam tickets</button>
+    </div>
+  </nav>
+  <main id="main"></main>
+</div>
+<script>
+const QUESTIONS = [{"topic": "question_words", "type": "choose", "prompt": "___ is your English teacher?", "options": ["Who", "Where", "When", "How many"], "answer": "Who", "note": "Who спрашивает о человеке: кто?", "ruHint": "человек"}, {"topic": "question_words", "type": "choose", "prompt": "___ do you live?", "options": ["What", "Where", "Why", "Whose"], "answer": "Where", "note": "Where спрашивает о месте: где? куда?", "ruHint": "место"}, {"topic": "question_words", "type": "choose", "prompt": "___ is your birthday?", "options": ["When", "Who", "Which", "How much"], "answer": "When", "note": "When спрашивает о времени: когда?", "ruHint": "время"}, {"topic": "question_words", "type": "choose", "prompt": "___ are you late?", "options": ["Why", "Where", "Who", "How many"], "answer": "Why", "note": "Why спрашивает о причине: почему?", "ruHint": "причина"}, {"topic": "question_words", "type": "choose", "prompt": "___ are you today?", "options": ["How", "What", "Whose", "Which"], "answer": "How", "note": "How спрашивает о состоянии или способе: как?", "ruHint": "состояние"}, {"topic": "question_words", "type": "choose", "prompt": "___ books are in your bag?", "options": ["How many", "How much", "Who", "Whose"], "answer": "How many", "note": "How many используется с исчисляемыми существительными во множественном числе.", "ruHint": "books = можно посчитать"}, {"topic": "question_words", "type": "choose", "prompt": "___ water do you drink every day?", "options": ["How much", "How many", "Which", "Where"], "answer": "How much", "note": "How much используется с неисчисляемыми существительными.", "ruHint": "water = нельзя считать по штукам"}, {"topic": "question_words", "type": "choose", "prompt": "___ subject do you like: English or History?", "options": ["Which", "Why", "When", "Who"], "answer": "Which", "note": "Which выбирает из ограниченного списка: который? какой из?", "ruHint": "выбор"}, {"topic": "question_words", "type": "choose", "prompt": "___ phone is on the desk?", "options": ["Whose", "Who", "Where", "What"], "answer": "Whose", "note": "Whose спрашивает о принадлежности: чей?", "ruHint": "чей"}, {"topic": "question_words", "type": "choose", "prompt": "___ is your favourite film?", "options": ["What", "When", "Where", "How many"], "answer": "What", "note": "What спрашивает о предмете, факте или названии: что? какой?", "ruHint": "название"}, {"topic": "question_words", "type": "match", "prompt": "Answer: She is my sister. Choose the question word.", "options": ["Who", "Where", "When", "How"], "answer": "Who", "note": "Ответ говорит о человеке, значит нужен Who.", "ruHint": "человек"}, {"topic": "question_words", "type": "match", "prompt": "Answer: I go to school at eight o'clock. Choose the question word.", "options": ["When", "Why", "Whose", "What"], "answer": "When", "note": "Ответ говорит о времени, значит нужен When.", "ruHint": "время"}, {"topic": "question_words", "type": "match", "prompt": "Answer: Because I am tired. Choose the question word.", "options": ["Why", "Where", "Which", "How many"], "answer": "Why", "note": "Because часто отвечает на Why.", "ruHint": "because = причина"}, {"topic": "question_words", "type": "match", "prompt": "Answer: I have two brothers. Choose the question word.", "options": ["How many", "How much", "Whose", "Where"], "answer": "How many", "note": "Two brothers — количество предметов/людей, которые можно посчитать.", "ruHint": "two brothers"}, {"topic": "question_words", "type": "match", "prompt": "Answer: This is Anna's notebook. Choose the question word.", "options": ["Whose", "Who", "What", "When"], "answer": "Whose", "note": "Anna's показывает принадлежность, значит Whose.", "ruHint": "Anna's"}, {"topic": "question_words", "type": "sentence", "prompt": "Choose the correct question.", "options": ["Where do you live?", "Where you live?", "Where does you live?", "Where are live you?"], "answer": "Where do you live?", "note": "В Present Simple с you нужен do: Where do you live?", "ruHint": "do + you + verb"}, {"topic": "question_words", "type": "sentence", "prompt": "Choose the correct question.", "options": ["What does he like?", "What do he likes?", "What he does like?", "What does he likes?"], "answer": "What does he like?", "note": "С he/she/it используем does, а основной глагол без -s: like.", "ruHint": "does + he + verb"}, {"topic": "question_words", "type": "sentence", "prompt": "Choose the correct question.", "options": ["How often do you play football?", "How often you play football?", "How often does you play football?", "How do often you play football?"], "answer": "How often do you play football?", "note": "How often = как часто; порядок: question word + do + subject + verb.", "ruHint": "как часто"}, {"topic": "question_words", "type": "exam", "prompt": "Choose the best question for an exam dialogue.", "options": ["Why do you study English?", "Why you study English?", "Why does you study English?", "Why are study English?"], "answer": "Why do you study English?", "note": "Для you в Present Simple нужен do.", "ruHint": "экзамен"}, {"topic": "question_words", "type": "exam", "prompt": "Your answer is: I usually travel by bus. Choose the question.", "options": ["How do you usually travel?", "Where do you usually travel?", "When do you usually travel?", "Whose bus is it?"], "answer": "How do you usually travel?", "note": "By bus отвечает на вопрос How? — каким способом?", "ruHint": "by bus = способ"}, {"topic": "modal_verbs", "type": "choose", "prompt": "I ___ swim very well.", "options": ["can", "must", "should", "may"], "answer": "can", "note": "Can показывает умение: я умею плавать.", "ruHint": "ability"}, {"topic": "modal_verbs", "type": "choose", "prompt": "You ___ wear a seat belt in a car.", "options": ["must", "can", "might", "could"], "answer": "must", "note": "Must показывает строгое правило или обязанность.", "ruHint": "rule"}, {"topic": "modal_verbs", "type": "choose", "prompt": "You look tired. You ___ go to bed earlier.", "options": ["should", "can", "might", "mustn't"], "answer": "should", "note": "Should = совет: тебе следует.", "ruHint": "advice"}, {"topic": "modal_verbs", "type": "choose", "prompt": "Students ___ use phones during the exam.", "options": ["mustn't", "can", "should", "may"], "answer": "mustn't", "note": "Mustn't = нельзя, запрещено.", "ruHint": "prohibition"}, {"topic": "modal_verbs", "type": "choose", "prompt": "___ I open the window?", "options": ["May", "Must", "Should", "Have to"], "answer": "May", "note": "May I...? — вежливая просьба о разрешении.", "ruHint": "permission"}, {"topic": "modal_verbs", "type": "choose", "prompt": "It is cloudy. It ___ rain later.", "options": ["might", "must", "can", "have to"], "answer": "might", "note": "Might показывает возможность: возможно, пойдёт дождь.", "ruHint": "possibility"}, {"topic": "modal_verbs", "type": "choose", "prompt": "I ___ get up at 6 because school starts early.", "options": ["have to", "can", "might", "may"], "answer": "have to", "note": "Have to = вынужден/должен из-за обстоятельств.", "ruHint": "external rule"}, {"topic": "modal_verbs", "type": "choose", "prompt": "When I was five, I ___ read simple books.", "options": ["could", "can", "must", "should"], "answer": "could", "note": "Could — умение в прошлом.", "ruHint": "past ability"}, {"topic": "modal_verbs", "type": "error", "prompt": "Choose the correct sentence.", "options": ["She can speak English.", "She can speaks English.", "She can to speak English.", "She cans speak English."], "answer": "She can speak English.", "note": "После модального глагола основной глагол идёт без to и без -s.", "ruHint": "modal + verb"}, {"topic": "modal_verbs", "type": "error", "prompt": "Choose the correct sentence.", "options": ["He must do his homework.", "He must to do his homework.", "He must does his homework.", "He must doing his homework."], "answer": "He must do his homework.", "note": "Must + verb без to.", "ruHint": "must + verb"}, {"topic": "modal_verbs", "type": "meaning", "prompt": "Meaning: совет. Choose the modal verb.", "options": ["should", "must", "can", "might"], "answer": "should", "note": "Should чаще всего используется для советов.", "ruHint": "advice"}, {"topic": "modal_verbs", "type": "meaning", "prompt": "Meaning: умение. Choose the modal verb.", "options": ["can", "must", "should", "may"], "answer": "can", "note": "Can = могу/умею.", "ruHint": "ability"}, {"topic": "modal_verbs", "type": "meaning", "prompt": "Meaning: строгая обязанность. Choose the modal verb.", "options": ["must", "might", "could", "can"], "answer": "must", "note": "Must = должен, сильное правило.", "ruHint": "strong duty"}, {"topic": "modal_verbs", "type": "meaning", "prompt": "Meaning: возможность, но не уверенность. Choose the modal verb.", "options": ["might", "must", "have to", "can"], "answer": "might", "note": "Might = возможно, но нет уверенности.", "ruHint": "maybe"}, {"topic": "modal_verbs", "type": "context", "prompt": "Exam situation: Your friend is nervous. Choose the best advice.", "options": ["You should practise every day.", "You mustn't practise every day.", "You can to practise every day.", "You might practises every day."], "answer": "You should practise every day.", "note": "Для мягкого совета используем should.", "ruHint": "exam advice"}, {"topic": "modal_verbs", "type": "context", "prompt": "Library rule: Choose the best sentence.", "options": ["You must be quiet.", "You might be quiet.", "You could be quiet yesterday.", "You should to be quiet."], "answer": "You must be quiet.", "note": "Правило в библиотеке — must.", "ruHint": "rule"}, {"topic": "modal_verbs", "type": "context", "prompt": "Polite permission: Choose the best sentence.", "options": ["May I come in?", "Must I come in?", "Should I came in?", "Can I to come in?"], "answer": "May I come in?", "note": "May I...? звучит вежливо для разрешения.", "ruHint": "permission"}, {"topic": "modal_verbs", "type": "context", "prompt": "Past ability: Choose the best sentence.", "options": ["I could ride a bike when I was seven.", "I can ride a bike when I was seven.", "I must ride a bike when I was seven.", "I should rode a bike when I was seven."], "answer": "I could ride a bike when I was seven.", "note": "When I was seven — прошлое, значит could.", "ruHint": "past"}, {"topic": "modal_verbs", "type": "exam", "prompt": "Complete the exam answer: To pass exams, students ___ revise and sleep well.", "options": ["should", "mustn't", "might not", "couldn't"], "answer": "should", "note": "Это общий совет, поэтому should.", "ruHint": "exam answer"}, {"topic": "modal_verbs", "type": "exam", "prompt": "Complete the exam answer: In my school, we ___ wear a uniform.", "options": ["have to", "might", "could", "shouldn't"], "answer": "have to", "note": "Have to хорошо подходит для школьного правила, которое задано извне.", "ruHint": "school rule"}, {"topic": "description_person", "type": "appearance", "prompt": "Choose an appearance word.", "options": ["tall", "kind", "honest", "lazy"], "answer": "tall", "note": "Tall описывает внешность: высокий.", "ruHint": "appearance"}, {"topic": "description_person", "type": "appearance", "prompt": "Choose an appearance word.", "options": ["slim", "friendly", "clever", "polite"], "answer": "slim", "note": "Slim описывает фигуру: стройный.", "ruHint": "appearance"}, {"topic": "description_person", "type": "character", "prompt": "Choose a character word.", "options": ["kind", "short", "brown eyes", "dark hair"], "answer": "kind", "note": "Kind описывает характер: добрый.", "ruHint": "character"}, {"topic": "description_person", "type": "character", "prompt": "Choose a character word.", "options": ["hardworking", "tall", "blue eyes", "young"], "answer": "hardworking", "note": "Hardworking описывает характер/качество: трудолюбивый.", "ruHint": "character"}, {"topic": "description_person", "type": "category", "prompt": "Which word describes hair?", "options": ["fair", "honest", "helpful", "funny"], "answer": "fair", "note": "Fair hair = светлые волосы.", "ruHint": "hair"}, {"topic": "description_person", "type": "category", "prompt": "Which word describes eyes?", "options": ["blue", "responsible", "lazy", "strong character"], "answer": "blue", "note": "Blue eyes = голубые глаза.", "ruHint": "eyes"}, {"topic": "description_person", "type": "sentence", "prompt": "Choose the correct sentence.", "options": ["She has long dark hair.", "She is long dark hair.", "She have long dark hair.", "She has a long dark hair."], "answer": "She has long dark hair.", "note": "Для волос обычно: has + adjective + hair, без a.", "ruHint": "hair"}, {"topic": "description_person", "type": "sentence", "prompt": "Choose the correct sentence.", "options": ["He is friendly and polite.", "He has friendly and polite.", "He are friendly and polite.", "He is a friendly and polite."], "answer": "He is friendly and polite.", "note": "Характер: He is + adjective.", "ruHint": "character"}, {"topic": "description_person", "type": "sentence", "prompt": "Choose the correct sentence.", "options": ["She is fifteen years old.", "She has fifteen years old.", "She is fifteen years.", "She have fifteen years old."], "answer": "She is fifteen years old.", "note": "Возраст по-английски: be + years old.", "ruHint": "age"}, {"topic": "description_person", "type": "sentence", "prompt": "Choose the correct sentence.", "options": ["In his free time, he likes playing football.", "In his free time, he like playing football.", "In his free time, he likes play football.", "In his free time, he liking football."], "answer": "In his free time, he likes playing football.", "note": "После like часто используем -ing: likes playing.", "ruHint": "hobby"}, {"topic": "description_person", "type": "plan", "prompt": "What should usually come first in a person description?", "options": ["Name and age", "Why you like this person", "Hobbies", "Conclusion"], "answer": "Name and age", "note": "В экзамене удобно начать с имени и возраста.", "ruHint": "plan"}, {"topic": "description_person", "type": "plan", "prompt": "What should usually come after appearance?", "options": ["Character", "Random grammar rule", "Question words table", "Nothing"], "answer": "Character", "note": "Хорошая структура: name/age → appearance → character → hobbies → opinion.", "ruHint": "plan"}, {"topic": "description_person", "type": "vocab", "prompt": "Choose the best positive adjective for an exam answer.", "options": ["helpful", "boring", "rude", "lazy"], "answer": "helpful", "note": "Helpful — хорошее слово для описания хорошего человека.", "ruHint": "positive"}, {"topic": "description_person", "type": "vocab", "prompt": "Choose the word that is NOT positive.", "options": ["rude", "friendly", "honest", "clever"], "answer": "rude", "note": "Rude = грубый, это отрицательная черта.", "ruHint": "negative"}, {"topic": "description_person", "type": "context", "prompt": "Your friend always tells the truth. He is ___.", "options": ["honest", "tall", "dark-haired", "young"], "answer": "honest", "note": "Honest = честный.", "ruHint": "truth"}, {"topic": "description_person", "type": "context", "prompt": "Your classmate studies a lot and does homework carefully. She is ___.", "options": ["hardworking", "short", "fair-haired", "old"], "answer": "hardworking", "note": "Hardworking = трудолюбивая.", "ruHint": "studies a lot"}, {"topic": "description_person", "type": "exam", "prompt": "Choose the best opening for an exam answer.", "options": ["I want to describe my best friend, Anna.", "Anna brown eyes tall.", "This topic is person.", "I am question words."], "answer": "I want to describe my best friend, Anna.", "note": "Это естественное начало устного ответа.", "ruHint": "opening"}, {"topic": "description_person", "type": "exam", "prompt": "Choose the best ending for an exam answer.", "options": ["I like him because he is honest and helpful.", "He hair and hobby.", "It is all topic.", "Question is finished."], "answer": "I like him because he is honest and helpful.", "note": "Хорошее окончание даёт мнение и причину.", "ruHint": "ending"}, {"topic": "description_person", "type": "exam", "prompt": "Choose the best full mini-description.", "options": ["My sister is twelve. She has long fair hair. She is kind and funny.", "My sister twelve has kind. She fair funny hair.", "Sister is questions and must can.", "She has friendly and she is hair."], "answer": "My sister is twelve. She has long fair hair. She is kind and funny.", "note": "Мини-описание должно быть грамматически правильным и логичным.", "ruHint": "mini answer"}, {"topic": "description_person", "type": "exam", "prompt": "Which sentence is best for hobbies?", "options": ["He enjoys reading books and playing chess.", "He has reading books and playing chess.", "He is read books and play chess.", "He can hobby books chess."], "answer": "He enjoys reading books and playing chess.", "note": "Enjoys + -ing: enjoys reading, playing.", "ruHint": "hobbies"}];
+const TICKETS = [{"title": "Ticket 1", "tasks": ["Ask 5 questions about a new classmate using different question words.", "Say 4 sentences with modal verbs about school rules and advice.", "Describe your best friend using the plan."], "sample": "Who is your best friend? Where does he live? What does he like? Why do you like him? How often do you meet? At school, we must be polite. We have to do homework. Students mustn't be late. We should revise before tests. My best friend is Alex. He is sixteen. He is tall and slim. He has short dark hair. He is kind, honest and helpful. I like him because he always supports me."}, {"title": "Ticket 2", "tasks": ["Make questions for these answers: at school, because I like it, two brothers, by bus, Anna's book.", "Explain can, must, should with examples.", "Describe a family member."], "sample": "Where do you study? Why do you study English? How many brothers do you have? How do you go to school? Whose book is this? I can speak English a little. I must follow school rules. I should practise every day. I want to describe my mother. She is kind and hardworking. She has dark hair and brown eyes. She likes cooking and reading. I love her because she helps me and gives good advice."}, {"title": "Ticket 3", "tasks": ["Choose 6 question words and make one question with each.", "Talk about what students can, must and mustn't do in an exam.", "Describe a famous person or a teacher."], "sample": "What is your favourite subject? Who is your teacher? Where is your classroom? When do lessons start? Why do you study English? How do you prepare for exams? In an exam, students must be quiet. They mustn't use phones. They can ask the teacher for instructions before the exam. They should read the tasks carefully. I want to describe my English teacher. She is friendly and responsible. She explains grammar clearly. I respect her because she is patient and helpful."}, {"title": "Ticket 4", "tasks": ["Ask questions about hobbies, school and free time.", "Give advice to a nervous student using should / shouldn't.", "Describe a person you admire."], "sample": "What hobbies do you have? Where do you spend your free time? When do you do homework? Why do you like your hobby? How often do you meet friends? You should sleep well before the exam. You should revise important grammar. You shouldn't panic. You shouldn't study all night. I admire my grandfather. He is strong, clever and honest. He likes fixing things and helping our family. I admire him because he is responsible and kind."}, {"title": "Ticket 5", "tasks": ["Make a short dialogue with question words.", "Compare must and have to with examples.", "Describe your classmate."], "sample": "Where do you live? I live near school. How do you get to school? I go by bus. What subject do you like? I like English. Why do you like it? Because it is useful. Must is a strong rule from the speaker or situation: You must be quiet. Have to often means an outside rule: We have to wear a uniform. My classmate is Dima. He is tall and athletic. He has short hair. He is friendly, funny and helpful. In his free time, he plays football."}, {"title": "Ticket 6", "tasks": ["Ask questions to learn about a person's appearance and character.", "Use may and might in two sentences.", "Describe your ideal friend."], "sample": "What does he look like? How old is he? What is he like? Why do you like him? Which qualities are important for you? May I ask a question? It might rain tomorrow. My ideal friend is honest, kind and reliable. He or she should be helpful and polite. Appearance is not the most important thing, but a friendly smile is nice. I like people who listen and support others."}, {"title": "Ticket 7", "tasks": ["Correct bad questions: Where you live? What does he likes? Why are you study English?", "Use could for past ability.", "Describe a person from your family."], "sample": "Where do you live? What does he like? Why do you study English? When I was six, I could read simple stories. When I was seven, I could ride a bike. I want to describe my brother. He is younger than me. He has short brown hair and green eyes. He is funny, active and sometimes noisy. He likes computer games and football."}, {"title": "Ticket 8", "tasks": ["Ask 5 questions about school life.", "Say what people should do to be healthy.", "Describe yourself for an exam."], "sample": "When do lessons start? What subjects do you study? Who is your favourite teacher? How many lessons do you have today? Why is education important? People should eat healthy food. They should drink enough water. They shouldn't eat too much fast food. They should do sport. My name is Andy. I am a student. I have dark hair and brown eyes. I am friendly, curious and hardworking. In my free time, I like learning and using computers."}, {"title": "Ticket 9", "tasks": ["Ask questions with how much / how many / whose / which.", "Use mustn't in three rules.", "Describe a sportsperson or actor."], "sample": "How many students are there in your class? How much time do you need? Whose pen is this? Which subject is easier for you? You mustn't cheat in exams. You mustn't run in the corridor. You mustn't be rude to teachers. I want to describe a famous actor. He is talented and hardworking. He has a confident smile. He is successful because he practises a lot and works seriously."}, {"title": "Ticket 10", "tasks": ["Make questions for a travel dialogue.", "Use can, could, may, might in one mini-story.", "Describe your neighbour or friend."], "sample": "Where are you going? When will you travel? How will you get there? What will you take? Why do you want to visit this place? I can speak English, so I could help a tourist yesterday. May I show you the map? It might be useful. My neighbour is an old man. He is polite and friendly. He has grey hair. He likes gardening. I like him because he always says hello and smiles."}, {"title": "Ticket 11", "tasks": ["Ask questions for an interview.", "Give school advice using should and have to.", "Describe a person with appearance, character and hobbies."], "sample": "Who are you? What do you do? Where do you study? When do you practise English? Why is English useful for you? Students should revise regularly. They should ask questions when they do not understand. They have to prepare for tests and do homework. My friend Kate is fifteen. She has long fair hair and blue eyes. She is kind, clever and responsible. She enjoys drawing and listening to music."}, {"title": "Ticket 12", "tasks": ["Make 8 questions using 8 different question words.", "Explain the rule: modal verb + verb without to.", "Give a full exam answer about your best friend."], "sample": "Who is your friend? What is his hobby? Where does he live? When do you meet? Why do you like him? How does he help you? Which sport does he like? Whose idea was it? After modal verbs we use the main verb without to: can speak, must go, should learn. My best friend is Max. He is sixteen years old. He is tall and strong. He has short dark hair. He is honest, funny and helpful. He likes football and computer games. I like him because he is reliable and always supports me."}];
+const TOPICS = {
+  question_words: {
+    title: "Question words",
+    lead: "Question words нужны, чтобы задавать точные вопросы. На экзамене они помогают вести диалог и понимать, какой информации не хватает.",
+    rule: "Порядок вопроса: question word + do/does/is/are/can + subject + verb/answer part.",
+    stats: ["Who — кто", "What — что / какой", "Where — где / куда", "When — когда", "Why — почему", "How — как", "How many — сколько предметов", "How much — сколько вещества/денег", "Which — который из", "Whose — чей"],
+    examples: ["Where do you live?", "What does he like?", "Why are you late?", "How many lessons do you have?", "Whose notebook is this?"]
+  },
+  modal_verbs: {
+    title: "Modal verbs",
+    lead: "Modal verbs показывают умение, правило, совет, разрешение или возможность. Это очень полезно для устной части экзамена.",
+    rule: "После modal verb основной глагол идёт без to: can speak, must go, should learn.",
+    stats: ["can — могу / умею", "could — мог / умел в прошлом", "must — должен / строгое правило", "mustn't — нельзя", "have to — приходится / обязан", "should — следует / совет", "may — можно", "might — возможно"],
+    examples: ["I can speak English.", "You must be quiet.", "Students mustn't cheat.", "You should revise every day.", "It might rain later."]
+  },
+  description_person: {
+    title: "Description of a person",
+    lead: "Описание человека — сильная тема для экзамена: можно показать лексику, грамматику, структуру и личное мнение.",
+    rule: "План: name and age → appearance → character → hobbies → why you like this person.",
+    stats: ["Appearance: tall, short, slim, strong", "Hair: dark hair, fair hair, long hair, short hair", "Eyes: blue eyes, brown eyes, green eyes", "Character: kind, friendly, clever, honest", "More character: helpful, hardworking, polite, responsible"],
+    examples: ["He is tall and slim.", "She has long fair hair.", "He is friendly and helpful.", "In his free time, he likes football.", "I like her because she is honest and kind."]
+  }
+};
+
+const state = {
+  view: localStorage.getItem('examTrainerView') || 'question_words',
+  index: Number(localStorage.getItem('examTrainerIndex_' + (localStorage.getItem('examTrainerView') || 'question_words')) || 0),
+  results: JSON.parse(localStorage.getItem('examTrainerResults') || '{}'),
+  wrongOnly: false,
+  answered: false,
+  currentSet: []
+};
+
+function save(){
+  localStorage.setItem('examTrainerView', state.view);
+  localStorage.setItem('examTrainerIndex_' + state.view, String(state.index));
+  localStorage.setItem('examTrainerResults', JSON.stringify(state.results));
+}
+function topicQuestions(topic){
+  const all = QUESTIONS.filter(q => q.topic === topic);
+  if(!state.wrongOnly) return all;
+  const wrong = all.filter((q, i) => state.results[keyFor(topic, i)] && !state.results[keyFor(topic, i)].correct);
+  return wrong.length ? wrong : all;
+}
+function keyFor(topic, originalIndex){return topic + '_' + originalIndex}
+function originalIndexOf(q){return QUESTIONS.filter(x => x.topic === q.topic).indexOf(q)}
+function totalStats(){
+  const values = Object.values(state.results);
+  return {done: values.length, correct: values.filter(x => x.correct).length};
+}
+function updateScore(){
+  const s = totalStats();
+  document.getElementById('totalScore').textContent = s.correct;
+  document.getElementById('totalDone').textContent = s.done;
+}
+function setView(view){
+  state.view = view;
+  state.index = Number(localStorage.getItem('examTrainerIndex_' + view) || 0);
+  state.wrongOnly = false;
+  state.answered = false;
+  save();
+  render();
+}
+function renderTabs(){
+  document.querySelectorAll('.tab').forEach(btn => btn.classList.toggle('active', btn.dataset.view === state.view));
+}
+function render(){
+  renderTabs(); updateScore();
+  if(state.view === 'exam_tickets') return renderTickets();
+  const main = document.getElementById('main');
+  const topic = TOPICS[state.view];
+  state.currentSet = topicQuestions(state.view);
+  if(state.index >= state.currentSet.length) state.index = 0;
+  const q = state.currentSet[state.index];
+  const originalIndex = originalIndexOf(q);
+  const topicAll = QUESTIONS.filter(x => x.topic === state.view);
+  const topicDone = topicAll.filter((_, i) => state.results[keyFor(state.view, i)]).length;
+  const topicCorrect = topicAll.filter((_, i) => state.results[keyFor(state.view, i)]?.correct).length;
+  const progress = Math.round((topicDone / topicAll.length) * 100);
+  main.innerHTML = `
+    <section class="grid">
+      <aside class="panel">
+        <h2 class="topicTitle">${topic.title}</h2>
+        <p class="topicLead">${topic.lead}</p>
+        <div class="formula">${topic.rule}</div>
+        <div class="wordTable">${topic.stats.map(item => {
+          const parts = item.split('—');
+          return parts.length > 1 ? `<div class="row"><div>${parts[0].trim()}</div><div>${parts.slice(1).join('—').trim()}</div></div>` : `<div class="pill">${item}</div>`;
+        }).join('')}</div>
+        <div class="list"><b>Exam examples</b>${topic.examples.map(e => `<div class="pill">${e}</div>`).join('')}</div>
+        <div class="progressTrack"><div class="progressFill" style="width:${progress}%"></div></div>
+        <div class="miniStats">
+          <div class="stat"><b>${topicDone}/20</b><span>done</span></div>
+          <div class="stat"><b>${topicCorrect}</b><span>correct</span></div>
+        </div>
+        <div class="controls">
+          <button class="smallBtn primary" id="resetTopic">Reset topic</button>
+          <button class="smallBtn" id="wrongOnly">${state.wrongOnly ? 'All tasks' : 'Train mistakes'}</button>
+        </div>
+      </aside>
+      <section class="panel">
+        <div class="taskTop">
+          <div>
+            <div class="taskNum">Task ${state.index + 1} / ${state.currentSet.length}${state.wrongOnly ? ' · mistakes' : ''}</div>
+            <div class="prompt">${q.prompt}</div>
+            <p class="hint">${q.ruHint ? 'Focus: ' + q.ruHint : ''}</p>
+          </div>
+          <div class="badge">${labelFor(q.type)}</div>
+        </div>
+        <div class="answers" id="answers">
+          ${q.options.map(opt => `<button class="answerBtn" data-answer="${escapeHtml(opt)}">${opt}</button>`).join('')}
+        </div>
+        <div class="feedback" id="feedback"></div>
+        <div class="bottomNav">
+          <button class="smallBtn" id="prevBtn">Previous</button>
+          <button class="smallBtn primary" id="nextBtn">Next</button>
+        </div>
+      </section>
+    </section>`;
+  document.getElementById('resetTopic').onclick = resetTopic;
+  document.getElementById('wrongOnly').onclick = () => {state.wrongOnly = !state.wrongOnly; state.index = 0; state.answered = false; render();};
+  document.getElementById('prevBtn').onclick = () => move(-1);
+  document.getElementById('nextBtn').onclick = () => move(1);
+  document.querySelectorAll('.answerBtn').forEach(btn => btn.onclick = () => answer(btn, q, originalIndex));
+  const previous = state.results[keyFor(state.view, originalIndex)];
+  if(previous) showPrevious(q, previous);
+}
+function labelFor(type){
+  return ({choose:'choose', match:'answer → question', sentence:'sentence', exam:'exam', error:'fix', meaning:'meaning', context:'situation', appearance:'appearance', character:'character', category:'category', plan:'plan', vocab:'vocabulary'}[type] || type);
+}
+function answer(btn, q, originalIndex){
+  const chosen = btn.dataset.answer;
+  const correct = chosen === q.answer;
+  state.results[keyFor(state.view, originalIndex)] = {chosen, correct};
+  save(); updateScore();
+  showPrevious(q, {chosen, correct});
+}
+function showPrevious(q, result){
+  document.querySelectorAll('.answerBtn').forEach(b => {
+    b.disabled = true;
+    const val = b.dataset.answer;
+    if(val === q.answer) b.classList.add('correct');
+    if(val === result.chosen && val !== q.answer) b.classList.add('wrong');
+  });
+  const fb = document.getElementById('feedback');
+  fb.className = 'feedback ' + (result.correct ? 'good' : 'bad');
+  fb.innerHTML = result.correct ? `<b>Correct.</b> ${q.note}` : `<b>Correct answer: ${q.answer}</b><br>${q.note}`;
+}
+function move(delta){
+  state.index = (state.index + delta + state.currentSet.length) % state.currentSet.length;
+  state.answered = false; save(); render();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+function resetTopic(){
+  QUESTIONS.filter(q => q.topic === state.view).forEach((q, i) => delete state.results[keyFor(state.view, i)]);
+  state.index = 0; state.wrongOnly = false; save(); render();
+}
+function renderTickets(){
+  const main = document.getElementById('main');
+  main.innerHTML = `
+    <section class="panel" style="margin-top:16px">
+      <h2 class="topicTitle">Exam tickets</h2>
+      <p class="topicLead">Готовые карточки для устной практики. Каждая карточка объединяет все 3 темы: question words, modal verbs, description of a person.</p>
+      <div class="tickets">
+        ${TICKETS.map((t, i) => `<article class="ticket">
+          <h3>${t.title}</h3>
+          <ol>${t.tasks.map(x => `<li>${x}</li>`).join('')}</ol>
+          <button class="ticketBtn" data-ticket="${i}">Sample answer</button>
+          <div class="sample" id="sample_${i}">${t.sample}</div>
+        </article>`).join('')}
+      </div>
+    </section>`;
+  document.querySelectorAll('.ticketBtn').forEach(btn => btn.onclick = () => document.getElementById('sample_' + btn.dataset.ticket).classList.toggle('open'));
+}
+function escapeHtml(str){return String(str).replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));}
+document.querySelectorAll('.tab').forEach(btn => btn.onclick = () => setView(btn.dataset.view));
+render();
+</script>
+</body>
+</html>
