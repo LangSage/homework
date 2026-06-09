@@ -42,11 +42,12 @@
     }
     .scoreBig{font-size:30px;font-weight:900;line-height:1}.scoreSmall{font-size:13px;color:var(--muted);margin-top:4px}
     nav{position:sticky;top:0;z-index:5;background:rgba(247,241,231,.88);backdrop-filter: blur(10px);padding:10px 0 12px;border-bottom:1px solid rgba(43,36,31,.14)}
-    .tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+    .tabs{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
     button{font:inherit;color:inherit}
     .tab,.smallBtn,.answerBtn,.ticketBtn{
       border:2px solid var(--line);background:var(--card);border-radius:14px;padding:11px 12px;font-weight:800;cursor:pointer;box-shadow:0 3px 0 var(--line);transition:.12s transform,.12s box-shadow,.12s background
     }
+    a.tab{display:flex;align-items:center;justify-content:center;text-decoration:none;text-align:center}
     .tab:hover,.smallBtn:hover,.answerBtn:hover,.ticketBtn:hover{transform:translateY(-1px);box-shadow:0 4px 0 var(--line)}
     .tab.active{background:var(--accent);}
     .grid{display:grid;grid-template-columns:330px 1fr;gap:16px;margin-top:16px;align-items:start}
@@ -83,6 +84,7 @@
       <button class="tab" data-view="modal_verbs">Modal verbs</button>
       <button class="tab" data-view="description_person">Description</button>
       <button class="tab" data-view="exam_tickets">Exam tickets</button>
+      <a class="tab" href="dictionary.html">Dictionary</a>
     </div>
   </nav>
   <main id="main"></main>
