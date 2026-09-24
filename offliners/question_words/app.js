@@ -301,6 +301,7 @@
   ];
 
   const canvas = document.getElementById('lessonCanvas');
+  const canvasShell = document.getElementById('canvasShell');
   const textTrap = document.getElementById('textTrap');
   const responseForm = document.getElementById('responseForm');
   const formName = document.getElementById('formName');
@@ -409,18 +410,20 @@
   }
 
   function resizeCanvas() {
-    const rect = canvas.getBoundingClientRect();
-    const dpr = Math.max(1, window.devicePixelRatio || 1);
-    const width = Math.max(320, Math.round(rect.width));
-    const height = Math.max(520, Math.round(rect.height));
+    const rect = canvasShell.getBoundingClientRect();
+    const dpr = Math.max(1, Math.round((window.devicePixelRatio || 1) * 100) / 100);
+    const width = Math.max(320, Math.floor(rect.width));
+    const height = Math.max(520, Math.floor(rect.height));
+
+    if (!width || !height) return;
 
     if (canvasSize.w !== width || canvasSize.h !== height || canvasSize.dpr !== dpr) {
       canvas.width = Math.round(width * dpr);
       canvas.height = Math.round(height * dpr);
       canvasSize = { w: width, h: height, dpr };
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      requestRender();
     }
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    requestRender();
   }
 
   function clearInteractionMaps() {
@@ -1491,7 +1494,7 @@
 
   window.addEventListener('resize', resizeCanvas);
   if (window.ResizeObserver) {
-    new ResizeObserver(resizeCanvas).observe(canvas);
+    new ResizeObserver(resizeCanvas).observe(canvasShell);
   }
 
   window.setInterval(() => {
