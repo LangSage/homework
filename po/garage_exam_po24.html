@@ -1,0 +1,495 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>СТО: Экзамен на звание — ПО-24</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0f1117;
+    --card: #1a1e28;
+    --card2: #222736;
+    --line: #2e3547;
+    --text: #e8eaf0;
+    --muted: #8b93a7;
+    --orange: #f97316;
+    --orange2: #fb923c;
+    --green: #22c55e;
+    --red: #ef4444;
+    --gold: #fbbf24;
+  }
+  body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    background:
+      radial-gradient(1200px 400px at 50% -100px, rgba(249,115,22,.12), transparent),
+      var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+  .wrap { width: min(860px, calc(100% - 24px)); margin: 0 auto 80px; }
+
+  /* ===== стартовый экран ===== */
+  .intro {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    padding: 24px 0;
+  }
+  .logo { font-size: 64px; animation: bob 2.4s ease-in-out infinite; }
+  @keyframes bob { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-10px) } }
+  h1.title { font-size: clamp(28px, 6vw, 44px); letter-spacing: 1px; margin: 12px 0 6px; }
+  h1.title span { color: var(--orange); }
+  .tagline { color: var(--muted); font-size: 17px; margin-bottom: 26px; }
+  .features { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-bottom: 30px; }
+  .chip {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 8px 16px;
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .chip b { color: var(--text); }
+  .namebox { display: flex; gap: 10px; justify-content: center; margin-bottom: 14px; flex-wrap: wrap; }
+  input {
+    padding: 14px 16px;
+    border-radius: 12px;
+    border: 1px solid var(--line);
+    background: var(--card);
+    color: var(--text);
+    font-size: 16px;
+    min-width: 260px;
+    outline: none;
+    transition: border .2s;
+  }
+  input:focus { border-color: var(--orange); }
+  input[readonly] { background: var(--card2); color: var(--muted); min-width: 110px; text-align: center; }
+  .bigbtn {
+    background: linear-gradient(135deg, var(--orange), #ea580c);
+    border: 0;
+    color: #fff;
+    font-size: 19px;
+    font-weight: 800;
+    padding: 16px 44px;
+    border-radius: 14px;
+    cursor: pointer;
+    letter-spacing: .5px;
+    box-shadow: 0 8px 30px rgba(249,115,22,.35);
+    transition: transform .15s, box-shadow .15s;
+  }
+  .bigbtn:hover { transform: translateY(-2px); box-shadow: 0 12px 36px rgba(249,115,22,.5); }
+  .bigbtn:active { transform: translateY(0); }
+
+  /* ===== HUD ===== */
+  .hud {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(15,17,23,.92);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--line);
+    padding: 12px 0;
+    margin-bottom: 20px;
+  }
+  .hud-in { width: min(860px, calc(100% - 24px)); margin: 0 auto; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .hud-stat { font-weight: 700; font-size: 15px; white-space: nowrap; }
+  .hud-stat small { display: block; font-weight: 400; color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; }
+  .xp { color: var(--gold); } .streak { color: var(--orange2); }
+  .timer.low { color: var(--red); animation: pulse 1s infinite; }
+  @keyframes pulse { 50% { opacity: .5 } }
+  .pbar { flex: 1; min-width: 120px; height: 10px; background: var(--card2); border-radius: 99px; overflow: hidden; border: 1px solid var(--line); }
+  .pbar > div { height: 100%; width: 0%; background: linear-gradient(90deg, var(--orange), var(--gold)); transition: width .4s ease; border-radius: 99px; }
+
+  /* ===== вопросы ===== */
+  .qcard {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 22px;
+    margin-bottom: 16px;
+    transition: border .3s, opacity .4s;
+  }
+  .qcard.done { opacity: .55; }
+  .qcard.done.correct { border-color: rgba(34,197,94,.5); }
+  .qcard.done.wrong { border-color: rgba(239,68,68,.5); }
+  .qhead { display: flex; align-items: baseline; gap: 10px; margin-bottom: 6px; }
+  .qnum {
+    font-size: 13px; font-weight: 800; color: var(--orange);
+    background: rgba(249,115,22,.12);
+    border-radius: 8px; padding: 4px 10px; letter-spacing: 1px;
+  }
+  .qtopic { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; }
+  .qtext { font-size: 19px; font-weight: 700; line-height: 1.45; margin: 10px 0 16px; }
+  .opt {
+    display: flex; align-items: center; gap: 12px;
+    padding: 13px 15px;
+    margin: 8px 0;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    cursor: pointer;
+    background: var(--card2);
+    transition: transform .12s, border .15s, background .15s;
+    font-size: 16px;
+  }
+  .opt:hover { border-color: var(--orange); transform: translateX(4px); }
+  .qcard.done .opt { pointer-events: none; }
+  .qcard.done .opt:hover { transform: none; border-color: var(--line); }
+  .letter {
+    width: 30px; height: 30px; flex-shrink: 0;
+    display: grid; place-items: center;
+    border-radius: 8px;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    font-weight: 800; font-size: 14px; color: var(--muted);
+  }
+  .opt.good { border-color: var(--green); background: rgba(34,197,94,.12); }
+  .opt.good .letter { background: var(--green); color: #06270f; border-color: var(--green); }
+  .opt.bad  { border-color: var(--red);  background: rgba(239,68,68,.12); }
+  .opt.bad .letter { background: var(--red); color: #fff; border-color: var(--red); }
+  .qcard.shake { animation: shake .4s; }
+  @keyframes shake { 20%{transform:translateX(-8px)} 40%{transform:translateX(8px)} 60%{transform:translateX(-5px)} 80%{transform:translateX(5px)} }
+  .xpfloat {
+    position: fixed; z-index: 100; pointer-events: none;
+    font-weight: 900; font-size: 20px; color: var(--gold);
+    text-shadow: 0 2px 10px rgba(0,0,0,.6);
+    animation: rise 1.1s ease-out forwards;
+  }
+  @keyframes rise { from { opacity: 1; transform: translateY(0) } to { opacity: 0; transform: translateY(-60px) } }
+
+  /* ===== финиш / результат ===== */
+  .finish {
+    width: 100%;
+    padding: 17px;
+    border: 0;
+    border-radius: 14px;
+    font-size: 19px;
+    font-weight: 800;
+    cursor: pointer;
+    background: linear-gradient(135deg, var(--orange), #ea580c);
+    color: #fff;
+    margin: 10px 0 0;
+    letter-spacing: .5px;
+    box-shadow: 0 8px 30px rgba(249,115,22,.3);
+  }
+  .finish:disabled { background: var(--card2); color: var(--muted); box-shadow: none; cursor: not-allowed; }
+  .result { display: none; background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 30px 24px; text-align: center; }
+  .rank-emoji { font-size: 76px; animation: pop .6s cubic-bezier(.2,1.6,.4,1); }
+  @keyframes pop { from { transform: scale(0) } to { transform: scale(1) } }
+  .rank-title { font-size: 26px; font-weight: 900; margin: 10px 0 2px; }
+  .rank-sub { color: var(--muted); margin-bottom: 20px; }
+  .score-big { font-size: 54px; font-weight: 900; color: var(--orange); }
+  .stat-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin: 18px 0; }
+  .stat-box { background: var(--card2); border: 1px solid var(--line); border-radius: 14px; padding: 14px 22px; min-width: 120px; }
+  .stat-box .v { font-size: 24px; font-weight: 800; }
+  .stat-box .l { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+  .answers-title { margin: 26px 0 10px; text-align: left; }
+  .result-line { padding: 10px 0; border-top: 1px solid var(--line); line-height: 1.5; text-align: left; font-size: 15px; }
+  .ok { color: var(--green); font-weight: 700; }
+  .bad { color: var(--red); font-weight: 700; }
+  .again { margin-top: 20px; background: var(--card2); border: 1px solid var(--line); color: var(--text); padding: 13px 30px; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; }
+  .again:hover { border-color: var(--orange); }
+  canvas#confetti { position: fixed; inset: 0; pointer-events: none; z-index: 200; }
+  .hidden { display: none !important; }
+
+  @media (max-width: 560px) {
+    .qtext { font-size: 17px; }
+    .hud-stat small { display: none; }
+  }
+  @media print {
+    body { background: #fff; color: #000; }
+    .intro, .hud, .qcard, .finish, canvas { display: none !important; }
+    .result { display: block !important; border: 0; color: #000; }
+    .result .result-line, .answers-title { color: #000; }
+  }
+</style>
+</head>
+<body>
+<canvas id="confetti"></canvas>
+
+<div class="wrap">
+
+  <!-- СТАРТ -->
+  <section class="intro" id="intro">
+    <div class="logo">🔧</div>
+    <h1 class="title">СТО: <span>Экзамен на звание</span></h1>
+    <p class="tagline">English for Auto Mechanics · группа ПО-24 · 50 вопросов</p>
+    <div class="features">
+      <div class="chip">⚡ <b>+10 XP</b> за верный ответ</div>
+      <div class="chip">🔥 Серия ×2 за 3 подряд</div>
+      <div class="chip">⏱ Быстрее = больше очков</div>
+      <div class="chip">🏆 Звания от «Стажёр» до «Главный механик»</div>
+    </div>
+    <div class="namebox">
+      <input id="studentName" type="text" placeholder="Фамилия Имя" autocomplete="off">
+      <input value="ПО-24" readonly>
+    </div>
+    <button class="bigbtn" id="startBtn">Завести двигатель 🚀</button>
+  </section>
+
+  <!-- ИГРА -->
+  <section id="game" class="hidden">
+    <div class="hud">
+      <div class="hud-in">
+        <div class="hud-stat"><small>Вопрос</small><span id="hudQ">0/50</span></div>
+        <div class="pbar"><div id="pbarFill"></div></div>
+        <div class="hud-stat xp"><small>Опыт</small><span id="hudXP">0 XP</span></div>
+        <div class="hud-stat streak"><small>Серия</small><span id="hudStreak">🔥 0</span></div>
+        <div class="hud-stat"><small>Время</small><span class="timer" id="hudTime">10:00</span></div>
+      </div>
+    </div>
+    <form id="quiz"></form>
+    <button class="finish" id="finishBtn" disabled>Сдать работу в мастерскую 🏁</button>
+  </section>
+
+  <section class="result" id="result"></section>
+</div>
+
+<script>
+const questions = [
+  {q:"«The car has a new engine.» Что новое в машине?", a:["двигатель","дверь","окно","сиденье"], c:0, t:"Детали"},
+  {q:"«This wheel is flat.» Что спущено?", a:["колесо","фара","зеркало","капот"], c:0, t:"Детали"},
+  {q:"«Press the brake!» Что нужно нажать?", a:["тормоз","газ","клаксон","педаль сцепления"], c:0, t:"Детали"},
+  {q:"«The battery is dead.» Что разрядилось?", a:["аккумулятор","двигатель","радиатор","фара"], c:0, t:"Детали"},
+  {q:"«Buy two new tires.» Что нужно купить?", a:["два новых колеса","два новых стекла","два новых сиденья","два новых зеркала"], c:0, t:"Детали"},
+  {q:"«Turn the steering wheel left.» Куда повернуть?", a:["руль влево","ключ вправо","педаль вниз","рычаг вверх"], c:0, t:"Детали"},
+  {q:"«The headlight is broken.» Что сломано?", a:["фара","дверь","бампер","стекло"], c:0, t:"Детали"},
+  {q:"«Look in the mirror.» Куда смотреть?", a:["в зеркало","в окно","в багажник","в бак"], c:0, t:"Детали"},
+  {q:"«Open the hood, please.» Что открыть? (American English)", a:["капот","багажник","дверь","бак"], c:0, t:"Детали"},
+  {q:"«My bag is in the trunk.» Где сумка? (American English)", a:["в багажнике","под капотом","на сиденье","на крыше"], c:0, t:"Детали"},
+
+  {q:"Механик: «New spark plugs.» Что он поставит?", a:["новые свечи","новое масло","новую шину","новый аккумулятор"], c:0, t:"Механика"},
+  {q:"Механик: «New oil filter.» Что он поставит?", a:["новый масляный фильтр","новое колесо","новую фару","новый аккумулятор"], c:0, t:"Механика"},
+  {q:"«The air filter is dirty.» Что грязное?", a:["воздушный фильтр","масло","аккумулятор","стекло"], c:0, t:"Механика"},
+  {q:"«The fuel pump is broken.» Что сломано?", a:["топливный насос","водяной насос","дворник","замок"], c:0, t:"Механика"},
+  {q:"«The radiator is hot.» Что горячее?", a:["радиатор","сиденье","зеркало","дверь"], c:0, t:"Механика"},
+  {q:"«The exhaust pipe is rusty.» Что ржавое?", a:["выхлопная труба","тормозной диск","аккумулятор","фара"], c:0, t:"Механика"},
+  {q:"«The gearbox is OK now.» Что теперь в порядке?", a:["коробка передач","печка","магнитола","замок"], c:0, t:"Механика"},
+  {q:"«The clutch is broken.» Что сломано?", a:["сцепление","фара","дворник","багажник"], c:0, t:"Механика"},
+  {q:"«The suspension is old.» Что старое?", a:["подвеска","фара","зеркало","сиденье"], c:0, t:"Механика"},
+  {q:"«New shock absorbers.» Что новое?", a:["новые амортизаторы","новые фары","новые зеркала","новые сиденья"], c:0, t:"Механика"},
+
+  {q:"Механик: «Give me the wrench.» Что дать?", a:["гаечный ключ","молоток","отвёртку","домкрат"], c:0, t:"Инструменты"},
+  {q:"«Take the screwdriver.» Что взять?", a:["отвёртку","молоток","ключ","домкрат"], c:0, t:"Инструменты"},
+  {q:"«Take the jack and lift the car.» Что взять?", a:["домкрат","фонарь","молоток","щётку"], c:0, t:"Инструменты"},
+  {q:"«Take the hammer.» Что взять?", a:["молоток","ключ","помпу","ведро"], c:0, t:"Инструменты"},
+  {q:"Что такое «jack»?", a:["домкрат","зеркало","фильтр","педаль"], c:0, t:"Инструменты"},
+  {q:"Что такое «screwdriver»?", a:["отвёртка","молоток","домкрат","насос"], c:0, t:"Инструменты"},
+  {q:"Какая деталь останавливает машину?", a:["brake","mirror","seat","hood"], c:0, t:"Инструменты"},
+  {q:"Какая деталь заводит двигатель?", a:["starter","bumper","mirror","tire"], c:0, t:"Инструменты"},
+  {q:"Какая деталь даёт электричество, когда двигатель работает?", a:["alternator","seat belt","muffler","wheel"], c:0, t:"Инструменты"},
+  {q:"Какая деталь хранит электричество?", a:["battery","radiator","clutch","filter"], c:0, t:"Инструменты"},
+
+  {q:"«Check the oil.» Что это значит?", a:["Проверь масло.","Замени колесо.","Открой дверь.","Заведи машину."], c:0, t:"Перевод"},
+  {q:"«Open the hood.» Что это значит?", a:["Открой капот.","Открой багажник.","Закрой дверь.","Сними колесо."], c:0, t:"Перевод"},
+  {q:"«Change the tire.» Что это значит?", a:["Замени шину.","Проверь тормоза.","Долей масло.","Мой машину."], c:0, t:"Перевод"},
+  {q:"«Start the engine.» Что это значит?", a:["Запусти двигатель.","Заглуши двигатель.","Открой капот.","Слезь с машины."], c:0, t:"Перевод"},
+  {q:"«Turn off the engine.» Что это значит?", a:["Заглуши двигатель.","Запусти двигатель.","Открой окно.","Помой машину."], c:0, t:"Перевод"},
+  {q:"«The battery is dead.» Что это значит?", a:["Аккумулятор разряжен.","Шина спущена.","Фара новая.","Масло горячее."], c:0, t:"Перевод"},
+  {q:"«The tire is flat.» Что это значит?", a:["Шина спущена.","Шина новая.","Колесо чистое.","Фара яркая."], c:0, t:"Перевод"},
+  {q:"«The engine is hot.» Что это значит?", a:["Двигатель горячий.","Двигатель холодный.","Двигатель новый.","Двигатель чистый."], c:0, t:"Перевод"},
+  {q:"«Check the brakes.» Что это значит?", a:["Проверь тормоза.","Проверь свет.","Проверь двери.","Проверь радио."], c:0, t:"Перевод"},
+  {q:"«Replace the filter.» Что это значит?", a:["Замени фильтр.","Открой капот.","Помой колесо.","Заведи машину."], c:0, t:"Перевод"},
+
+  {q:"Машина не заводится. Что проверить первым?", a:["аккумулятор","сиденье","зеркало","радио"], c:0, t:"Практика"},
+  {q:"Двигатель очень горячий. Что с ним охлаждает?", a:["радиатор","сиденье","зеркало","бампер"], c:0, t:"Практика"},
+  {q:"В шине мало воздуха. Что нужно?", a:["воздух","масло","бензин","воду"], c:0, t:"Практика"},
+  {q:"Фары не горят. Что проверить?", a:["лампы","сиденья","шины","дворники"], c:0, t:"Практика"},
+  {q:"Хочу проверить масло в двигателе. Что мне нужно?", a:["щуп","зеркало","молоток","фонарь"], c:0, t:"Практика"},
+  {q:"Что охлаждает двигатель?", a:["жидкость (антифриз)","бензин","масло для салона","вода для мытья"], c:0, t:"Практика"},
+  {q:"Что в тормозах?", a:["тормозная жидкость","антифриз","масло","вода"], c:0, t:"Практика"},
+  {q:"Что моет лобовое стекло?", a:["дворник","глушитель","стартер","фара"], c:0, t:"Практика"},
+  {q:"Что делает выхлоп тише?", a:["глушитель","аккумулятор","радиатор","зеркало"], c:0, t:"Практика"},
+  {q:"Что скажет механик, когда машина готова?", a:["The car is ready.","The book is blue.","The cat is small.","The soup is hot."], c:0, t:"Практика"}
+];
+
+const TOTAL = questions.length;
+const TIME_LIMIT = 600; // 10 минут
+
+let state = null;
+
+const $ = id => document.getElementById(id);
+
+function startGame() {
+  state = {
+    name: $("studentName").value.trim() || "Без имени",
+    answers: new Array(TOTAL).fill(null),
+    score: 0, xp: 0, streak: 0, bestStreak: 0,
+    answered: 0, startTime: Date.now(), timeLeft: TIME_LIMIT, timerId: null
+  };
+  $("intro").classList.add("hidden");
+  $("result").style.display = "none";
+  $("game").classList.remove("hidden");
+  buildQuiz();
+  state.timerId = setInterval(tick, 1000);
+  updateHUD();
+  window.scrollTo({top: 0});
+}
+
+function tick() {
+  state.timeLeft--;
+  const m = Math.floor(Math.max(state.timeLeft,0) / 60), s = Math.max(state.timeLeft,0) % 60;
+  const el = $("hudTime");
+  el.textContent = `${m}:${String(s).padStart(2,"0")}`;
+  el.classList.toggle("low", state.timeLeft <= 60);
+  if (state.timeLeft <= 0) { clearInterval(state.timerId); finishGame(true); }
+}
+
+function buildQuiz() {
+  const quiz = $("quiz");
+  quiz.innerHTML = "";
+  const topicIcons = {"Детали":"🚗","Механика":"⚙️","Инструменты":"🛠️","Логика":"💡","Перевод":"🗣️","Практика":"🔩"};
+  questions.forEach((item, i) => {
+    const box = document.createElement("section");
+    box.className = "qcard";
+    box.id = "qcard" + i;
+    box.innerHTML = `
+      <div class="qhead">
+        <span class="qnum">ВОПРОС ${i+1}</span>
+        <span class="qtopic">${topicIcons[item.t]||""} ${item.t}</span>
+      </div>
+      <div class="qtext">${item.q}</div>
+      ${item.a.map((opt, j) => `
+        <div class="opt" data-q="${i}" data-j="${j}">
+          <span class="letter">${String.fromCharCode(65+j)}</span>
+          <span>${opt}</span>
+        </div>`).join("")}
+    `;
+    quiz.appendChild(box);
+  });
+  quiz.querySelectorAll(".opt").forEach(el =>
+    el.addEventListener("click", () => pick(el)));
+  $("finishBtn").disabled = false;
+}
+
+function pick(el) {
+  const i = +el.dataset.q, j = +el.dataset.j;
+  if (state.answers[i] !== null) return;
+
+  const card = $("qcard" + i);
+  const item = questions[i];
+  state.answers[i] = j;
+  state.answered++;
+  card.classList.add("done");
+
+  const opts = card.querySelectorAll(".opt");
+  opts[item.c].classList.add("good");
+
+  if (j === item.c) {
+    state.score++;
+    state.streak++;
+    state.bestStreak = Math.max(state.bestStreak, state.streak);
+    const bonus = state.streak >= 3 ? 2 : 1;
+    const gained = 10 * bonus;
+    state.xp += gained;
+    floatXP(el, "+" + gained + " XP" + (bonus > 1 ? " 🔥" : ""));
+  } else {
+    state.streak = 0;
+    el.classList.add("bad");
+    card.classList.add("wrong", "shake");
+  }
+  if (j === item.c) card.classList.add("correct");
+
+  updateHUD();
+  if (state.answered === TOTAL) {
+    setTimeout(() => finishGame(false), 700);
+  }
+}
+
+function floatXP(anchor, text) {
+  const r = anchor.getBoundingClientRect();
+  const el = document.createElement("div");
+  el.className = "xpfloat";
+  el.textContent = text;
+  el.style.left = (r.left + r.width / 2 - 30) + "px";
+  el.style.top = (r.top - 10) + "px";
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1100);
+}
+
+function updateHUD() {
+  $("hudQ").textContent = `${state.answered}/${TOTAL}`;
+  $("pbarFill").style.width = (state.answered / TOTAL * 100) + "%";
+  $("hudXP").textContent = state.xp + " XP";
+  $("hudStreak").textContent = "🔥 " + state.streak;
+}
+
+function rankFor(pct) {
+  if (pct >= 90) return {e:"🏆", t:"Главный механик", s:"Коллеги снимают шляпу. Двигатель знаний работает как часы!"};
+  if (pct >= 70) return {e:"🔧", t:"Мастер цеха", s:"Уверенная работа! Пара деталей — и будет идеально."};
+  if (pct >= 50) return {e:"🛠️", t:"Подмастерье", s:"База есть, но инструмент ещё нужно подтянуть."};
+  if (pct >= 30) return {e:"🔩", t:"Ученик", s:"Начало положено. Загляни в словарь — и вперёд!"};
+  return {e:"🪛", t:"Стажёр", s:"Не глуши мотор! Попробуй ещё раз — точно получится."};
+}
+
+function finishGame(timeUp) {
+  clearInterval(state.timerId);
+  const pct = Math.round(state.score / TOTAL * 100);
+  const rank = rankFor(pct);
+  const elapsed = Math.round((Date.now() - state.startTime) / 1000);
+  const mm = Math.floor(elapsed/60), ss = String(elapsed%60).padStart(2,"0");
+  const rows = questions.map((item, i) => {
+    const ua = state.answers[i];
+    return `<div class="result-line">
+      <strong>${i+1}.</strong>
+      ${ua === item.c
+        ? `<span class="ok">✓</span> ${item.a[item.c]}`
+        : `<span class="bad">✗</span> Ваш ответ: ${ua === null ? "нет ответа" : item.a[ua]}<br>Правильный ответ: <strong>${item.a[item.c]}</strong>`}
+    </div>`;
+  }).join("");
+
+  $("game").classList.add("hidden");
+  const res = $("result");
+  res.innerHTML = `
+    <div class="rank-emoji">${rank.e}</div>
+    <div class="rank-title">${rank.t}</div>
+    <div class="rank-sub">${rank.s}</div>
+    <p><strong>${state.name}</strong> · ПО-24 · ${new Date().toLocaleString("ru-RU")}</p>
+    ${timeUp ? `<p style="color:var(--red);font-weight:700;margin-top:6px">⏱ Время вышло!</p>` : ""}
+    <div class="score-big">${state.score} / ${TOTAL}</div>
+    <div class="stat-row">
+      <div class="stat-box"><div class="v" style="color:${pct>=70?'var(--green)':'var(--red)'}">${pct}%</div><div class="l">точность</div></div>
+      <div class="stat-box"><div class="v" style="color:var(--gold)">${state.xp}</div><div class="l">XP заработано</div></div>
+      <div class="stat-box"><div class="v" style="color:var(--orange2)">${state.bestStreak}</div><div class="l">лучшая серия 🔥</div></div>
+      <div class="stat-box"><div class="v">${mm}:${ss}</div><div class="l">время</div></div>
+    </div>
+    <h2 class="answers-title">Разбор ответов</h2>
+    ${rows}
+    <button class="again" onclick="location.reload()">🔁 Пройти ещё раз</button>
+  `;
+  res.style.display = "block";
+  res.scrollIntoView({behavior:"smooth"});
+  if (pct >= 70) confetti();
+}
+
+/* ===== конфетти ===== */
+function confetti() {
+  const cv = $("confetti"), ctx = cv.getContext("2d");
+  cv.width = innerWidth; cv.height = innerHeight;
+  const colors = ["#f97316","#fbbf24","#22c55e","#3b82f6","#ef4444","#e879f9"];
+  const parts = Array.from({length: 180}, () => ({
+    x: Math.random()*cv.width, y: -20 - Math.random()*cv.height*.5,
+    w: 6+Math.random()*8, h: 8+Math.random()*10,
+    vy: 2+Math.random()*3.5, vx: -1.5+Math.random()*3,
+    rot: Math.random()*Math.PI, vr: -.1+Math.random()*.2,
+    color: colors[Math.floor(Math.random()*colors.length)]
+  }));
+  let frames = 0;
+  (function anim() {
+    ctx.clearRect(0,0,cv.width,cv.height);
+    parts.forEach(p => {
+      p.y += p.vy; p.x += p.vx; p.rot += p.vr;
+      ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.rot);
+      ctx.fillStyle = p.color; ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);
+      ctx.restore();
+    });
+    if (++frames < 260) requestAnimationFrame(anim);
+    else ctx.clearRect(0,0,cv.width,cv.height);
+  })();
+}
+
+$("startBtn").addEventListener("click", startGame);
+$("finishBtn").addEventListener("click", () => finishGame(false));
+</script>
+</body>
+</html>
